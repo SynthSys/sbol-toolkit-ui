@@ -3,8 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package ed.biordm.sbol.fixer;
+package ed.biordm.sbol.toolkit.scrapbook;
 
+import ed.biordm.sbol.toolkit.scrapbook.MetaReader;
 import java.io.File;
 import java.net.URISyntaxException;
 import java.util.List;

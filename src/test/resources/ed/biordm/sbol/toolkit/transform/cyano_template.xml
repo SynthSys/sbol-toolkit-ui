@@ -1,0 +1,540 @@
+<?xml version="1.0" ?>
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:sbol="http://sbols.org/v2#" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:prov="http://www.w3.org/ns/prov#" xmlns:om="http://www.ontology-of-units-of-measure.org/resource/om-2/">
+  <sbol:ComponentDefinition rdf:about="http://bio.ed.ac.uk/a_mccormick/cyano_source/ampr_origin/1.0.0">
+    <sbol:persistentIdentity rdf:resource="http://bio.ed.ac.uk/a_mccormick/cyano_source/ampr_origin"/>
+    <sbol:displayId>ampr_origin</sbol:displayId>
+    <sbol:version>1.0.0</sbol:version>
+    <sbol:type rdf:resource="http://www.biopax.org/release/biopax-level3.owl#DnaRegion"/>
+    <sbol:role rdf:resource="http://identifiers.org/so/SO:0000804"/>
+    <sbol:component>
+      <sbol:Component rdf:about="http://bio.ed.ac.uk/a_mccormick/cyano_source/ampr_origin/ori_instance/1.0.0">
+        <sbol:persistentIdentity rdf:resource="http://bio.ed.ac.uk/a_mccormick/cyano_source/ampr_origin/ori_instance"/>
+        <sbol:displayId>ori_instance</sbol:displayId>
+        <sbol:version>1.0.0</sbol:version>
+        <sbol:access rdf:resource="http://sbols.org/v2#public"/>
+        <sbol:definition rdf:resource="http://bio.ed.ac.uk/a_mccormick/cyano_source/ori/1.0.0"/>
+      </sbol:Component>
+    </sbol:component>
+    <sbol:sequenceAnnotation>
+      <sbol:SequenceAnnotation rdf:about="http://bio.ed.ac.uk/a_mccormick/cyano_source/ampr_origin/ori/1.0.0">
+        <sbol:persistentIdentity rdf:resource="http://bio.ed.ac.uk/a_mccormick/cyano_source/ampr_origin/ori"/>
+        <sbol:displayId>ori</sbol:displayId>
+        <sbol:version>1.0.0</sbol:version>
+        <sbol:location>
+          <sbol:Range rdf:about="http://bio.ed.ac.uk/a_mccormick/cyano_source/ampr_origin/ori/ori/1.0.0">
+            <sbol:persistentIdentity rdf:resource="http://bio.ed.ac.uk/a_mccormick/cyano_source/ampr_origin/ori/ori"/>
+            <sbol:displayId>ori</sbol:displayId>
+            <sbol:version>1.0.0</sbol:version>
+            <sbol:start>1228</sbol:start>
+            <sbol:end>1816</sbol:end>
+          </sbol:Range>
+        </sbol:location>
+        <sbol:component rdf:resource="http://bio.ed.ac.uk/a_mccormick/cyano_source/ampr_origin/ori_instance/1.0.0"/>
+      </sbol:SequenceAnnotation>
+    </sbol:sequenceAnnotation>
+    <sbol:sequenceAnnotation>
+      <sbol:SequenceAnnotation rdf:about="http://bio.ed.ac.uk/a_mccormick/cyano_source/ampr_origin/AmpR_prom/1.0.0">
+        <sbol:persistentIdentity rdf:resource="http://bio.ed.ac.uk/a_mccormick/cyano_source/ampr_origin/AmpR_prom"/>
+        <sbol:displayId>AmpR_prom</sbol:displayId>
+        <sbol:version>1.0.0</sbol:version>
+        <sbol:role rdf:resource="http://identifiers.org/so/SO:0000167"/>
+        <sbol:location>
+          <sbol:Range rdf:about="http://bio.ed.ac.uk/a_mccormick/cyano_source/ampr_origin/AmpR_prom/AmpR_prom/1.0.0">
+            <sbol:persistentIdentity rdf:resource="http://bio.ed.ac.uk/a_mccormick/cyano_source/ampr_origin/AmpR_prom/AmpR_prom"/>
+            <sbol:displayId>AmpR_prom</sbol:displayId>
+            <sbol:version>1.0.0</sbol:version>
+            <sbol:start>92</sbol:start>
+            <sbol:end>196</sbol:end>
+          </sbol:Range>
+        </sbol:location>
+      </sbol:SequenceAnnotation>
+    </sbol:sequenceAnnotation>
+    <sbol:sequenceAnnotation>
+      <sbol:SequenceAnnotation rdf:about="http://bio.ed.ac.uk/a_mccormick/cyano_source/ampr_origin/AmpR/1.0.0">
+        <sbol:persistentIdentity rdf:resource="http://bio.ed.ac.uk/a_mccormick/cyano_source/ampr_origin/AmpR"/>
+        <sbol:displayId>AmpR</sbol:displayId>
+        <sbol:version>1.0.0</sbol:version>
+        <sbol:role rdf:resource="http://identifiers.org/so/SO:0000316"/>
+        <sbol:location>
+          <sbol:Range rdf:about="http://bio.ed.ac.uk/a_mccormick/cyano_source/ampr_origin/AmpR/AmpR/1.0.0">
+            <sbol:persistentIdentity rdf:resource="http://bio.ed.ac.uk/a_mccormick/cyano_source/ampr_origin/AmpR/AmpR"/>
+            <sbol:displayId>AmpR</sbol:displayId>
+            <sbol:version>1.0.0</sbol:version>
+            <sbol:start>197</sbol:start>
+            <sbol:end>1057</sbol:end>
+          </sbol:Range>
+        </sbol:location>
+      </sbol:SequenceAnnotation>
+    </sbol:sequenceAnnotation>
+    <sbol:sequence rdf:resource="http://bio.ed.ac.uk/a_mccormick/cyano_source/ampr_origin_seq/1.0.0"/>
+  </sbol:ComponentDefinition>
+  <sbol:ComponentDefinition rdf:about="http://bio.ed.ac.uk/a_mccormick/cyano_source/sll00199_codA_Km/1.0.0">
+    <sbol:persistentIdentity rdf:resource="http://bio.ed.ac.uk/a_mccormick/cyano_source/sll00199_codA_Km"/>
+    <sbol:displayId>sll00199_codA_Km</sbol:displayId>
+    <sbol:version>1.0.0</sbol:version>
+    <sbol:type rdf:resource="http://www.biopax.org/release/biopax-level3.owl#DnaRegion"/>
+    <sbol:type rdf:resource="http://identifiers.org/so/SO:0000988"/>
+    <sbol:role rdf:resource="http://identifiers.org/so/SO:0000637"/>
+    <sbol:component>
+      <sbol:Component rdf:about="http://bio.ed.ac.uk/a_mccormick/cyano_source/sll00199_codA_Km/left/1.0.0">
+        <sbol:persistentIdentity rdf:resource="http://bio.ed.ac.uk/a_mccormick/cyano_source/sll00199_codA_Km/left"/>
+        <sbol:displayId>left</sbol:displayId>
+        <sbol:version>1.0.0</sbol:version>
+        <sbol:access rdf:resource="http://sbols.org/v2#public"/>
+        <sbol:definition rdf:resource="http://bio.ed.ac.uk/a_mccormick/cyano_source/sll00199_left/1.0.0"/>
+      </sbol:Component>
+    </sbol:component>
+    <sbol:component>
+      <sbol:Component rdf:about="http://bio.ed.ac.uk/a_mccormick/cyano_source/sll00199_codA_Km/right/1.0.0">
+        <sbol:persistentIdentity rdf:resource="http://bio.ed.ac.uk/a_mccormick/cyano_source/sll00199_codA_Km/right"/>
+        <sbol:displayId>right</sbol:displayId>
+        <sbol:version>1.0.0</sbol:version>
+        <sbol:access rdf:resource="http://sbols.org/v2#public"/>
+        <sbol:definition rdf:resource="http://bio.ed.ac.uk/a_mccormick/cyano_source/sll00199_right/1.0.0"/>
+      </sbol:Component>
+    </sbol:component>
+    <sbol:component>
+      <sbol:Component rdf:about="http://bio.ed.ac.uk/a_mccormick/cyano_source/sll00199_codA_Km/insert/1.0.0">
+        <sbol:persistentIdentity rdf:resource="http://bio.ed.ac.uk/a_mccormick/cyano_source/sll00199_codA_Km/insert"/>
+        <sbol:displayId>insert</sbol:displayId>
+        <sbol:version>1.0.0</sbol:version>
+        <sbol:access rdf:resource="http://sbols.org/v2#public"/>
+        <sbol:definition rdf:resource="http://bio.ed.ac.uk/a_mccormick/cyano_source/codA_Km/1.0.0"/>
+      </sbol:Component>
+    </sbol:component>
+    <sbol:component>
+      <sbol:Component rdf:about="http://bio.ed.ac.uk/a_mccormick/cyano_source/sll00199_codA_Km/ampR/1.0.0">
+        <sbol:persistentIdentity rdf:resource="http://bio.ed.ac.uk/a_mccormick/cyano_source/sll00199_codA_Km/ampR"/>
+        <sbol:displayId>ampR</sbol:displayId>
+        <sbol:version>1.0.0</sbol:version>
+        <sbol:access rdf:resource="http://sbols.org/v2#public"/>
+        <sbol:definition rdf:resource="http://bio.ed.ac.uk/a_mccormick/cyano_source/ampr_origin/1.0.0"/>
+      </sbol:Component>
+    </sbol:component>
+    <sbol:component>
+      <sbol:Component rdf:about="http://bio.ed.ac.uk/a_mccormick/cyano_source/sll00199_codA_Km/gap/1.0.0">
+        <sbol:persistentIdentity rdf:resource="http://bio.ed.ac.uk/a_mccormick/cyano_source/sll00199_codA_Km/gap"/>
+        <sbol:displayId>gap</sbol:displayId>
+        <sbol:version>1.0.0</sbol:version>
+        <sbol:access rdf:resource="http://sbols.org/v2#public"/>
+        <sbol:definition rdf:resource="http://bio.ed.ac.uk/a_mccormick/cyano_source/gap/1.0.0"/>
+      </sbol:Component>
+    </sbol:component>
+    <sbol:sequenceConstraint>
+      <sbol:SequenceConstraint rdf:about="http://bio.ed.ac.uk/a_mccormick/cyano_source/sll00199_codA_Km/cs2/1.0.0">
+        <sbol:persistentIdentity rdf:resource="http://bio.ed.ac.uk/a_mccormick/cyano_source/sll00199_codA_Km/cs2"/>
+        <sbol:displayId>cs2</sbol:displayId>
+        <sbol:version>1.0.0</sbol:version>
+        <sbol:restriction rdf:resource="http://sbols.org/v2#precedes"/>
+        <sbol:subject rdf:resource="http://bio.ed.ac.uk/a_mccormick/cyano_source/sll00199_codA_Km/left/1.0.0"/>
+        <sbol:object rdf:resource="http://bio.ed.ac.uk/a_mccormick/cyano_source/sll00199_codA_Km/insert/1.0.0"/>
+      </sbol:SequenceConstraint>
+    </sbol:sequenceConstraint>
+    <sbol:sequenceConstraint>
+      <sbol:SequenceConstraint rdf:about="http://bio.ed.ac.uk/a_mccormick/cyano_source/sll00199_codA_Km/cs4/1.0.0">
+        <sbol:persistentIdentity rdf:resource="http://bio.ed.ac.uk/a_mccormick/cyano_source/sll00199_codA_Km/cs4"/>
+        <sbol:displayId>cs4</sbol:displayId>
+        <sbol:version>1.0.0</sbol:version>
+        <sbol:restriction rdf:resource="http://sbols.org/v2#precedes"/>
+        <sbol:subject rdf:resource="http://bio.ed.ac.uk/a_mccormick/cyano_source/sll00199_codA_Km/right/1.0.0"/>
+        <sbol:object rdf:resource="http://bio.ed.ac.uk/a_mccormick/cyano_source/sll00199_codA_Km/gap/1.0.0"/>
+      </sbol:SequenceConstraint>
+    </sbol:sequenceConstraint>
+    <sbol:sequenceConstraint>
+      <sbol:SequenceConstraint rdf:about="http://bio.ed.ac.uk/a_mccormick/cyano_source/sll00199_codA_Km/cs1/1.0.0">
+        <sbol:persistentIdentity rdf:resource="http://bio.ed.ac.uk/a_mccormick/cyano_source/sll00199_codA_Km/cs1"/>
+        <sbol:displayId>cs1</sbol:displayId>
+        <sbol:version>1.0.0</sbol:version>
+        <sbol:restriction rdf:resource="http://sbols.org/v2#precedes"/>
+        <sbol:subject rdf:resource="http://bio.ed.ac.uk/a_mccormick/cyano_source/sll00199_codA_Km/ampR/1.0.0"/>
+        <sbol:object rdf:resource="http://bio.ed.ac.uk/a_mccormick/cyano_source/sll00199_codA_Km/left/1.0.0"/>
+      </sbol:SequenceConstraint>
+    </sbol:sequenceConstraint>
+    <sbol:sequenceConstraint>
+      <sbol:SequenceConstraint rdf:about="http://bio.ed.ac.uk/a_mccormick/cyano_source/sll00199_codA_Km/cs3/1.0.0">
+        <sbol:persistentIdentity rdf:resource="http://bio.ed.ac.uk/a_mccormick/cyano_source/sll00199_codA_Km/cs3"/>
+        <sbol:displayId>cs3</sbol:displayId>
+        <sbol:version>1.0.0</sbol:version>
+        <sbol:restriction rdf:resource="http://sbols.org/v2#precedes"/>
+        <sbol:subject rdf:resource="http://bio.ed.ac.uk/a_mccormick/cyano_source/sll00199_codA_Km/insert/1.0.0"/>
+        <sbol:object rdf:resource="http://bio.ed.ac.uk/a_mccormick/cyano_source/sll00199_codA_Km/right/1.0.0"/>
+      </sbol:SequenceConstraint>
+    </sbol:sequenceConstraint>
+  </sbol:ComponentDefinition>
+  <sbol:ComponentDefinition rdf:about="http://bio.ed.ac.uk/a_mccormick/cyano_source/left_flank/1.0.0">
+    <sbol:persistentIdentity rdf:resource="http://bio.ed.ac.uk/a_mccormick/cyano_source/left_flank"/>
+    <sbol:displayId>left_flank</sbol:displayId>
+    <sbol:version>1.0.0</sbol:version>
+    <sbol:type rdf:resource="http://www.biopax.org/release/biopax-level3.owl#DnaRegion"/>
+    <sbol:role rdf:resource="http://identifiers.org/so/SO:0000298"/>
+  </sbol:ComponentDefinition>
+  <sbol:ComponentDefinition rdf:about="http://bio.ed.ac.uk/a_mccormick/cyano_source/gap/1.0.0">
+    <sbol:persistentIdentity rdf:resource="http://bio.ed.ac.uk/a_mccormick/cyano_source/gap"/>
+    <sbol:displayId>gap</sbol:displayId>
+    <sbol:version>1.0.0</sbol:version>
+    <sbol:type rdf:resource="http://www.biopax.org/release/biopax-level3.owl#DnaRegion"/>
+    <sbol:role rdf:resource="http://identifiers.org/so/SO:0000804"/>
+    <sbol:sequence rdf:resource="http://bio.ed.ac.uk/a_mccormick/cyano_source/gap_seq/1.0.0"/>
+  </sbol:ComponentDefinition>
+  <sbol:ComponentDefinition rdf:about="http://bio.ed.ac.uk/a_mccormick/cyano_source/cyano_codA_Km/1.0.0">
+    <sbol:persistentIdentity rdf:resource="http://bio.ed.ac.uk/a_mccormick/cyano_source/cyano_codA_Km"/>
+    <sbol:displayId>cyano_codA_Km</sbol:displayId>
+    <sbol:version>1.0.0</sbol:version>
+    <sbol:type rdf:resource="http://www.biopax.org/release/biopax-level3.owl#DnaRegion"/>
+    <sbol:type rdf:resource="http://identifiers.org/so/SO:0000988"/>
+    <sbol:role rdf:resource="http://identifiers.org/so/SO:0000637"/>
+    <sbol:component>
+      <sbol:Component rdf:about="http://bio.ed.ac.uk/a_mccormick/cyano_source/cyano_codA_Km/right/1.0.0">
+        <sbol:persistentIdentity rdf:resource="http://bio.ed.ac.uk/a_mccormick/cyano_source/cyano_codA_Km/right"/>
+        <sbol:displayId>right</sbol:displayId>
+        <sbol:version>1.0.0</sbol:version>
+        <sbol:access rdf:resource="http://sbols.org/v2#public"/>
+        <sbol:definition rdf:resource="http://bio.ed.ac.uk/a_mccormick/cyano_source/right_flank/1.0.0"/>
+      </sbol:Component>
+    </sbol:component>
+    <sbol:component>
+      <sbol:Component rdf:about="http://bio.ed.ac.uk/a_mccormick/cyano_source/cyano_codA_Km/insert/1.0.0">
+        <sbol:persistentIdentity rdf:resource="http://bio.ed.ac.uk/a_mccormick/cyano_source/cyano_codA_Km/insert"/>
+        <sbol:displayId>insert</sbol:displayId>
+        <sbol:version>1.0.0</sbol:version>
+        <sbol:access rdf:resource="http://sbols.org/v2#public"/>
+        <sbol:definition rdf:resource="http://bio.ed.ac.uk/a_mccormick/cyano_source/codA_Km/1.0.0"/>
+      </sbol:Component>
+    </sbol:component>
+    <sbol:component>
+      <sbol:Component rdf:about="http://bio.ed.ac.uk/a_mccormick/cyano_source/cyano_codA_Km/gap/1.0.0">
+        <sbol:persistentIdentity rdf:resource="http://bio.ed.ac.uk/a_mccormick/cyano_source/cyano_codA_Km/gap"/>
+        <sbol:displayId>gap</sbol:displayId>
+        <sbol:version>1.0.0</sbol:version>
+        <sbol:access rdf:resource="http://sbols.org/v2#public"/>
+        <sbol:definition rdf:resource="http://bio.ed.ac.uk/a_mccormick/cyano_source/gap/1.0.0"/>
+      </sbol:Component>
+    </sbol:component>
+    <sbol:component>
+      <sbol:Component rdf:about="http://bio.ed.ac.uk/a_mccormick/cyano_source/cyano_codA_Km/ampR/1.0.0">
+        <sbol:persistentIdentity rdf:resource="http://bio.ed.ac.uk/a_mccormick/cyano_source/cyano_codA_Km/ampR"/>
+        <sbol:displayId>ampR</sbol:displayId>
+        <sbol:version>1.0.0</sbol:version>
+        <sbol:access rdf:resource="http://sbols.org/v2#public"/>
+        <sbol:definition rdf:resource="http://bio.ed.ac.uk/a_mccormick/cyano_source/ampr_origin/1.0.0"/>
+      </sbol:Component>
+    </sbol:component>
+    <sbol:component>
+      <sbol:Component rdf:about="http://bio.ed.ac.uk/a_mccormick/cyano_source/cyano_codA_Km/left/1.0.0">
+        <sbol:persistentIdentity rdf:resource="http://bio.ed.ac.uk/a_mccormick/cyano_source/cyano_codA_Km/left"/>
+        <sbol:displayId>left</sbol:displayId>
+        <sbol:version>1.0.0</sbol:version>
+        <sbol:access rdf:resource="http://sbols.org/v2#public"/>
+        <sbol:definition rdf:resource="http://bio.ed.ac.uk/a_mccormick/cyano_source/left_flank/1.0.0"/>
+      </sbol:Component>
+    </sbol:component>
+    <sbol:sequenceConstraint>
+      <sbol:SequenceConstraint rdf:about="http://bio.ed.ac.uk/a_mccormick/cyano_source/cyano_codA_Km/cs3/1.0.0">
+        <sbol:persistentIdentity rdf:resource="http://bio.ed.ac.uk/a_mccormick/cyano_source/cyano_codA_Km/cs3"/>
+        <sbol:displayId>cs3</sbol:displayId>
+        <sbol:version>1.0.0</sbol:version>
+        <sbol:restriction rdf:resource="http://sbols.org/v2#precedes"/>
+        <sbol:subject rdf:resource="http://bio.ed.ac.uk/a_mccormick/cyano_source/cyano_codA_Km/insert/1.0.0"/>
+        <sbol:object rdf:resource="http://bio.ed.ac.uk/a_mccormick/cyano_source/cyano_codA_Km/right/1.0.0"/>
+      </sbol:SequenceConstraint>
+    </sbol:sequenceConstraint>
+    <sbol:sequenceConstraint>
+      <sbol:SequenceConstraint rdf:about="http://bio.ed.ac.uk/a_mccormick/cyano_source/cyano_codA_Km/cs1/1.0.0">
+        <sbol:persistentIdentity rdf:resource="http://bio.ed.ac.uk/a_mccormick/cyano_source/cyano_codA_Km/cs1"/>
+        <sbol:displayId>cs1</sbol:displayId>
+        <sbol:version>1.0.0</sbol:version>
+        <sbol:restriction rdf:resource="http://sbols.org/v2#precedes"/>
+        <sbol:subject rdf:resource="http://bio.ed.ac.uk/a_mccormick/cyano_source/cyano_codA_Km/ampR/1.0.0"/>
+        <sbol:object rdf:resource="http://bio.ed.ac.uk/a_mccormick/cyano_source/cyano_codA_Km/left/1.0.0"/>
+      </sbol:SequenceConstraint>
+    </sbol:sequenceConstraint>
+    <sbol:sequenceConstraint>
+      <sbol:SequenceConstraint rdf:about="http://bio.ed.ac.uk/a_mccormick/cyano_source/cyano_codA_Km/cs2/1.0.0">
+        <sbol:persistentIdentity rdf:resource="http://bio.ed.ac.uk/a_mccormick/cyano_source/cyano_codA_Km/cs2"/>
+        <sbol:displayId>cs2</sbol:displayId>
+        <sbol:version>1.0.0</sbol:version>
+        <sbol:restriction rdf:resource="http://sbols.org/v2#precedes"/>
+        <sbol:subject rdf:resource="http://bio.ed.ac.uk/a_mccormick/cyano_source/cyano_codA_Km/left/1.0.0"/>
+        <sbol:object rdf:resource="http://bio.ed.ac.uk/a_mccormick/cyano_source/cyano_codA_Km/insert/1.0.0"/>
+      </sbol:SequenceConstraint>
+    </sbol:sequenceConstraint>
+    <sbol:sequenceConstraint>
+      <sbol:SequenceConstraint rdf:about="http://bio.ed.ac.uk/a_mccormick/cyano_source/cyano_codA_Km/cs4/1.0.0">
+        <sbol:persistentIdentity rdf:resource="http://bio.ed.ac.uk/a_mccormick/cyano_source/cyano_codA_Km/cs4"/>
+        <sbol:displayId>cs4</sbol:displayId>
+        <sbol:version>1.0.0</sbol:version>
+        <sbol:restriction rdf:resource="http://sbols.org/v2#precedes"/>
+        <sbol:subject rdf:resource="http://bio.ed.ac.uk/a_mccormick/cyano_source/cyano_codA_Km/right/1.0.0"/>
+        <sbol:object rdf:resource="http://bio.ed.ac.uk/a_mccormick/cyano_source/cyano_codA_Km/gap/1.0.0"/>
+      </sbol:SequenceConstraint>
+    </sbol:sequenceConstraint>
+  </sbol:ComponentDefinition>
+  <sbol:ComponentDefinition rdf:about="http://bio.ed.ac.uk/a_mccormick/cyano_source/sll00199_right/1.0.0">
+    <sbol:persistentIdentity rdf:resource="http://bio.ed.ac.uk/a_mccormick/cyano_source/sll00199_right"/>
+    <sbol:displayId>sll00199_right</sbol:displayId>
+    <sbol:version>1.0.0</sbol:version>
+    <sbol:type rdf:resource="http://www.biopax.org/release/biopax-level3.owl#DnaRegion"/>
+    <sbol:role rdf:resource="http://identifiers.org/so/SO:0000298"/>
+    <sbol:sequence rdf:resource="http://bio.ed.ac.uk/a_mccormick/cyano_source/sll00199_right_seq/1.0.0"/>
+  </sbol:ComponentDefinition>
+  <sbol:ComponentDefinition rdf:about="http://bio.ed.ac.uk/a_mccormick/cyano_source/right_flank/1.0.0">
+    <sbol:persistentIdentity rdf:resource="http://bio.ed.ac.uk/a_mccormick/cyano_source/right_flank"/>
+    <sbol:displayId>right_flank</sbol:displayId>
+    <sbol:version>1.0.0</sbol:version>
+    <sbol:type rdf:resource="http://www.biopax.org/release/biopax-level3.owl#DnaRegion"/>
+    <sbol:role rdf:resource="http://identifiers.org/so/SO:0000298"/>
+  </sbol:ComponentDefinition>
+  <sbol:ComponentDefinition rdf:about="http://bio.ed.ac.uk/a_mccormick/cyano_source/sll00199_left/1.0.0">
+    <sbol:persistentIdentity rdf:resource="http://bio.ed.ac.uk/a_mccormick/cyano_source/sll00199_left"/>
+    <sbol:displayId>sll00199_left</sbol:displayId>
+    <sbol:version>1.0.0</sbol:version>
+    <sbol:type rdf:resource="http://www.biopax.org/release/biopax-level3.owl#DnaRegion"/>
+    <sbol:role rdf:resource="http://identifiers.org/so/SO:0000298"/>
+    <sbol:sequence rdf:resource="http://bio.ed.ac.uk/a_mccormick/cyano_source/sll00199_left_seq/1.0.0"/>
+  </sbol:ComponentDefinition>
+  <sbol:ComponentDefinition rdf:about="http://bio.ed.ac.uk/a_mccormick/cyano_source/sll00199_codA_Km_flat/1.0.0">
+    <sbol:persistentIdentity rdf:resource="http://bio.ed.ac.uk/a_mccormick/cyano_source/sll00199_codA_Km_flat"/>
+    <sbol:displayId>sll00199_codA_Km_flat</sbol:displayId>
+    <sbol:version>1.0.0</sbol:version>
+    <sbol:type rdf:resource="http://www.biopax.org/release/biopax-level3.owl#DnaRegion"/>
+    <sbol:type rdf:resource="http://identifiers.org/so/SO:0000988"/>
+    <sbol:role rdf:resource="http://identifiers.org/so/SO:0000637"/>
+    <sbol:component>
+      <sbol:Component rdf:about="http://bio.ed.ac.uk/a_mccormick/cyano_source/sll00199_codA_Km_flat/gap/1.0.0">
+        <sbol:persistentIdentity rdf:resource="http://bio.ed.ac.uk/a_mccormick/cyano_source/sll00199_codA_Km_flat/gap"/>
+        <sbol:displayId>gap</sbol:displayId>
+        <sbol:version>1.0.0</sbol:version>
+        <sbol:access rdf:resource="http://sbols.org/v2#public"/>
+        <sbol:definition rdf:resource="http://bio.ed.ac.uk/a_mccormick/cyano_source/gap/1.0.0"/>
+      </sbol:Component>
+    </sbol:component>
+    <sbol:component>
+      <sbol:Component rdf:about="http://bio.ed.ac.uk/a_mccormick/cyano_source/sll00199_codA_Km_flat/left/1.0.0">
+        <sbol:persistentIdentity rdf:resource="http://bio.ed.ac.uk/a_mccormick/cyano_source/sll00199_codA_Km_flat/left"/>
+        <sbol:displayId>left</sbol:displayId>
+        <sbol:version>1.0.0</sbol:version>
+        <sbol:access rdf:resource="http://sbols.org/v2#public"/>
+        <sbol:definition rdf:resource="http://bio.ed.ac.uk/a_mccormick/cyano_source/sll00199_left/1.0.0"/>
+      </sbol:Component>
+    </sbol:component>
+    <sbol:component>
+      <sbol:Component rdf:about="http://bio.ed.ac.uk/a_mccormick/cyano_source/sll00199_codA_Km_flat/insert/1.0.0">
+        <sbol:persistentIdentity rdf:resource="http://bio.ed.ac.uk/a_mccormick/cyano_source/sll00199_codA_Km_flat/insert"/>
+        <sbol:displayId>insert</sbol:displayId>
+        <sbol:version>1.0.0</sbol:version>
+        <sbol:access rdf:resource="http://sbols.org/v2#public"/>
+        <sbol:definition rdf:resource="http://bio.ed.ac.uk/a_mccormick/cyano_source/codA_Km/1.0.0"/>
+      </sbol:Component>
+    </sbol:component>
+    <sbol:component>
+      <sbol:Component rdf:about="http://bio.ed.ac.uk/a_mccormick/cyano_source/sll00199_codA_Km_flat/ampR/1.0.0">
+        <sbol:persistentIdentity rdf:resource="http://bio.ed.ac.uk/a_mccormick/cyano_source/sll00199_codA_Km_flat/ampR"/>
+        <sbol:displayId>ampR</sbol:displayId>
+        <sbol:version>1.0.0</sbol:version>
+        <sbol:access rdf:resource="http://sbols.org/v2#public"/>
+        <sbol:definition rdf:resource="http://bio.ed.ac.uk/a_mccormick/cyano_source/ampr_origin/1.0.0"/>
+      </sbol:Component>
+    </sbol:component>
+    <sbol:component>
+      <sbol:Component rdf:about="http://bio.ed.ac.uk/a_mccormick/cyano_source/sll00199_codA_Km_flat/ori_instance/1.0.0">
+        <sbol:persistentIdentity rdf:resource="http://bio.ed.ac.uk/a_mccormick/cyano_source/sll00199_codA_Km_flat/ori_instance"/>
+        <sbol:displayId>ori_instance</sbol:displayId>
+        <sbol:version>1.0.0</sbol:version>
+        <sbol:access rdf:resource="http://sbols.org/v2#public"/>
+        <sbol:definition rdf:resource="http://bio.ed.ac.uk/a_mccormick/cyano_source/ori/1.0.0"/>
+      </sbol:Component>
+    </sbol:component>
+    <sbol:component>
+      <sbol:Component rdf:about="http://bio.ed.ac.uk/a_mccormick/cyano_source/sll00199_codA_Km_flat/right/1.0.0">
+        <sbol:persistentIdentity rdf:resource="http://bio.ed.ac.uk/a_mccormick/cyano_source/sll00199_codA_Km_flat/right"/>
+        <sbol:displayId>right</sbol:displayId>
+        <sbol:version>1.0.0</sbol:version>
+        <sbol:access rdf:resource="http://sbols.org/v2#public"/>
+        <sbol:definition rdf:resource="http://bio.ed.ac.uk/a_mccormick/cyano_source/sll00199_right/1.0.0"/>
+      </sbol:Component>
+    </sbol:component>
+    <sbol:sequenceAnnotation>
+      <sbol:SequenceAnnotation rdf:about="http://bio.ed.ac.uk/a_mccormick/cyano_source/sll00199_codA_Km_flat/AmpR/1.0.0">
+        <sbol:persistentIdentity rdf:resource="http://bio.ed.ac.uk/a_mccormick/cyano_source/sll00199_codA_Km_flat/AmpR"/>
+        <sbol:displayId>AmpR</sbol:displayId>
+        <sbol:version>1.0.0</sbol:version>
+        <sbol:role rdf:resource="http://identifiers.org/so/SO:0000316"/>
+        <sbol:location>
+          <sbol:Range rdf:about="http://bio.ed.ac.uk/a_mccormick/cyano_source/sll00199_codA_Km_flat/AmpR/AmpR/1.0.0">
+            <sbol:persistentIdentity rdf:resource="http://bio.ed.ac.uk/a_mccormick/cyano_source/sll00199_codA_Km_flat/AmpR/AmpR"/>
+            <sbol:displayId>AmpR</sbol:displayId>
+            <sbol:version>1.0.0</sbol:version>
+            <sbol:start>197</sbol:start>
+            <sbol:end>1057</sbol:end>
+          </sbol:Range>
+        </sbol:location>
+      </sbol:SequenceAnnotation>
+    </sbol:sequenceAnnotation>
+    <sbol:sequenceAnnotation>
+      <sbol:SequenceAnnotation rdf:about="http://bio.ed.ac.uk/a_mccormick/cyano_source/sll00199_codA_Km_flat/ann1/1.0.0">
+        <sbol:persistentIdentity rdf:resource="http://bio.ed.ac.uk/a_mccormick/cyano_source/sll00199_codA_Km_flat/ann1"/>
+        <sbol:displayId>ann1</sbol:displayId>
+        <sbol:version>1.0.0</sbol:version>
+        <sbol:location>
+          <sbol:Range rdf:about="http://bio.ed.ac.uk/a_mccormick/cyano_source/sll00199_codA_Km_flat/ann1/ann1/1.0.0">
+            <sbol:persistentIdentity rdf:resource="http://bio.ed.ac.uk/a_mccormick/cyano_source/sll00199_codA_Km_flat/ann1/ann1"/>
+            <sbol:displayId>ann1</sbol:displayId>
+            <sbol:version>1.0.0</sbol:version>
+            <sbol:start>1</sbol:start>
+            <sbol:end>2073</sbol:end>
+          </sbol:Range>
+        </sbol:location>
+        <sbol:component rdf:resource="http://bio.ed.ac.uk/a_mccormick/cyano_source/sll00199_codA_Km_flat/ampR/1.0.0"/>
+      </sbol:SequenceAnnotation>
+    </sbol:sequenceAnnotation>
+    <sbol:sequenceAnnotation>
+      <sbol:SequenceAnnotation rdf:about="http://bio.ed.ac.uk/a_mccormick/cyano_source/sll00199_codA_Km_flat/ori/1.0.0">
+        <sbol:persistentIdentity rdf:resource="http://bio.ed.ac.uk/a_mccormick/cyano_source/sll00199_codA_Km_flat/ori"/>
+        <sbol:displayId>ori</sbol:displayId>
+        <sbol:version>1.0.0</sbol:version>
+        <sbol:location>
+          <sbol:Range rdf:about="http://bio.ed.ac.uk/a_mccormick/cyano_source/sll00199_codA_Km_flat/ori/ori/1.0.0">
+            <sbol:persistentIdentity rdf:resource="http://bio.ed.ac.uk/a_mccormick/cyano_source/sll00199_codA_Km_flat/ori/ori"/>
+            <sbol:displayId>ori</sbol:displayId>
+            <sbol:version>1.0.0</sbol:version>
+            <sbol:start>1228</sbol:start>
+            <sbol:end>1816</sbol:end>
+          </sbol:Range>
+        </sbol:location>
+        <sbol:component rdf:resource="http://bio.ed.ac.uk/a_mccormick/cyano_source/sll00199_codA_Km_flat/ori_instance/1.0.0"/>
+      </sbol:SequenceAnnotation>
+    </sbol:sequenceAnnotation>
+    <sbol:sequenceAnnotation>
+      <sbol:SequenceAnnotation rdf:about="http://bio.ed.ac.uk/a_mccormick/cyano_source/sll00199_codA_Km_flat/ann2/1.0.0">
+        <sbol:persistentIdentity rdf:resource="http://bio.ed.ac.uk/a_mccormick/cyano_source/sll00199_codA_Km_flat/ann2"/>
+        <sbol:displayId>ann2</sbol:displayId>
+        <sbol:version>1.0.0</sbol:version>
+        <sbol:location>
+          <sbol:Range rdf:about="http://bio.ed.ac.uk/a_mccormick/cyano_source/sll00199_codA_Km_flat/ann2/ann2/1.0.0">
+            <sbol:persistentIdentity rdf:resource="http://bio.ed.ac.uk/a_mccormick/cyano_source/sll00199_codA_Km_flat/ann2/ann2"/>
+            <sbol:displayId>ann2</sbol:displayId>
+            <sbol:version>1.0.0</sbol:version>
+            <sbol:start>2074</sbol:start>
+            <sbol:end>2573</sbol:end>
+          </sbol:Range>
+        </sbol:location>
+        <sbol:component rdf:resource="http://bio.ed.ac.uk/a_mccormick/cyano_source/sll00199_codA_Km_flat/left/1.0.0"/>
+      </sbol:SequenceAnnotation>
+    </sbol:sequenceAnnotation>
+    <sbol:sequenceAnnotation>
+      <sbol:SequenceAnnotation rdf:about="http://bio.ed.ac.uk/a_mccormick/cyano_source/sll00199_codA_Km_flat/AmpR_prom/1.0.0">
+        <sbol:persistentIdentity rdf:resource="http://bio.ed.ac.uk/a_mccormick/cyano_source/sll00199_codA_Km_flat/AmpR_prom"/>
+        <sbol:displayId>AmpR_prom</sbol:displayId>
+        <sbol:version>1.0.0</sbol:version>
+        <sbol:role rdf:resource="http://identifiers.org/so/SO:0000167"/>
+        <sbol:location>
+          <sbol:Range rdf:about="http://bio.ed.ac.uk/a_mccormick/cyano_source/sll00199_codA_Km_flat/AmpR_prom/AmpR_prom/1.0.0">
+            <sbol:persistentIdentity rdf:resource="http://bio.ed.ac.uk/a_mccormick/cyano_source/sll00199_codA_Km_flat/AmpR_prom/AmpR_prom"/>
+            <sbol:displayId>AmpR_prom</sbol:displayId>
+            <sbol:version>1.0.0</sbol:version>
+            <sbol:start>92</sbol:start>
+            <sbol:end>196</sbol:end>
+          </sbol:Range>
+        </sbol:location>
+      </sbol:SequenceAnnotation>
+    </sbol:sequenceAnnotation>
+    <sbol:sequenceConstraint>
+      <sbol:SequenceConstraint rdf:about="http://bio.ed.ac.uk/a_mccormick/cyano_source/sll00199_codA_Km_flat/cs4/1.0.0">
+        <sbol:persistentIdentity rdf:resource="http://bio.ed.ac.uk/a_mccormick/cyano_source/sll00199_codA_Km_flat/cs4"/>
+        <sbol:displayId>cs4</sbol:displayId>
+        <sbol:version>1.0.0</sbol:version>
+        <sbol:restriction rdf:resource="http://sbols.org/v2#precedes"/>
+        <sbol:subject rdf:resource="http://bio.ed.ac.uk/a_mccormick/cyano_source/sll00199_codA_Km_flat/right/1.0.0"/>
+        <sbol:object rdf:resource="http://bio.ed.ac.uk/a_mccormick/cyano_source/sll00199_codA_Km_flat/gap/1.0.0"/>
+      </sbol:SequenceConstraint>
+    </sbol:sequenceConstraint>
+    <sbol:sequenceConstraint>
+      <sbol:SequenceConstraint rdf:about="http://bio.ed.ac.uk/a_mccormick/cyano_source/sll00199_codA_Km_flat/cs1/1.0.0">
+        <sbol:persistentIdentity rdf:resource="http://bio.ed.ac.uk/a_mccormick/cyano_source/sll00199_codA_Km_flat/cs1"/>
+        <sbol:displayId>cs1</sbol:displayId>
+        <sbol:version>1.0.0</sbol:version>
+        <sbol:restriction rdf:resource="http://sbols.org/v2#precedes"/>
+        <sbol:subject rdf:resource="http://bio.ed.ac.uk/a_mccormick/cyano_source/sll00199_codA_Km_flat/ampR/1.0.0"/>
+        <sbol:object rdf:resource="http://bio.ed.ac.uk/a_mccormick/cyano_source/sll00199_codA_Km_flat/left/1.0.0"/>
+      </sbol:SequenceConstraint>
+    </sbol:sequenceConstraint>
+    <sbol:sequenceConstraint>
+      <sbol:SequenceConstraint rdf:about="http://bio.ed.ac.uk/a_mccormick/cyano_source/sll00199_codA_Km_flat/cs2/1.0.0">
+        <sbol:persistentIdentity rdf:resource="http://bio.ed.ac.uk/a_mccormick/cyano_source/sll00199_codA_Km_flat/cs2"/>
+        <sbol:displayId>cs2</sbol:displayId>
+        <sbol:version>1.0.0</sbol:version>
+        <sbol:restriction rdf:resource="http://sbols.org/v2#precedes"/>
+        <sbol:subject rdf:resource="http://bio.ed.ac.uk/a_mccormick/cyano_source/sll00199_codA_Km_flat/left/1.0.0"/>
+        <sbol:object rdf:resource="http://bio.ed.ac.uk/a_mccormick/cyano_source/sll00199_codA_Km_flat/insert/1.0.0"/>
+      </sbol:SequenceConstraint>
+    </sbol:sequenceConstraint>
+    <sbol:sequenceConstraint>
+      <sbol:SequenceConstraint rdf:about="http://bio.ed.ac.uk/a_mccormick/cyano_source/sll00199_codA_Km_flat/cs3/1.0.0">
+        <sbol:persistentIdentity rdf:resource="http://bio.ed.ac.uk/a_mccormick/cyano_source/sll00199_codA_Km_flat/cs3"/>
+        <sbol:displayId>cs3</sbol:displayId>
+        <sbol:version>1.0.0</sbol:version>
+        <sbol:restriction rdf:resource="http://sbols.org/v2#precedes"/>
+        <sbol:subject rdf:resource="http://bio.ed.ac.uk/a_mccormick/cyano_source/sll00199_codA_Km_flat/insert/1.0.0"/>
+        <sbol:object rdf:resource="http://bio.ed.ac.uk/a_mccormick/cyano_source/sll00199_codA_Km_flat/right/1.0.0"/>
+      </sbol:SequenceConstraint>
+    </sbol:sequenceConstraint>
+    <sbol:sequence rdf:resource="http://bio.ed.ac.uk/a_mccormick/cyano_source/sll00199_codA_Km_flat_seq/1.0.0"/>
+  </sbol:ComponentDefinition>
+  <sbol:ComponentDefinition rdf:about="http://bio.ed.ac.uk/a_mccormick/cyano_source/codA_Km/1.0.0">
+    <sbol:persistentIdentity rdf:resource="http://bio.ed.ac.uk/a_mccormick/cyano_source/codA_Km"/>
+    <sbol:displayId>codA_Km</sbol:displayId>
+    <sbol:version>1.0.0</sbol:version>
+    <sbol:type rdf:resource="http://www.biopax.org/release/biopax-level3.owl#DnaRegion"/>
+    <sbol:role rdf:resource="http://identifiers.org/so/SO:0000915"/>
+    <sbol:sequence rdf:resource="http://bio.ed.ac.uk/a_mccormick/cyano_source/codA_Km_seq/1.0.0"/>
+  </sbol:ComponentDefinition>
+  <sbol:ComponentDefinition rdf:about="http://bio.ed.ac.uk/a_mccormick/cyano_source/ori/1.0.0">
+    <sbol:persistentIdentity rdf:resource="http://bio.ed.ac.uk/a_mccormick/cyano_source/ori"/>
+    <sbol:displayId>ori</sbol:displayId>
+    <sbol:version>1.0.0</sbol:version>
+    <sbol:type rdf:resource="http://www.biopax.org/release/biopax-level3.owl#DnaRegion"/>
+    <sbol:role rdf:resource="http://identifiers.org/so/SO:0000296"/>
+  </sbol:ComponentDefinition>
+  <sbol:Sequence rdf:about="http://bio.ed.ac.uk/a_mccormick/cyano_source/sll00199_right_seq/1.0.0">
+    <sbol:persistentIdentity rdf:resource="http://bio.ed.ac.uk/a_mccormick/cyano_source/sll00199_right_seq"/>
+    <sbol:displayId>sll00199_right_seq</sbol:displayId>
+    <sbol:version>1.0.0</sbol:version>
+    <sbol:elements>tcagccagctcaatctgtgtgtcgttgatttaagcttaatgctacggggtctgtctccaactccctcagcttctcgcaatggcaaggcaaataatgtttctcttgctgagtagatgttcaggaggacggatcgaaagtctacaaaacagattcttgaccaagccatctacttagaaaaacttctgcgttttggcgatcgcatcttttaagcgagatgcgatttttttgtccattagtttgtattttaatactcttttgttgtttgatttcgtccaagcttttcttggtatgtgggatcttccgtgcccaaaattttatcccagaaagtgaaatatagtcatttcaattaacgatgagagaatttaatgtaaaattatggagtgtacaaaatgaacaggtttaaacaatggcttacagtttagatttaaggcaaagggtagtagcttatatagaagctggaggaaaaataactgaggcttccaagatatataaaataggaaaagcctcgatatacagatggttaaatagagtagatttaagcccaacaaaagtagagcgtcgccatagg</sbol:elements>
+    <sbol:encoding rdf:resource="http://www.chem.qmul.ac.uk/iubmb/misc/naseq.html"/>
+  </sbol:Sequence>
+  <sbol:Sequence rdf:about="http://bio.ed.ac.uk/a_mccormick/cyano_source/gap_seq/1.0.0">
+    <sbol:persistentIdentity rdf:resource="http://bio.ed.ac.uk/a_mccormick/cyano_source/gap_seq"/>
+    <sbol:displayId>gap_seq</sbol:displayId>
+    <sbol:version>1.0.0</sbol:version>
+    <sbol:elements>CGCTGCTTACAGACAAGCTGTGACCGTCTCCGGGAGCTGCATGTGTCAGAGGTTTTCACCGTCATCACCGAAACGCGCGAGACG</sbol:elements>
+    <sbol:encoding rdf:resource="http://www.chem.qmul.ac.uk/iubmb/misc/naseq.html"/>
+  </sbol:Sequence>
+  <sbol:Sequence rdf:about="http://bio.ed.ac.uk/a_mccormick/cyano_source/sll00199_left_seq/1.0.0">
+    <sbol:persistentIdentity rdf:resource="http://bio.ed.ac.uk/a_mccormick/cyano_source/sll00199_left_seq"/>
+    <sbol:displayId>sll00199_left_seq</sbol:displayId>
+    <sbol:version>1.0.0</sbol:version>
+    <sbol:elements>caaggcaaaaccaccgttatcagcagaacgacggcgggaaaaaatgattaaacgaaaaaatttgcaaggattcatagcggttgcccaatctaactcagggagcgacttcagcccacaaaaaacaccactgggcctactgggctattcccattatcatctacattgaagggatagcaagctaatttttatgacggcgatcgccaaaaacaaagaaaattcagcaattaccgtgggtagcaaaaaatccccatctaaagttcagtaaatatagctagaacaaccaagcattttcggcaaagtactattcagatagaacgagaaatgagcttgttctatccgcccggggctgaggctgtataatctacgacgggctgtcaaacattgtgataccatgggcagaagaaaggaaaaacgtccctgatcgcctttttgggcacggagtagggcgttaccccggcccgttcaaccacaagtccctatAGATACAATCGCCAAGAAGT</sbol:elements>
+    <sbol:encoding rdf:resource="http://www.chem.qmul.ac.uk/iubmb/misc/naseq.html"/>
+  </sbol:Sequence>
+  <sbol:Sequence rdf:about="http://bio.ed.ac.uk/a_mccormick/cyano_source/ampr_origin_seq/1.0.0">
+    <sbol:persistentIdentity rdf:resource="http://bio.ed.ac.uk/a_mccormick/cyano_source/ampr_origin_seq"/>
+    <sbol:displayId>ampr_origin_seq</sbol:displayId>
+    <sbol:version>1.0.0</sbol:version>
+    <sbol:elements>AAAGGGCCTCGTGATACGCCTATTTTTATAGGTTAATGTCATGATAATAATGGTTTCTTAGACGTCAGGTGGCACTTTTCGGGGAAATGTGCGCGGAACCCCTATTTGTTTATTTTTCTAAATACATTCAAATATGTATCCGCTCATGAGACAATAACCCTGATAAATGCTTCAATAATATTGAAAAAGGAAGAGTATGAGTATTCAACATTTCCGTGTCGCCCTTATTCCCTTTTTTGCGGCATTTTGCCTTCCTGTTTTTGCTCACCCAGAAACGCTGGTGAAAGTAAAAGATGCTGAAGATCAGTTGGGTGCACGAGTGGGTTACATCGAACTGGATCTCAACAGCGGTAAGATCCTTGAGAGTTTTCGCCCCGAAGAACGTTTTCCAATGATGAGCACTTTTAAAGTTCTGCTATGTGGCGCGGTATTATCCCGTATTGACGCCGGGCAAGAGCAACTCGGTCGCCGCATACACTATTCTCAGAATGACTTGGTTGAGTACTCACCAGTCACAGAAAAGCATCTTACGGATGGCATGACAGTAAGAGAATTATGCAGTGCTGCCATAACCATGAGTGATAACACTGCGGCCAACTTACTTCTGACAACGATCGGAGGACCGAAGGAGCTAACCGCTTTTTTGCACAACATGGGGGATCATGTAACTCGCCTTGATCGTTGGGAACCGGAGCTGAATGAAGCCATACCAAACGACGAGCGTGACACCACGATGCCTGTAGCAATGGCAACAACGTTGCGCAAACTATTAACTGGCGAACTACTTACTCTAGCTTCCCGGCAACAATTAATAGACTGGATGGAGGCGGATAAAGTTGCAGGACCACTTCTGCGCTCGGCCCTTCCGGCTGGCTGGTTTATTGCTGATAAATCTGGAGCCGGTGAGCGTGGTTCTCGCGGTATCATTGCAGCACTGGGGCCAGATGGTAAGCCCTCCCGTATCGTAGTTATCTACACGACGGGGAGTCAGGCAACTATGGATGAACGAAATAGACAGATCGCTGAGATAGGTGCCTCACTGATTAAGCATTGGTAACTGTCAGACCAAGTTTACTCATATATACTTTAGATTGATTTAAAACTTCATTTTTAATTTAAAAGGATCTAGGTGAAGATCCTTTTTGATAATCTCATGACCAAAATCCCTTAACGTGAGTTTTCGTTCCACTGAGCGTCAGACCCCGTAGAAAAGATCAAAGGATCTTCTTGAGATCCTTTTTTTCTGCGCGTAATCTGCTGCTTGCAAACAAAAAAACCACCGCTACCAGCGGTGGTTTGTTTGCCGGATCAAGAGCTACCAACTCTTTTTCCGAAGGTAACTGGCTTCAGCAGAGCGCAGATACCAAATACTGTTCTTCTAGTGTAGCCGTAGTTAGGCCACCACTTCAAGAACTCTGTAGCACCGCCTACATACCTCGCTCTGCTAATCCTGTTACCAGTGGCTGCTGCCAGTGGCGATAAGTCGTGTCTTACCGGGTTGGACTCAAGACGATAGTTACCGGATAAGGCGCAGCGGTCGGGCTGAACGGGGGGTTCGTGCACACAGCCCAGCTTGGAGCGAACGACCTACACCGAACTGAGATACCTACAGCGTGAGCTATGAGAAAGCGCCACGCTTCCCGAAGGGAGAAAGGCGGACAGGTATCCGGTAAGCGGCAGGGTCGGAACAGGAGAGCGCACGAGGGAGCTTCCAGGGGGAAACGCCTGGTATCTTTATAGTCCTGTCGGGTTTCGCCACCTCTGACTTGAGCGTCGATTTTTGTGATGCTCGTCAGGGGGGCGGAGCCTATGGAAAAACGCCAGCAACGCGGCCTTTTTACGGTTCCTGGCCTTTTGCTGGCCTTTTGCTCACATGTTCTTTCCTGCGTTATCCCCTGATTCTGTGGATAACCGTATTACCGCCTTTGAGTGAGCTGATACCGCTCGCCGCAGCCGAACGACCGAGCGCAGCGAGTCAGTGAGCGAGGAAGCGGATGAGCGCCCAATACGCAAACCGCCTCTCCCCGCGCGTTGGCCGATTCATTAATGCAGCTGGCACGACAGGTTTCggag</sbol:elements>
+    <sbol:encoding rdf:resource="http://www.chem.qmul.ac.uk/iubmb/misc/naseq.html"/>
+  </sbol:Sequence>
+  <sbol:Sequence rdf:about="http://bio.ed.ac.uk/a_mccormick/cyano_source/sll00199_codA_Km_flat_seq/1.0.0">
+    <sbol:persistentIdentity rdf:resource="http://bio.ed.ac.uk/a_mccormick/cyano_source/sll00199_codA_Km_flat_seq"/>
+    <sbol:displayId>sll00199_codA_Km_flat_seq</sbol:displayId>
+    <sbol:version>1.0.0</sbol:version>
+    <sbol:elements>AAAGGGCCTCGTGATACGCCTATTTTTATAGGTTAATGTCATGATAATAATGGTTTCTTAGACGTCAGGTGGCACTTTTCGGGGAAATGTGCGCGGAACCCCTATTTGTTTATTTTTCTAAATACATTCAAATATGTATCCGCTCATGAGACAATAACCCTGATAAATGCTTCAATAATATTGAAAAAGGAAGAGTATGAGTATTCAACATTTCCGTGTCGCCCTTATTCCCTTTTTTGCGGCATTTTGCCTTCCTGTTTTTGCTCACCCAGAAACGCTGGTGAAAGTAAAAGATGCTGAAGATCAGTTGGGTGCACGAGTGGGTTACATCGAACTGGATCTCAACAGCGGTAAGATCCTTGAGAGTTTTCGCCCCGAAGAACGTTTTCCAATGATGAGCACTTTTAAAGTTCTGCTATGTGGCGCGGTATTATCCCGTATTGACGCCGGGCAAGAGCAACTCGGTCGCCGCATACACTATTCTCAGAATGACTTGGTTGAGTACTCACCAGTCACAGAAAAGCATCTTACGGATGGCATGACAGTAAGAGAATTATGCAGTGCTGCCATAACCATGAGTGATAACACTGCGGCCAACTTACTTCTGACAACGATCGGAGGACCGAAGGAGCTAACCGCTTTTTTGCACAACATGGGGGATCATGTAACTCGCCTTGATCGTTGGGAACCGGAGCTGAATGAAGCCATACCAAACGACGAGCGTGACACCACGATGCCTGTAGCAATGGCAACAACGTTGCGCAAACTATTAACTGGCGAACTACTTACTCTAGCTTCCCGGCAACAATTAATAGACTGGATGGAGGCGGATAAAGTTGCAGGACCACTTCTGCGCTCGGCCCTTCCGGCTGGCTGGTTTATTGCTGATAAATCTGGAGCCGGTGAGCGTGGTTCTCGCGGTATCATTGCAGCACTGGGGCCAGATGGTAAGCCCTCCCGTATCGTAGTTATCTACACGACGGGGAGTCAGGCAACTATGGATGAACGAAATAGACAGATCGCTGAGATAGGTGCCTCACTGATTAAGCATTGGTAACTGTCAGACCAAGTTTACTCATATATACTTTAGATTGATTTAAAACTTCATTTTTAATTTAAAAGGATCTAGGTGAAGATCCTTTTTGATAATCTCATGACCAAAATCCCTTAACGTGAGTTTTCGTTCCACTGAGCGTCAGACCCCGTAGAAAAGATCAAAGGATCTTCTTGAGATCCTTTTTTTCTGCGCGTAATCTGCTGCTTGCAAACAAAAAAACCACCGCTACCAGCGGTGGTTTGTTTGCCGGATCAAGAGCTACCAACTCTTTTTCCGAAGGTAACTGGCTTCAGCAGAGCGCAGATACCAAATACTGTTCTTCTAGTGTAGCCGTAGTTAGGCCACCACTTCAAGAACTCTGTAGCACCGCCTACATACCTCGCTCTGCTAATCCTGTTACCAGTGGCTGCTGCCAGTGGCGATAAGTCGTGTCTTACCGGGTTGGACTCAAGACGATAGTTACCGGATAAGGCGCAGCGGTCGGGCTGAACGGGGGGTTCGTGCACACAGCCCAGCTTGGAGCGAACGACCTACACCGAACTGAGATACCTACAGCGTGAGCTATGAGAAAGCGCCACGCTTCCCGAAGGGAGAAAGGCGGACAGGTATCCGGTAAGCGGCAGGGTCGGAACAGGAGAGCGCACGAGGGAGCTTCCAGGGGGAAACGCCTGGTATCTTTATAGTCCTGTCGGGTTTCGCCACCTCTGACTTGAGCGTCGATTTTTGTGATGCTCGTCAGGGGGGCGGAGCCTATGGAAAAACGCCAGCAACGCGGCCTTTTTACGGTTCCTGGCCTTTTGCTGGCCTTTTGCTCACATGTTCTTTCCTGCGTTATCCCCTGATTCTGTGGATAACCGTATTACCGCCTTTGAGTGAGCTGATACCGCTCGCCGCAGCCGAACGACCGAGCGCAGCGAGTCAGTGAGCGAGGAAGCGGATGAGCGCCCAATACGCAAACCGCCTCTCCCCGCGCGTTGGCCGATTCATTAATGCAGCTGGCACGACAGGTTTCggagcaaggcaaaaccaccgttatcagcagaacgacggcgggaaaaaatgattaaacgaaaaaatttgcaaggattcatagcggttgcccaatctaactcagggagcgacttcagcccacaaaaaacaccactgggcctactgggctattcccattatcatctacattgaagggatagcaagctaatttttatgacggcgatcgccaaaaacaaagaaaattcagcaattaccgtgggtagcaaaaaatccccatctaaagttcagtaaatatagctagaacaaccaagcattttcggcaaagtactattcagatagaacgagaaatgagcttgttctatccgcccggggctgaggctgtataatctacgacgggctgtcaaacattgtgataccatgggcagaagaaaggaaaaacgtccctgatcgcctttttgggcacggagtagggcgttaccccggcccgttcaaccacaagtccctatAGATACAATCGCCAAGAAGTATGaGAAGAGCACGGTAGCCTTNNNNNNNNNNNNNNNNNNTGCCCAGTCTTCTGCCTAAGGCAGGTGCCGCGGTGCGGGTGCCAGGGCGTGCCCCCGGGCTCCCCGGGCGCGTACTCCACtttacagctagctcagtcctaggtattatgctagctattgtgagcggataacaatttcacacatactagagaaagaggagaaatactaaATGTCTAACAACGCGCTGCAAACCATCATCAATGCACGCCTGCCTGGAGAGGAAGGGTTGTGGCAGATTCACTTACAGGACGGCAAAATCTCCGCGATCGACGCACAATCTGGGGTTATGCCGATCACCGAAAACTCTTTGGATGCCGAACAAGGGTTAGTCATTCCCCCATTCGTTGAACCACATATTCACCTGGATACTACTCAGACAGCCGGTCAGCCCAATTGGAACCAGTCCGGTACGCTGTTCGAAGGTATCGAACGATGGGCGGAGCGAAAAGCTCTACTCACGCATGACGATGTCAAGCAACGGGCCTGGCAGACCCTGAAGTGGCAGATCGCCAACGGAATACAGCACGTACGCACTCACGTGGATGTTTCCGATGCCACTTTGACGGCATTGAAGGCAATGCTCGAAGTTAAGCAGGAAGTAGCCCCGTGGATTGACTTGCAAATCGCTGCCTTCCCTCAGGAAGGCATCCTAAGTTATCCGAATGGAGAAGCGCTCCTGGAGGAGGCATTGCGGTTAGGAGCAGACGTGGTGGGAGCGATTCCCCATTTCGAGTTTACCCGCGAGTACGGTGTTGAATCTCTGCATAAAACATTTGCTTTAGCTCAGAAGTATGACCGTCTGATCGACGTACACTGCGACGAGATCGATGACGAACAGAGTCGCTTCGTGGAGACGGTGGCTGCGCTGGCGCATCACGAAGGCATGGGTGCACGTGTAACTGCAAGCCATACGACGGCTATGCACAGCTATAATGGGGCATATACATCTCGTTTGTTCCGATTACTAAAAATGAGCGGAATCAACTTTGTTGCCAATCCATTGGTCAACATTCATCTACAAGGACGCTTCGACACCTACCCGAAACGGCGAGGAATCACACGAGTTAAGGAAATGCTAGAGTCTGGTATCAATGTGTGTTTCGGGCATGATGACGTGTGTGGTCCCTGGTACCCTCTAGGAACAGCCAACATGCTGCAAGTTCTCCACATGGGTCTACACGTGTGTCAACTCATGGGGTATGGACAAATTAACGATGGACTCAATCTAATTACACACCATTCCGCCCGAACACTGAACCTCCAGGATTACGGGATCGCGGCGGGAAATTCTGCCAACCTCATCATTCTGCCCGCGGAAAACGGGTTCGACGCTCTACGCCGTCAAGTGCCAGTTCGGTATTCTGTTCGTGGGGGTAAGGTAATTGCAAGTACCCAACCGGCTCAGACCACGGTCTATTTAGAGCAACCGGAAGCTATCGACTACAAACGATGAgcttcaaataaaacgaaaggctcagtcgaaagactgggcctttcgttttatctgttgtttgtcggtgaacgctctctactagagtcacactggctcaccttcgggtgggcctttctgcgcgctCTGAGGTCTGCCTCGTGAAGAAGGTGTTGCTGACTCATACCAGGCCTGAATCGCCCCATCATCCAGCCAGAAAGTGAGGGAGCCACGGTTGATGAGAGCTTTGTTGTAGGTGGACCAGTTGGTGATTTTGAACTTTTGCTTTGCCACGGAACGGTCTGCGTTGTCGGGAAGATGCGTGATCTGATCCTTCAACTCAGCAAAAGTTCGATTTATTCAACAAAGCCGCCGTCCCGTCAAGTCAGCGTAATGCTCTGCCAGTGTTACAACCAATTAACCAATTCTGATTAGAAAAACTCATCGAGCATCAAATGAAACTGCAATTTATTCATATCAGGATTATCAATACCATATTTTTGAAAAAGCCGTTTCTGTAATGAAGGAGAAAACTCACCGAGGCAGTTCCATAGGATGGCAAGATCCTGGTATCGGTCTGCGATTCCGACTCGTCCAACATCAATACAACCTATTAATTTCCCCTCGTCAAAAATAAGGTTATCAAGTGAGAAATCACCATGAGTGACGACTGAATCCGGTGAGAATGGCAAAAGCTTATGCATTTCTTTCCAGACTTGTTCAACAGGCCAGCCATTACGCTCGTCATCAAAATCACTCGCATCAACCAAACCGTTATTCATTCGTGATTGCGCCTGAGCGAGACGAAATACGCGATCGCTGTTAAAAGGACAATTACAAACAGGAATCGAATGCAACCGGCGCAGGAACACTGCCAGCGCATCAACAATATTTTCACCTGAATCAGGATATTCTTCTAATACCTGGAATGCTGTTTTCCCGGGGATCGCAGTGGTGAGTAACCATGCATCATCAGGAGTACGGATAAAATGCTTGATGGTCGGAAGAGGCATAAATTCCGTCAGCCAGTTTAGTCTGACCATCTCATCTGTAACATCATTGGCAACGCTACCTTTGCCATGTTTCAGAAACAACTCTGGCGCATCGGGCTTCCCATACAATCGATAGATTGTCGCACCTGATTGCCCGACATTATCGCGAGCCCATTTATACCCATATAAATCAGCATCCATGTTGGAATTTAATCGCGGCCTCGAGCAAGACGTTTCCCGTTGAATATGGCTCATAACACCCCTTGTATTACTGTTTATGTAAGCAGACAGTTTTATTGTTCATGATGATATATTTTTATCTTGTGCAATGTAACATCAGAGATTTTGAGACACAACGTGGCTTTCCGCGGTGCGGGTGCCAGGGCGTGCCCTTGGGCTCCCCGGGCGCGTACTCCACCACCTGCCATTGGGAGAAGACTTGGGAGCTCTTCataatcagccagctcaatctgtgtgtcgttgatttaagcttaatgctacggggtctgtctccaactccctcagcttctcgcaatggcaaggcaaataatgtttctcttgctgagtagatgttcaggaggacggatcgaaagtctacaaaacagattcttgaccaagccatctacttagaaaaacttctgcgttttggcgatcgcatcttttaagcgagatgcgatttttttgtccattagtttgtattttaatactcttttgttgtttgatttcgtccaagcttttcttggtatgtgggatcttccgtgcccaaaattttatcccagaaagtgaaatatagtcatttcaattaacgatgagagaatttaatgtaaaattatggagtgtacaaaatgaacaggtttaaacaatggcttacagtttagatttaaggcaaagggtagtagcttatatagaagctggaggaaaaataactgaggcttccaagatatataaaataggaaaagcctcgatatacagatggttaaatagagtagatttaagcccaacaaaagtagagcgtcgccataggCGCTGCTTACAGACAAGCTGTGACCGTCTCCGGGAGCTGCATGTGTCAGAGGTTTTCACCGTCATCACCGAAACGCGCGAGACG</sbol:elements>
+    <sbol:encoding rdf:resource="http://www.chem.qmul.ac.uk/iubmb/misc/naseq.html"/>
+  </sbol:Sequence>
+  <sbol:Sequence rdf:about="http://bio.ed.ac.uk/a_mccormick/cyano_source/codA_Km_seq/1.0.0">
+    <sbol:persistentIdentity rdf:resource="http://bio.ed.ac.uk/a_mccormick/cyano_source/codA_Km_seq"/>
+    <sbol:displayId>codA_Km_seq</sbol:displayId>
+    <sbol:version>1.0.0</sbol:version>
+    <sbol:elements>ATGaGAAGAGCACGGTAGCCTTNNNNNNNNNNNNNNNNNNTGCCCAGTCTTCTGCCTAAGGCAGGTGCCGCGGTGCGGGTGCCAGGGCGTGCCCCCGGGCTCCCCGGGCGCGTACTCCACtttacagctagctcagtcctaggtattatgctagctattgtgagcggataacaatttcacacatactagagaaagaggagaaatactaaATGTCTAACAACGCGCTGCAAACCATCATCAATGCACGCCTGCCTGGAGAGGAAGGGTTGTGGCAGATTCACTTACAGGACGGCAAAATCTCCGCGATCGACGCACAATCTGGGGTTATGCCGATCACCGAAAACTCTTTGGATGCCGAACAAGGGTTAGTCATTCCCCCATTCGTTGAACCACATATTCACCTGGATACTACTCAGACAGCCGGTCAGCCCAATTGGAACCAGTCCGGTACGCTGTTCGAAGGTATCGAACGATGGGCGGAGCGAAAAGCTCTACTCACGCATGACGATGTCAAGCAACGGGCCTGGCAGACCCTGAAGTGGCAGATCGCCAACGGAATACAGCACGTACGCACTCACGTGGATGTTTCCGATGCCACTTTGACGGCATTGAAGGCAATGCTCGAAGTTAAGCAGGAAGTAGCCCCGTGGATTGACTTGCAAATCGCTGCCTTCCCTCAGGAAGGCATCCTAAGTTATCCGAATGGAGAAGCGCTCCTGGAGGAGGCATTGCGGTTAGGAGCAGACGTGGTGGGAGCGATTCCCCATTTCGAGTTTACCCGCGAGTACGGTGTTGAATCTCTGCATAAAACATTTGCTTTAGCTCAGAAGTATGACCGTCTGATCGACGTACACTGCGACGAGATCGATGACGAACAGAGTCGCTTCGTGGAGACGGTGGCTGCGCTGGCGCATCACGAAGGCATGGGTGCACGTGTAACTGCAAGCCATACGACGGCTATGCACAGCTATAATGGGGCATATACATCTCGTTTGTTCCGATTACTAAAAATGAGCGGAATCAACTTTGTTGCCAATCCATTGGTCAACATTCATCTACAAGGACGCTTCGACACCTACCCGAAACGGCGAGGAATCACACGAGTTAAGGAAATGCTAGAGTCTGGTATCAATGTGTGTTTCGGGCATGATGACGTGTGTGGTCCCTGGTACCCTCTAGGAACAGCCAACATGCTGCAAGTTCTCCACATGGGTCTACACGTGTGTCAACTCATGGGGTATGGACAAATTAACGATGGACTCAATCTAATTACACACCATTCCGCCCGAACACTGAACCTCCAGGATTACGGGATCGCGGCGGGAAATTCTGCCAACCTCATCATTCTGCCCGCGGAAAACGGGTTCGACGCTCTACGCCGTCAAGTGCCAGTTCGGTATTCTGTTCGTGGGGGTAAGGTAATTGCAAGTACCCAACCGGCTCAGACCACGGTCTATTTAGAGCAACCGGAAGCTATCGACTACAAACGATGAgcttcaaataaaacgaaaggctcagtcgaaagactgggcctttcgttttatctgttgtttgtcggtgaacgctctctactagagtcacactggctcaccttcgggtgggcctttctgcgcgctCTGAGGTCTGCCTCGTGAAGAAGGTGTTGCTGACTCATACCAGGCCTGAATCGCCCCATCATCCAGCCAGAAAGTGAGGGAGCCACGGTTGATGAGAGCTTTGTTGTAGGTGGACCAGTTGGTGATTTTGAACTTTTGCTTTGCCACGGAACGGTCTGCGTTGTCGGGAAGATGCGTGATCTGATCCTTCAACTCAGCAAAAGTTCGATTTATTCAACAAAGCCGCCGTCCCGTCAAGTCAGCGTAATGCTCTGCCAGTGTTACAACCAATTAACCAATTCTGATTAGAAAAACTCATCGAGCATCAAATGAAACTGCAATTTATTCATATCAGGATTATCAATACCATATTTTTGAAAAAGCCGTTTCTGTAATGAAGGAGAAAACTCACCGAGGCAGTTCCATAGGATGGCAAGATCCTGGTATCGGTCTGCGATTCCGACTCGTCCAACATCAATACAACCTATTAATTTCCCCTCGTCAAAAATAAGGTTATCAAGTGAGAAATCACCATGAGTGACGACTGAATCCGGTGAGAATGGCAAAAGCTTATGCATTTCTTTCCAGACTTGTTCAACAGGCCAGCCATTACGCTCGTCATCAAAATCACTCGCATCAACCAAACCGTTATTCATTCGTGATTGCGCCTGAGCGAGACGAAATACGCGATCGCTGTTAAAAGGACAATTACAAACAGGAATCGAATGCAACCGGCGCAGGAACACTGCCAGCGCATCAACAATATTTTCACCTGAATCAGGATATTCTTCTAATACCTGGAATGCTGTTTTCCCGGGGATCGCAGTGGTGAGTAACCATGCATCATCAGGAGTACGGATAAAATGCTTGATGGTCGGAAGAGGCATAAATTCCGTCAGCCAGTTTAGTCTGACCATCTCATCTGTAACATCATTGGCAACGCTACCTTTGCCATGTTTCAGAAACAACTCTGGCGCATCGGGCTTCCCATACAATCGATAGATTGTCGCACCTGATTGCCCGACATTATCGCGAGCCCATTTATACCCATATAAATCAGCATCCATGTTGGAATTTAATCGCGGCCTCGAGCAAGACGTTTCCCGTTGAATATGGCTCATAACACCCCTTGTATTACTGTTTATGTAAGCAGACAGTTTTATTGTTCATGATGATATATTTTTATCTTGTGCAATGTAACATCAGAGATTTTGAGACACAACGTGGCTTTCCGCGGTGCGGGTGCCAGGGCGTGCCCTTGGGCTCCCCGGGCGCGTACTCCACCACCTGCCATTGGGAGAAGACTTGGGAGCTCTTCataa</sbol:elements>
+    <sbol:encoding rdf:resource="http://www.chem.qmul.ac.uk/iubmb/misc/naseq.html"/>
+  </sbol:Sequence>
+</rdf:RDF>

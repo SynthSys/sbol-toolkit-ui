@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package ed.biordm.sbol.fixer;
+package ed.biordm.sbol.toolkit.scrapbook;
 
 import com.opencsv.CSVReader;
 import com.opencsv.exceptions.CsvException;
