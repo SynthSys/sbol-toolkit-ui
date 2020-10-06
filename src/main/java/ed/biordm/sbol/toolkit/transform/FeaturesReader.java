@@ -51,7 +51,7 @@ public class FeaturesReader {
 
             Sheet sheet = workbook.getSheetAt(sheetNr);
 
-            Map<String, List<String>> rows = readWorksheetRows(sheet);
+            Map<String, List<String>> rows = readWorksheetRows(sheet, skipRows);
 
             rows.forEach((key, value) -> {
                 List<String> colVals = (List<String>) value;
@@ -92,7 +92,7 @@ public class FeaturesReader {
 
             Sheet sheet = workbook.getSheetAt(sheetNr);
 
-            features = readWorksheetRows(sheet);
+            features = readWorksheetRows(sheet, skipRows);
         } catch (IllegalArgumentException | NotOLE2FileException e) {
             throw new ExcelFormatException("Not valid excel: " + e.getMessage(), e);
         }
@@ -103,9 +103,10 @@ public class FeaturesReader {
      * Iterates through all rows in the provided worksheet and
      *
      * @param worksheet
+     * @param skipRows: the number of rows to skip, e.g. '1' for skipping header
      * @return map with id and the list of read column values
      */
-    protected Map<String, List<String>> readWorksheetRows(Sheet worksheet) {
+    protected Map<String, List<String>> readWorksheetRows(Sheet worksheet, int skipRows) {
         Map<String, List<String>> rows = new HashMap<>();
 
         // https://knpcode.com/java-programs/read-excel-file-java-using-apache-poi/
@@ -113,7 +114,7 @@ public class FeaturesReader {
         while (rowItr.hasNext()) {
             Row row = rowItr.next();
             // skip header (First row)
-            if (row.getRowNum() == 0) {
+            if (row.getRowNum() < skipRows) {
                 continue;
             }
             Iterator<Cell> cellItr = row.cellIterator();
