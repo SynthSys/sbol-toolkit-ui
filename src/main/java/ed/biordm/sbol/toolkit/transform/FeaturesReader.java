@@ -41,7 +41,8 @@ public class FeaturesReader {
      * @param sheetNr
      * @return map with id, value pairs from the read rows
      */
-    public Map<String, String> readSimpleFeatures(Path file, int skipRows, int sheetNr) throws IOException, ExcelFormatException {
+    public Map<String, String> readSimpleFeatures(Path file, int skipRows, 
+            int sheetNr) throws IOException, ExcelFormatException {
         Map<String, String> features = new HashMap<>();
         try {
             Workbook workbook = WorkbookFactory.create(file.toFile(), null, true);
@@ -53,21 +54,17 @@ public class FeaturesReader {
             Map<String, List<String>> rows = readWorksheetRows(sheet);
 
             rows.forEach((key, value) -> {
-                List<String> colVals = (List<String>)value;
+                List<String> colVals = (List<String>) value;
                 String featureVal = new String();
-                if(colVals.size() > 1) {
-                   featureVal = String.join(",", colVals); 
+                if (colVals.size() > 1) {
+                    featureVal = String.join(",", colVals);
                 } else {
-                   if(colVals.size() > 0) {
-                       featureVal = colVals.get(0); 
-                   }
+                    if (colVals.size() > 0) {
+                        featureVal = colVals.get(0);
+                    }
                 }
-                if(colVals.size() > 0) {
-                // features.put(key, featureVal);
-                    features.put(key, value.get(0));
-                } else {
-                    features.put(key, "");
-                }
+
+                features.put(key, featureVal);
             });
         } catch (IllegalArgumentException | NotOLE2FileException e) {
             throw new ExcelFormatException("Not valid excel: " + e.getMessage(), e);
@@ -85,13 +82,25 @@ public class FeaturesReader {
      * @param sheetNr
      * @return map with id and the list of read features values
      */
-    public Map<String, List<String>> readMultiFeatures(Path file, int skipRows, int sheetNr) {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public Map<String, List<String>> readMultiFeatures(Path file, int skipRows,
+            int sheetNr) throws IOException, ExcelFormatException {
+        Map<String, List<String>> features = new HashMap<>();
+        try {
+            Workbook workbook = WorkbookFactory.create(file.toFile(), null, true);
+            FormulaEvaluator formEval = workbook.getCreationHelper().createFormulaEvaluator();
+            formEval.setIgnoreMissingWorkbooks(true);
 
+            Sheet sheet = workbook.getSheetAt(sheetNr);
+
+            features = readWorksheetRows(sheet);
+        } catch (IllegalArgumentException | NotOLE2FileException e) {
+            throw new ExcelFormatException("Not valid excel: " + e.getMessage(), e);
+        }
+        return features;
     }
 
     /**
-     * Iterates through all rows in the provided worksheet and 
+     * Iterates through all rows in the provided worksheet and
      *
      * @param worksheet
      * @return map with id and the list of read column values
@@ -117,14 +126,14 @@ public class FeaturesReader {
 
                 String cellValue = getStringValueFromCell(cell);
 
-                if(index == 0) {
+                if (index == 0) {
                     rows.put(cellValue, colVals);
                 } else {
                     colVals.add(cellValue);
                 }
             }
         }
-        
+
         return rows;
     }
 
@@ -135,15 +144,15 @@ public class FeaturesReader {
 
         if (cellValue instanceof Number) {
             stringCellVal = String.valueOf(cellValue);
-        } else if(cellValue instanceof String) {
-            stringCellVal = (String)cellValue;
-        } else if(cellValue instanceof Boolean) {
+        } else if (cellValue instanceof String) {
+            stringCellVal = (String) cellValue;
+        } else if (cellValue instanceof Boolean) {
             stringCellVal = String.valueOf(cellValue);
-        } else if(cellValue instanceof Date) {
+        } else if (cellValue instanceof Date) {
             DateFormat df = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
             stringCellVal = df.format(cellValue);
         }
-        
+
         return stringCellVal;
     }
 
