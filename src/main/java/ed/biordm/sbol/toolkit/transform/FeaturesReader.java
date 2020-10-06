@@ -51,28 +51,8 @@ public class FeaturesReader {
             Sheet sheet = workbook.getSheetAt(sheetNr);
 
             Map<String, List<String>> rows = readWorksheetRows(sheet);
-            /*Iterator<Map.Entry<String, List<String>>> entries = rows.entrySet().iterator();
-            
-            while ( entries.hasNext() ) {
-                Map.Entry<String, List<String>> entry = entries.next();
-                List<String> colVals = entry.getValue();
-                String featureVal = new String();
-                System.out.println(entry.getKey());
-                if(colVals.size() > 1) {
-                   featureVal = String.join(",", colVals); 
-                } else {
-                   if(colVals.size() > 0) {
-                       featureVal = colVals.get(0);
-                       System.out.println(featureVal);
-                   }
-                }
-                System.out.println(features.get(entry.getKey()));
-                features.put(entry.getKey(), new String(featureVal));
-                System.out.println(features.get(entry.getKey()));
-            }*/
+
             rows.forEach((key, value) -> {
-                System.out.println(key);
-                System.out.println(value);
                 List<String> colVals = (List<String>)value;
                 String featureVal = new String();
                 if(colVals.size() > 1) {
@@ -89,27 +69,6 @@ public class FeaturesReader {
                     features.put(key, "");
                 }
             });
-            
-            /*BiConsumer<String, List<String>> action = (key, value) -> 
-            { 
-                List<String> colVals = (List<String>)value;
-                String featureVal = new String();
-                if(colVals.size() > 1) {
-                   featureVal = String.join(",", colVals); 
-                } else {
-                   if(colVals.size() > 0) {
-                       featureVal = colVals.get(0); 
-                   }
-                }
-                if(colVals.size() > 0) {
-                // features.put(key, featureVal);
-                    features.put(key, value.get(0));
-                } else {
-                    features.put(key, "");
-                }
-            };
-            
-            rows.forEach(action);*/
         } catch (IllegalArgumentException | NotOLE2FileException e) {
             throw new ExcelFormatException("Not valid excel: " + e.getMessage(), e);
         }
@@ -175,16 +134,12 @@ public class FeaturesReader {
         Object cellValue = getValueFromCell(cell);
 
         if (cellValue instanceof Number) {
-            System.out.println("This is an Integer");
             stringCellVal = String.valueOf(cellValue);
         } else if(cellValue instanceof String) {
-            System.out.println("This is a String");
             stringCellVal = (String)cellValue;
         } else if(cellValue instanceof Boolean) {
-            System.out.println("This is a Boolean");
             stringCellVal = String.valueOf(cellValue);
         } else if(cellValue instanceof Date) {
-            System.out.println("This is a Date");
             DateFormat df = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
             stringCellVal = df.format(cellValue);
         }
