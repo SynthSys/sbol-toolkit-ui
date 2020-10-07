@@ -9,6 +9,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashSet;
 import java.util.Set;
+import org.sbolstandard.core2.AccessType;
 import org.sbolstandard.core2.Component;
 import org.sbolstandard.core2.ComponentDefinition;
 import org.sbolstandard.core2.OrientationType;
@@ -17,6 +18,7 @@ import org.sbolstandard.core2.SBOLDocument;
 import org.sbolstandard.core2.SBOLValidationException;
 import org.sbolstandard.core2.Sequence;
 import org.sbolstandard.core2.SequenceAnnotation;
+import org.sbolstandard.core2.SequenceConstraint;
 
 /**
  *
@@ -115,7 +117,8 @@ public class TemplateTransformer {
                 prevCmpDef = doc.getComponentDefinition(c.getDisplayId(), c.getVersion());
                 
                 // make copy of existing component definition - does version have to be supplied?
-                newCmpDef = (ComponentDefinition) doc.createCopy(prevCmpDef, cleanName, "1");
+                // should we use 'createRecursiveCopy' here?
+                newCmpDef = (ComponentDefinition) doc.createCopy(prevCmpDef, cleanName, c.getVersion());
                 
                 // add sequence constraints for children if present
                 Component prev = null;
@@ -143,17 +146,29 @@ public class TemplateTransformer {
                     {
                         /*String uniqueId = SBOLUtils.getUniqueDisplayId(null, null,
                                         comp.getDisplayId() + "Sequence", comp.getVersion(), "Sequence", doc);*/
-                        String sequenceName = newCmpDef.getDisplayId().concat("Sequence");
+                        String sequenceName = newCmpDef.getDisplayId().concat("_Sequence");
                         newCmpDef.addSequence(doc.createSequence(sequenceName, newCmpDef.getVersion(), newSequence, Sequence.IUPAC_DNA));
-                        parent.addSequence(doc.createSequence(sequenceName, newCmpDef.getVersion(), newSequence, Sequence.IUPAC_DNA));
                     }else
                     {
                         newCmpDef.getSequences().iterator().next().setElements(newSequence);	
-                        parent.getSequences().iterator().next().setElements(newSequence);
                     }
 		}
+
+                // update links in parent component
+                SequenceConstraint seqCon = parent.getSequenceConstraint(genericComponentId);
+                parent.removeComponent(c); // remove original component to be replaced
+                Component link = parent.createComponent(cleanName.concat("_Component"), AccessType.PUBLIC, newCmpDef.getIdentity());
+                link.addWasDerivedFrom(c.getIdentity());
+                
+                parent.createSequenceConstraint("cs1", RestrictionType.PRECEDES, aC.getIdentity(), lC.getIdentity());
+                parent.removeComponent(prevCmpDef);
             }
         }
+
+        // Add the flattened sequences to the parent component's SequenceAnnotation component
+        parent = flattenSequences(parent, newName, doc);
+        
+        return newCmpDef;
     }
 
     /**
@@ -261,5 +276,139 @@ public class TemplateTransformer {
                 comp.getSequences().iterator().next().setElements(newSeq);	
             }
         }
+    }
+
+    /**
+     * following method is copied from edu.utah.ece.async.sboldesigner.sbol.CombinatorialExpansionUtil
+     * 
+     * @param originalTemplate
+     * @param originalComponent
+     * @param newParent
+     * @param children
+     * @throws SBOLValidationException 
+     */
+    private static void addChildren(ComponentDefinition originalTemplate, Component originalComponent,
+                    ComponentDefinition newParent, HashSet<ComponentDefinition> children) throws SBOLValidationException {
+            Component newComponent = newParent.getComponent(originalComponent.getDisplayId());
+            newComponent.addWasDerivedFrom(originalComponent.getIdentity());
+
+            if (children.isEmpty()) {
+                    removeConstraintReferences(newParent, newComponent);
+                    for (SequenceAnnotation sa : newParent.getSequenceAnnotations()) {
+                            if (sa.isSetComponent() && sa.getComponentURI().equals(newComponent.getIdentity())) {
+                                    newParent.removeSequenceAnnotation(sa);
+                            }
+                    }
+                    newParent.removeComponent(newComponent);
+                    return;
+            }
+
+            boolean first = true;
+            for (ComponentDefinition child : children) {
+                    if (first) {
+                            // take over the definition of newParent's version of the
+                            // original component
+                            newComponent.setDefinition(child.getIdentity());
+                            first = false;
+                    } else {
+                            // create a new component
+                            String uniqueId = SBOLUtils.getUniqueDisplayId(newParent, null, child.getDisplayId() + "_Component",
+                                            "1", "Component", null);
+                            Component link = newParent.createComponent(uniqueId, AccessType.PUBLIC, child.getIdentity());
+                            link.addWasDerivedFrom(originalComponent.getIdentity());
+
+                            // create a new 'prev precedes link' constraint
+                            Component oldPrev = getBeforeComponent(originalTemplate, originalComponent);
+                            if (oldPrev != null) {
+                                    Component newPrev = newParent.getComponent(oldPrev.getDisplayId());
+                                    if (newPrev != null) {
+                                            uniqueId = SBOLUtils.getUniqueDisplayId(newParent, null,
+                                                            newParent.getDisplayId() + "_SequenceConstraint", null, "SequenceConstraint", null);
+                                            newParent.createSequenceConstraint(uniqueId, RestrictionType.PRECEDES, newPrev.getIdentity(),
+                                                            link.getIdentity());
+                                    }
+                            }
+
+                            // create a new 'link precedes next' constraint
+                            Component oldNext = getAfterComponent(originalTemplate, originalComponent);
+                            if (oldNext != null) {
+                                    Component newNext = newParent.getComponent(oldNext.getDisplayId());
+                                    if (newNext != null) {
+                                            uniqueId = SBOLUtils.getUniqueDisplayId(newParent, null,
+                                                            newParent.getDisplayId() + "_SequenceConstraint", null, "SequenceConstraint", null);
+                                            newParent.createSequenceConstraint(uniqueId, RestrictionType.PRECEDES, link.getIdentity(),
+                                                            newNext.getIdentity());
+                                    }
+                            }
+                    }
+            }
+    }
+
+    /**
+     * following method is copied from edu.utah.ece.async.sboldesigner.sbol.CombinatorialExpansionUtil
+     * 
+     * @param newParent
+     * @param newComponent
+     * @throws SBOLValidationException 
+     */
+    private static void removeConstraintReferences(ComponentDefinition newParent, Component newComponent) throws SBOLValidationException {
+            Component subject = null;
+            Component object = null;
+            for (SequenceConstraint sc : newParent.getSequenceConstraints()) {
+                    if (sc.getSubject().equals(newComponent)) {
+                            object = sc.getObject();
+                            //If we know what the new subject of this sequence constraint should be, modify it
+                            if(subject != null) {
+                                    sc.setSubject(subject.getIdentity());
+                                    object = null;
+                                    subject = null;
+                            }else {//else remove it
+                                    newParent.removeSequenceConstraint(sc);
+                            }
+                    }
+                    if(sc.getObject().equals(newComponent)){
+                            subject = sc.getSubject();
+                            //If we know what the new object of this sequence constraint should be, modify it
+                            if(object != null) {
+                                    sc.setObject(object.getIdentity());
+                                    object = null;
+                                    subject = null;
+                            }else {//else remove it
+                                    newParent.removeSequenceConstraint(sc);
+                            }
+                    }
+            }
+    }
+
+    /**
+     * following method is copied from edu.utah.ece.async.sboldesigner.sbol.CombinatorialExpansionUtil
+     * 
+     * @param template
+     * @param component
+     * @return 
+     */
+    private static Component getBeforeComponent(ComponentDefinition template, Component component) {
+            for (SequenceConstraint sc : template.getSequenceConstraints()) {
+                    if (sc.getRestriction().equals(RestrictionType.PRECEDES) && sc.getObject().equals(component)) {
+                            return sc.getSubject();
+                    }
+            }
+            return null;
+    }
+
+    /**
+     * following method is copied from edu.utah.ece.async.sboldesigner.sbol.CombinatorialExpansionUtil
+     * 
+     * @param template
+     * @param component
+     * @return 
+     */
+    private static Component getAfterComponent(ComponentDefinition template, Component component) {
+            for (SequenceConstraint sc : template.getSequenceConstraints()) {
+                    if (sc.getRestriction().equals(RestrictionType.PRECEDES) && sc.getSubject().equals(component)) {
+                            return sc.getObject();
+                    }
+            }
+            return null;
     }
 }
