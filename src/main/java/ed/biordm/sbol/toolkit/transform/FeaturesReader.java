@@ -41,7 +41,7 @@ public class FeaturesReader {
      * @param sheetNr
      * @return map with id, value pairs from the read rows
      */
-    public Map<String, String> readSimpleFeatures(Path file, int skipRows, 
+    public Map<String, String> readSimpleFeatures(Path file, int skipRows,
             int sheetNr) throws IOException, ExcelFormatException {
         Map<String, String> features = new HashMap<>();
         try {
