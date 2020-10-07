@@ -6,7 +6,9 @@
 package ed.biordm.sbol.toolkit.transform;
 
 import java.net.URISyntaxException;
+import org.sbolstandard.core2.Component;
 import org.sbolstandard.core2.ComponentDefinition;
+import org.sbolstandard.core2.RestrictionType;
 import org.sbolstandard.core2.SBOLDocument;
 import org.sbolstandard.core2.SBOLValidationException;
 
@@ -32,14 +34,35 @@ public class TemplateTransformer {
     public ComponentDefinition instantiateFromTemplate(ComponentDefinition template,
             String newName, String version, String description, SBOLDocument doc) throws SBOLValidationException, URISyntaxException {
 
-        // nname should be sanitized for conversion into display id as alphanumeric with _ (replace all non alphanumeric characters with _)
+        // name should be sanitized for conversion into display id as alphanumeric with _ (replace all non alphanumeric characters with _)
         // it should be deep copy, i.e. the owned object must be copied like component, sequenceanotations, sequenceConstraints
         // that should be already handled by doc.crateCopy method.
-        //throw new UnsupportedOperationException("Not supported yet.");
+
+        //SBOLDocument newDoc = doc.createRecursiveCopy(template);
         String cleanName = sanitizeName(newName);
-        ComponentDefinition instance = doc.createComponentDefinition(cleanName, version, template.getIdentity());
-        instance.setDescription(description);
-        return instance;
+
+        ComponentDefinition copy = doc.createComponentDefinition(cleanName, version, template.getIdentity());
+        copy.setRoles(template.getRoles());
+        copy.setDescription(description);
+
+        // see edu.utah.ece.async.sboldesigner.sbol.CombinatorialExpansionUtil.createTemplateCopy
+        Component prev = null;
+        Component curr = null;
+        for (Component c : template.getSortedComponents()) {
+            curr = copy.createComponent(c.getDisplayId(), c.getAccess(), c.getDefinitionURI());
+            if (prev != null) {
+                String constraintName = copy.getDisplayId().concat("_SequenceConstraint");
+                copy.createSequenceConstraint(constraintName, RestrictionType.PRECEDES,
+                        prev.getIdentity(), curr.getIdentity());
+            }
+            prev = curr;
+        }
+        copy.addWasDerivedFrom(template.getIdentity());
+
+        for (Component component : copy.getComponents()) {
+            component.addWasDerivedFrom(template.getComponent(component.getDisplayId()).getIdentity());
+        }
+        return copy;
     }
 
     /**
@@ -118,6 +141,7 @@ public class TemplateTransformer {
      * @return
      */
     private String sanitizeName(String name) {
-        return name;
+        String cleanName = name.replaceAll("[^\\p{IsAlphabetic}\\p{IsDigit}]", "_");
+        return cleanName;
     }
 }
