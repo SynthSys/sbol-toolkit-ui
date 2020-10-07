@@ -5,12 +5,18 @@
  */
 package ed.biordm.sbol.toolkit.transform;
 
+import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.HashSet;
+import java.util.Set;
 import org.sbolstandard.core2.Component;
 import org.sbolstandard.core2.ComponentDefinition;
+import org.sbolstandard.core2.OrientationType;
 import org.sbolstandard.core2.RestrictionType;
 import org.sbolstandard.core2.SBOLDocument;
 import org.sbolstandard.core2.SBOLValidationException;
+import org.sbolstandard.core2.Sequence;
+import org.sbolstandard.core2.SequenceAnnotation;
 
 /**
  *
@@ -95,7 +101,59 @@ public class TemplateTransformer {
         // in the parent component defition the sequenceAnotations and sequeceConstraints have to be updated to point
         // to new component instead of genericComponentId
         // it returns the new sub component definion not the parent so it can be further customized if needed
-        throw new UnsupportedOperationException("Not supported yet.");
+        
+        // throw new UnsupportedOperationException("Not supported yet.");
+        String cleanName = sanitizeName(newName);
+        
+        ComponentDefinition prevCmpDef = null;
+        ComponentDefinition newCmpDef = null;
+
+        for (Component c : parent.getSortedComponents()) {
+            // If this component identity matches the generic component ID, replace it
+            if (c.getIdentity().equals(URI.create(genericComponentId))) {
+                // find the ComponentDefinition in the SBOL document
+                prevCmpDef = doc.getComponentDefinition(c.getDisplayId(), c.getVersion());
+                
+                // make copy of existing component definition - does version have to be supplied?
+                newCmpDef = (ComponentDefinition) doc.createCopy(prevCmpDef, cleanName, "1");
+                
+                // add sequence constraints for children if present
+                Component prev = null;
+                Component curr = null;
+                for (Component child : prevCmpDef.getSortedComponents()) {
+                    curr = newCmpDef.createComponent(child.getDisplayId(), child.getAccess(), child.getDefinitionURI());
+                    if (prev != null) {
+                        String constraintName = newCmpDef.getDisplayId().concat("_SequenceConstraint");
+                        newCmpDef.createSequenceConstraint(constraintName, RestrictionType.PRECEDES,
+                                prev.getIdentity(), curr.getIdentity());
+                    }
+                    prev = curr;
+                }
+
+                newCmpDef.addWasDerivedFrom(prevCmpDef.getIdentity());
+
+                for (Component component : newCmpDef.getComponents()) {
+                    component.addWasDerivedFrom(prevCmpDef.getComponent(component.getDisplayId()).getIdentity());
+                }
+
+                // see edu.utah.ece.async.sboldesigner.sbol.editor.SBOLDesign.rebuildSequences
+                // add sequence to the new component
+		if(newSequence != "") {
+                    if(newCmpDef.getSequences().isEmpty())
+                    {
+                        /*String uniqueId = SBOLUtils.getUniqueDisplayId(null, null,
+                                        comp.getDisplayId() + "Sequence", comp.getVersion(), "Sequence", doc);*/
+                        String sequenceName = newCmpDef.getDisplayId().concat("Sequence");
+                        newCmpDef.addSequence(doc.createSequence(sequenceName, newCmpDef.getVersion(), newSequence, Sequence.IUPAC_DNA));
+                        parent.addSequence(doc.createSequence(sequenceName, newCmpDef.getVersion(), newSequence, Sequence.IUPAC_DNA));
+                    }else
+                    {
+                        newCmpDef.getSequences().iterator().next().setElements(newSequence);	
+                        parent.getSequences().iterator().next().setElements(newSequence);
+                    }
+		}
+            }
+        }
     }
 
     /**
@@ -143,5 +201,65 @@ public class TemplateTransformer {
     private String sanitizeName(String name) {
         String cleanName = name.replaceAll("[^\\p{IsAlphabetic}\\p{IsDigit}]", "_");
         return cleanName;
+    }
+
+    /**
+     * Copied from edu.utah.ece.async.sboldesigner.sbol.editor.SBOLDesign.rebuildSequences
+     * @param comp
+     * @param doc
+     * @throws SBOLValidationException 
+     */
+    private void rebuildSequences(ComponentDefinition comp, SBOLDocument doc) throws SBOLValidationException {
+        Set<SequenceAnnotation> oldSequenceAnn = comp.getSequenceAnnotations();
+        comp.clearSequenceAnnotations();
+        Set<Sequence> currSequences = new HashSet<Sequence>();
+        int start = 1;
+        int length;
+        int count = 0;
+        String newSeq = "";
+        ComponentDefinition curr;
+        for(org.sbolstandard.core2.Component c : comp.getSortedComponents()) {
+            curr = c.getDefinition();
+            if(!curr.getComponents().isEmpty()) {
+                    rebuildSequences(curr, doc);
+            }
+            length = 0;
+            //Append sequences to build newly constructed sequence
+            for(Sequence s : curr.getSequences()) {
+                currSequences.add(s);
+                newSeq = newSeq.concat(s.getElements());
+                length += s.getElements().length();
+            }
+
+            OrientationType o = OrientationType.INLINE;
+            for(SequenceAnnotation sa : oldSequenceAnn) {
+                if(sa.getComponent().getIdentity() == c.getIdentity()) {
+                        o = sa.getLocations().iterator().next().getOrientation();
+                }
+            }
+
+            SequenceAnnotation seqAnn;
+            if (length==0) {
+                seqAnn = comp.createSequenceAnnotation("SequenceAnnotation_"+count, "GenericLocation", o);
+            } else {
+                seqAnn = comp.createSequenceAnnotation("SequenceAnnotation_"+count, "Range" , start, start+length-1, o);
+                start += length;
+            }
+            seqAnn.setComponent(c.getIdentity());
+
+            count++;
+        }
+        if(newSeq != "") {
+            if(comp.getSequences().isEmpty())
+            {
+                /*String uniqueId = SBOLUtils.getUniqueDisplayId(null, null,
+                                comp.getDisplayId() + "Sequence", comp.getVersion(), "Sequence", doc);*/
+                String uniqueId = comp.getDisplayId().concat("Sequence");
+                comp.addSequence(doc.createSequence(uniqueId, comp.getVersion(), newSeq, Sequence.IUPAC_DNA));
+            }else
+            {
+                comp.getSequences().iterator().next().setElements(newSeq);	
+            }
+        }
     }
 }
