@@ -156,12 +156,15 @@ public class TemplateTransformer {
 
                 // update links in parent component
                 SequenceConstraint seqCon = parent.getSequenceConstraint(genericComponentId);
-                parent.removeComponent(c); // remove original component to be replaced
+
                 Component link = parent.createComponent(cleanName.concat("_Component"), AccessType.PUBLIC, newCmpDef.getIdentity());
                 link.addWasDerivedFrom(c.getIdentity());
                 
-                parent.createSequenceConstraint("cs1", RestrictionType.PRECEDES, aC.getIdentity(), lC.getIdentity());
-                parent.removeComponent(prevCmpDef);
+                Component bc = getBeforeComponent(prevCmpDef, c);
+                Component ac = getAfterComponent(prevCmpDef, c);
+                parent.removeComponent(c); // remove original component to be replaced
+
+                parent.createSequenceConstraint(cleanName, RestrictionType.PRECEDES, ac.getIdentity(), bc.getIdentity());
             }
         }
 
