@@ -12,6 +12,7 @@ import java.util.Set;
 import org.sbolstandard.core2.AccessType;
 import org.sbolstandard.core2.Component;
 import org.sbolstandard.core2.ComponentDefinition;
+import org.sbolstandard.core2.OperatorType;
 import org.sbolstandard.core2.OrientationType;
 import org.sbolstandard.core2.RestrictionType;
 import org.sbolstandard.core2.SBOLDocument;
@@ -103,8 +104,6 @@ public class TemplateTransformer {
         // in the parent component defition the sequenceAnotations and sequeceConstraints have to be updated to point
         // to new component instead of genericComponentId
         // it returns the new sub component definion not the parent so it can be further customized if needed
-        
-        // throw new UnsupportedOperationException("Not supported yet.");
         String cleanName = sanitizeName(newName);
         
         ComponentDefinition prevCmpDef = null;
@@ -113,17 +112,26 @@ public class TemplateTransformer {
         for (Component c : parent.getSortedComponents()) {
             // If this component identity matches the generic component ID, replace it
             if (c.getIdentity().equals(URI.create(genericComponentId))) {
+                System.out.println(c.getVersion());
+                System.out.println(c.getDisplayId());
+                System.out.println(c.getIdentity().toString());
+                System.out.println(c.getDefinitionURI().toString());
                 // find the ComponentDefinition in the SBOL document
-                prevCmpDef = doc.getComponentDefinition(c.getDisplayId(), c.getVersion());
+                prevCmpDef = doc.getComponentDefinition(c.getDefinitionURI().toString(), c.getVersion());
                 
                 // make copy of existing component definition - does version have to be supplied?
                 // should we use 'createRecursiveCopy' here?
                 newCmpDef = (ComponentDefinition) doc.createCopy(prevCmpDef, cleanName, c.getVersion());
                 
+                HashSet<ComponentDefinition> children = new HashSet<>();
+               
                 // add sequence constraints for children if present
                 Component prev = null;
                 Component curr = null;
                 for (Component child : prevCmpDef.getSortedComponents()) {
+                    ComponentDefinition childCD = doc.getComponentDefinition(child.getDefinitionURI());
+                    children.add(childCD);
+
                     curr = newCmpDef.createComponent(child.getDisplayId(), child.getAccess(), child.getDefinitionURI());
                     if (prev != null) {
                         String constraintName = newCmpDef.getDisplayId().concat("_SequenceConstraint");
@@ -132,6 +140,8 @@ public class TemplateTransformer {
                     }
                     prev = curr;
                 }
+
+                addChildren(prevCmpDef, c, newCmpDef, children);
 
                 newCmpDef.addWasDerivedFrom(prevCmpDef.getIdentity());
 
@@ -169,9 +179,9 @@ public class TemplateTransformer {
         }
 
         // Add the flattened sequences to the parent component's SequenceAnnotation component
-        parent = flattenSequences(parent, newName, doc);
+        //parent = flattenSequences(parent, newName, doc);
         
-        return newCmpDef;
+        return parent;
     }
 
     /**
@@ -292,6 +302,8 @@ public class TemplateTransformer {
      */
     private static void addChildren(ComponentDefinition originalTemplate, Component originalComponent,
                     ComponentDefinition newParent, HashSet<ComponentDefinition> children) throws SBOLValidationException {
+    /* private static void addChildren(ComponentDefinition originalTemplate, Component originalComponent,
+                    ComponentDefinition newParent, List<ComponentDefinition> children) throws SBOLValidationException {*/
             Component newComponent = newParent.getComponent(originalComponent.getDisplayId());
             newComponent.addWasDerivedFrom(originalComponent.getIdentity());
 
@@ -315,9 +327,10 @@ public class TemplateTransformer {
                             first = false;
                     } else {
                             // create a new component
-                            String uniqueId = SBOLUtils.getUniqueDisplayId(newParent, null, child.getDisplayId() + "_Component",
-                                            "1", "Component", null);
-                            Component link = newParent.createComponent(uniqueId, AccessType.PUBLIC, child.getIdentity());
+                            /*String uniqueId = SBOLUtils.getUniqueDisplayId(newParent, null, child.getDisplayId() + "_Component",
+                                            "1", "Component", null);*/
+                            String childId = child.getDisplayId().concat("_Component");
+                            Component link = newParent.createComponent(childId, AccessType.PUBLIC, child.getIdentity());
                             link.addWasDerivedFrom(originalComponent.getIdentity());
 
                             // create a new 'prev precedes link' constraint
@@ -325,9 +338,10 @@ public class TemplateTransformer {
                             if (oldPrev != null) {
                                     Component newPrev = newParent.getComponent(oldPrev.getDisplayId());
                                     if (newPrev != null) {
-                                            uniqueId = SBOLUtils.getUniqueDisplayId(newParent, null,
-                                                            newParent.getDisplayId() + "_SequenceConstraint", null, "SequenceConstraint", null);
-                                            newParent.createSequenceConstraint(uniqueId, RestrictionType.PRECEDES, newPrev.getIdentity(),
+                                        String seqId = newParent.getDisplayId().concat("_SequenceConstraint");
+                                            /*uniqueId = SBOLUtils.getUniqueDisplayId(newParent, null,
+                                                            newParent.getDisplayId() + "_SequenceConstraint", null, "SequenceConstraint", null);*/
+                                            newParent.createSequenceConstraint(seqId, RestrictionType.PRECEDES, newPrev.getIdentity(),
                                                             link.getIdentity());
                                     }
                             }
@@ -337,9 +351,10 @@ public class TemplateTransformer {
                             if (oldNext != null) {
                                     Component newNext = newParent.getComponent(oldNext.getDisplayId());
                                     if (newNext != null) {
-                                            uniqueId = SBOLUtils.getUniqueDisplayId(newParent, null,
-                                                            newParent.getDisplayId() + "_SequenceConstraint", null, "SequenceConstraint", null);
-                                            newParent.createSequenceConstraint(uniqueId, RestrictionType.PRECEDES, link.getIdentity(),
+                                        String seqId = newParent.getDisplayId().concat("_SequenceConstraint");
+                                            /*uniqueId = SBOLUtils.getUniqueDisplayId(newParent, null,
+                                                            newParent.getDisplayId() + "_SequenceConstraint", null, "SequenceConstraint", null);*/
+                                            newParent.createSequenceConstraint(seqId, RestrictionType.PRECEDES, link.getIdentity(),
                                                             newNext.getIdentity());
                                     }
                             }
@@ -355,32 +370,32 @@ public class TemplateTransformer {
      * @throws SBOLValidationException 
      */
     private static void removeConstraintReferences(ComponentDefinition newParent, Component newComponent) throws SBOLValidationException {
-            Component subject = null;
-            Component object = null;
-            for (SequenceConstraint sc : newParent.getSequenceConstraints()) {
-                    if (sc.getSubject().equals(newComponent)) {
-                            object = sc.getObject();
-                            //If we know what the new subject of this sequence constraint should be, modify it
-                            if(subject != null) {
-                                    sc.setSubject(subject.getIdentity());
-                                    object = null;
-                                    subject = null;
-                            }else {//else remove it
-                                    newParent.removeSequenceConstraint(sc);
-                            }
-                    }
-                    if(sc.getObject().equals(newComponent)){
-                            subject = sc.getSubject();
-                            //If we know what the new object of this sequence constraint should be, modify it
-                            if(object != null) {
-                                    sc.setObject(object.getIdentity());
-                                    object = null;
-                                    subject = null;
-                            }else {//else remove it
-                                    newParent.removeSequenceConstraint(sc);
-                            }
-                    }
+        Component subject = null;
+        Component object = null;
+        for (SequenceConstraint sc : newParent.getSequenceConstraints()) {
+            if (sc.getSubject().equals(newComponent)) {
+                object = sc.getObject();
+                //If we know what the new subject of this sequence constraint should be, modify it
+                if(subject != null) {
+                    sc.setSubject(subject.getIdentity());
+                    object = null;
+                    subject = null;
+                }else {//else remove it
+                    newParent.removeSequenceConstraint(sc);
+                }
             }
+            if(sc.getObject().equals(newComponent)){
+                subject = sc.getSubject();
+                //If we know what the new object of this sequence constraint should be, modify it
+                if(object != null) {
+                    sc.setObject(object.getIdentity());
+                    object = null;
+                    subject = null;
+                }else {//else remove it
+                    newParent.removeSequenceConstraint(sc);
+                }
+            }
+        }
     }
 
     /**
@@ -414,4 +429,89 @@ public class TemplateTransformer {
             }
             return null;
     }
+
+    private static HashSet<HashSet<ComponentDefinition>> group(HashSet<ComponentDefinition> variants,
+                    OperatorType operator) {
+            HashSet<HashSet<ComponentDefinition>> groups = new HashSet<>();
+
+            for (ComponentDefinition CD : variants) {
+                    HashSet<ComponentDefinition> group = new HashSet<>();
+                    group.add(CD);
+                    groups.add(group);
+            }
+
+            if (operator == OperatorType.ONE) {
+                    return groups;
+            }
+
+            if (operator == OperatorType.ZEROORONE) {
+                    groups.add(new HashSet<>());
+                    return groups;
+            }
+
+            groups.clear();
+            generateCombinations(groups, variants.toArray(new ComponentDefinition[0]), 0, new HashSet<>());
+            if (operator == OperatorType.ONEORMORE) {
+                    return groups;
+            }
+
+            if (operator == OperatorType.ZEROORMORE) {
+                    groups.add(new HashSet<>());
+                    return groups;
+            }
+
+            throw new IllegalArgumentException(operator.toString() + " operator not supported");
+    }
+
+    /**
+     * Generates all combinations except the empty set.
+     */
+    private static void generateCombinations(HashSet<HashSet<ComponentDefinition>> groups,
+                    ComponentDefinition[] variants, int i, HashSet<ComponentDefinition> set) {
+            if (i == variants.length) {
+                    if (!set.isEmpty()) {
+                            groups.add(set);
+                    }
+                    return;
+            }
+
+            HashSet<ComponentDefinition> no = new HashSet<>(set);
+            generateCombinations(groups, variants, i + 1, no);
+
+            HashSet<ComponentDefinition> yes = new HashSet<>(set);
+            yes.add(variants[i]);
+            generateCombinations(groups, variants, i + 1, yes);
+    }
+
+    /*private static HashSet<ComponentDefinition> collectVariants(SBOLDocument doc, VariableComponent vc)
+                    throws SBOLValidationException {
+            HashSet<ComponentDefinition> variants = new HashSet<>();
+
+            //Recursively collect variants from possible nested VariantDerivations 
+//		for(CombinatorialDerivation cd : vc.getVariantDerivations())
+//		{
+//			for (VariableComponent v : cd.getVariableComponents()) {
+//				variants.addAll(collectVariants(doc, v));
+//				
+//			}
+//		}
+            // add all variants
+            variants.addAll(vc.getVariants());
+
+            // add all variants from variantCollections
+            for (Collection c : vc.getVariantCollections()) {
+                    for (TopLevel tl : c.getMembers()) {
+                            if (tl instanceof ComponentDefinition) {
+                                    variants.add((ComponentDefinition) tl);
+                            }
+                    }
+            }
+
+            // add all variants from variantDerivations
+            for (CombinatorialDerivation derivation : vc.getVariantDerivations()) {
+                    variants.addAll(enumerate(doc, derivation));
+            }
+
+            return variants;
+    }*/
 }

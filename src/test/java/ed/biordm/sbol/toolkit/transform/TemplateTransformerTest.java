@@ -5,13 +5,21 @@
  */
 package ed.biordm.sbol.toolkit.transform;
 
+import java.io.File;
+import java.io.IOException;
 import java.net.URI;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import static org.junit.Assert.assertEquals;
 import org.junit.Test;
+import org.junit.Before;
+import org.sbolstandard.core2.Component;
 import org.sbolstandard.core2.ComponentDefinition;
+import org.sbolstandard.core2.SBOLConversionException;
 import org.sbolstandard.core2.SBOLDocument;
+import org.sbolstandard.core2.SBOLReader;
+import org.sbolstandard.core2.SBOLValidationException;
 
 /**
  *
@@ -20,6 +28,24 @@ import org.sbolstandard.core2.SBOLDocument;
 public class TemplateTransformerTest {
 
     TemplateTransformer templateTransformer = new TemplateTransformer();
+    SBOLDocument doc;
+    
+    @Before
+    public void generateSBOLDocument() throws IOException, SBOLValidationException, SBOLConversionException {
+        String fName = "cyano_template.xml";
+        File file = new File(getClass().getResource(fName).getFile());
+
+        try {
+            doc = SBOLReader.read(file);
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw e;
+        }
+
+        doc.setDefaultURIprefix("http://bio.ed.ac.uk/a_mccormick/cyano_source/");
+        doc.setComplete(true);
+        doc.setCreateDefaults(true);
+    }
 
     /**
      * Test of instantiateFromTemplate method, of class TemplateTransformer.
@@ -53,5 +79,52 @@ public class TemplateTransformerTest {
         assertEquals(newDescription, newCmp.getDescription());
         assertEquals(expTypesSet, newCmp.getTypes());
         assertEquals(region.getRoles(), newCmp.getRoles());
+    }
+
+    /**
+     * Test of instantiateFromTemplate method, of class TemplateTransformer.
+     */
+    @Test
+    public void testConcreatizeComponent() throws Exception {
+        Set<ComponentDefinition> cmpDefs = doc.getComponentDefinitions();
+        
+        for(ComponentDefinition cmpDef: cmpDefs) {
+            System.out.println(cmpDef.getDisplayId());
+            System.out.println(cmpDef.getIdentity());
+            
+            String cmpDefId = cmpDef.getDisplayId();
+            
+            if(cmpDefId.equals("sll00199_codA_Km") || cmpDefId.equals("cyano_codA_Km")) {
+                // Create new sub-component belonging to one of these parent CDs
+                Component subCmp = cmpDef.getComponent("left");
+                String genericComponentId = subCmp.getIdentity().toString();
+                System.out.println(genericComponentId);
+                String newName = "test_left";
+                String newSequence = "test_sequence";
+                
+                ComponentDefinition newParent = templateTransformer.concreatizePart(cmpDef, genericComponentId,
+                    newName, newSequence, doc);
+
+                // Get child components and verify they match in new component
+                List<Component> origCmps = cmpDef.getSortedComponents();
+                List<Component> newCmps = newParent.getSortedComponents();
+                int count = 0;
+                
+                for(Component child: origCmps) {
+                    Component newCmp = newCmps.get(count);
+                    
+                    System.out.println(child.getDisplayId());
+                    System.out.println(newCmp.getDisplayId());
+                }
+                // Get sequence constraints and verify they match in new component
+                
+                
+                // Get sequence annos and verify they match in new component
+            }
+        }
+        
+        /*
+        ComponentDefinition concreatizePart(ComponentDefinition parent, String genericComponentId,
+            String newName, String newSequence, SBOLDocument doc)*/
     }
 }
