@@ -150,13 +150,40 @@ public class FeaturesReaderTest {
             assertEquals(expValue, result.get(expKey));
                     
     }
+
+    @Test
+    public void readSimpleFeaturesReadsFirstTwoColumnsPreservingBlanks() throws Exception {
+        File file = new File(getClass().getResource("flank-list.xlsx").getFile());
+
+            // Test worksheet 1 (Right flank)
+            Map<String, String> result = featuresReader.readSimpleFeatures(file.toPath(), 0, 1);
+            String expKey = "name right";
+            String expValue = " Right flank sequence";
+            
+            assertEquals(expValue, result.get(expKey));
+
+            expKey = "0001_slr0611_right";
+            expValue = "";             
+            assertEquals(expValue, result.get(expKey));
+            
+            expKey = "0002_slr0612_right";
+            expValue = "TCAAGGCTCCCTCCCCCCAGGGCATTAAAATAGGAACAGTTGCCGAACTCCCTATCAAGCCGAATCATTAATCATCCCGTTTATGTCCTATCTAATCGCTGTGGTAGCCAACCGCATTGCCGCCGAAGAAGCTTATACAACCTTGGAACAGGCAGGATTTGCCCAAAAGAATTTGACTATCATTGGCACAGGTTATAAAACCGCTGACGAATTTGGCTTGGTGGACCCGAAAAAACAAGCTATCAAAAGGGCAAAGCTCATGGCCATCTGGTTAGTACCCTTTGGTTTCGCTGCCGGTTATTGCTTTAACCTCATCACTGGCTTGAGCACCTTA";             
+            assertEquals(expValue, result.get(expKey));
+            
+            expKey = "0003_slr0613_right";
+            expValue = "ACTCCATCTTGAGCGGTAATGACTTCCCCGAAGAAGTTATAAACTTGTAGGCAATTCGGGCAGACCGAAGGGCTTACCAACCGTATTGGGACCAAACTGGGTGCCTGTAAAGGGATTCTGCTACCCTTACCCCCCGCAATTGGTTTAACAGGGGTAAATGACCCTGGGGTGCGGATAAATCCCAGGTAAAGCCCTTGGGCCAACGGGTCCAAACATTGCCGCTTTTCCAGCCAATTTTCGGCCAAAGCTTGGTAAATTCTTTTCCGGACGCCAACCAGAGTCGTCGTTGCACCGAAAAACCAAAATTACCGTTGGAGTGGAGCCACCACAAAGCATTAATGGTGTGCAGGTCTAGGGCAGGAAATTTTTCTACTTCTGTGAAATAGAGCCATTGTCTTTGACTGGCCCCAGGCCCCGCCAGTTCGCACAATTTATCCCGGGTTATTTCATCCGCTGTTTCAAAATCCTGGCTTCCTAGGGCTTCCTGGAGCGGCAGATAATCAATGCCCTGGGCCGATTGTAAGGGGAAAATGCCTGTGGGGTAA";
+                      
+            assertEquals(expValue, result.get(expKey));
+                    
+    }
+
     /**
      * Test of readWorksheetRows method, of class FeaturesReader.
      */
     @Test
     public void testReadWorksheetRows() throws Exception {
         File file = new File(getClass().getResource("flank-list.xlsx").getFile());
-        Workbook workbook = WorkbookFactory.create(file, null, true);
+        try(Workbook workbook = WorkbookFactory.create(file, null, true)) {
         FormulaEvaluator formEval = workbook.getCreationHelper().createFormulaEvaluator();
         formEval.setIgnoreMissingWorkbooks(true);
 
@@ -204,6 +231,7 @@ public class FeaturesReaderTest {
         expValue = Arrays.asList("TCTGGTAGAAAAAAACAATGGTTGGATTCTAAGCTCTGGAGTGGACTGGGATAGCGCTGAAATTGGATTAATTTTGCTTACTATCCCATCGCAATTTTGCTTAAACTCGACTATTTTTATTTGTTTTGATTGCAGAATCAATTTGGTTTCCTACGGCTCCAACAATTGTAAAAACTCCGCCTCAGATAGTAACTTGATGCCCAAACTTTCCGCCTTGGCGGCCTTACTTCCTGGTTTATCTCCCAAGAGAACATAATCAGTTTTGGTACTTACACTGCTGGTTACTTTACCGCCGCTCTGTTCAATTAATTCCTGAGCTTCTAGGCGACTAAGGTTGGGCAAAGTCCCGGTTAACACAAAGGTTTTGCCCTTTAACTTGCCGCTGTCAGTTTTGGTCTGGTCAATCCCTTGGTTTGCCAATACTAAACCCAACTCCTCTAAATCTTGAATTAATTGTTGATTACCGGGGTTCCTGAACCAATTAACCACGGCTTCGGCAATTTCTGGGCCAATGCCATAGACTCCT");
         rows = featuresReader.readWorksheetRows(sheet, 10);
         assertEquals(null, rows.get(expKey));
+        }
     }
 
     /**
@@ -212,7 +240,7 @@ public class FeaturesReaderTest {
     @Test
     public void testGetStringValueFromCell() throws Exception {
         File file = new File(getClass().getResource("flank-list.xlsx").getFile());
-        Workbook workbook = WorkbookFactory.create(file, null, true);
+        try (Workbook workbook = WorkbookFactory.create(file, null, true)) {
         FormulaEvaluator formEval = workbook.getCreationHelper().createFormulaEvaluator();
         formEval.setIgnoreMissingWorkbooks(true);
 
@@ -249,6 +277,7 @@ public class FeaturesReaderTest {
 
         assertEquals(resKey, expKey);
         assertEquals(resValue, expValue);
+        }
     }
 
     /**
@@ -257,7 +286,7 @@ public class FeaturesReaderTest {
     @Test
     public void testGetValueFromCell() throws Exception {
         File file = new File(getClass().getResource("flank-list.xlsx").getFile());
-        Workbook workbook = WorkbookFactory.create(file, null, true);
+        try (Workbook workbook = WorkbookFactory.create(file, null, true)) {
         FormulaEvaluator formEval = workbook.getCreationHelper().createFormulaEvaluator();
         formEval.setIgnoreMissingWorkbooks(true);
 
@@ -333,5 +362,6 @@ public class FeaturesReaderTest {
 
         assertEquals(resKey, expKey);
         assertEquals(resValue, expValue);
+        }
     }
 }
