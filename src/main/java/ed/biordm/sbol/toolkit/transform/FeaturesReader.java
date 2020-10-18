@@ -65,6 +65,7 @@ public class FeaturesReader {
                 }
 
                 features.put(key, featureVal);
+                
             });
         } catch (IllegalArgumentException | NotOLE2FileException e) {
             throw new ExcelFormatException("Not valid excel: " + e.getMessage(), e);

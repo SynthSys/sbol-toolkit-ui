@@ -134,6 +134,38 @@ public class FeaturesReaderTest {
         }
     }
 
+
+    @Test
+    public void readMultiFeaturesReadsListOfValuesPreservingBlanks() throws Exception {
+        File file = new File(getClass().getResource("flank-list.xlsx").getFile());
+
+        try {
+            // Test worksheet 1 (Right flank)
+            Map<String, List<String>> result = featuresReader.readMultiFeatures(file.toPath(), 0, 1);
+            String expKey = "name right";
+            List<String> expValue = List.of(" Right flank sequence");
+            
+            assertEquals(expValue, result.get(expKey));
+
+            expKey = "0001_slr0611_right";
+            expValue = List.of("","Tomek");             
+            assertEquals(expValue, result.get(expKey));
+            
+            expKey = "0002_slr0612_right";
+            expValue = List.of("TCAAGGCTCCCTCCCCCCAGGGCATTAAAATAGGAACAGTTGCCGAACTCCCTATCAAGCCGAATCATTAATCATCCCGTTTATGTCCTATCTAATCGCTGTGGTAGCCAACCGCATTGCCGCCGAAGAAGCTTATACAACCTTGGAACAGGCAGGATTTGCCCAAAAGAATTTGACTATCATTGGCACAGGTTATAAAACCGCTGACGAATTTGGCTTGGTGGACCCGAAAAAACAAGCTATCAAAAGGGCAAAGCTCATGGCCATCTGGTTAGTACCCTTTGGTTTCGCTGCCGGTTATTGCTTTAACCTCATCACTGGCTTGAGCACCTTA");             
+            assertEquals(expValue, result.get(expKey));
+            
+            expKey = "0003_slr0613_right";
+            expValue = List.of("ACTCCATCTTGAGCGGTAATGACTTCCCCGAAGAAGTTATAAACTTGTAGGCAATTCGGGCAGACCGAAGGGCTTACCAACCGTATTGGGACCAAACTGGGTGCCTGTAAAGGGATTCTGCTACCCTTACCCCCCGCAATTGGTTTAACAGGGGTAAATGACCCTGGGGTGCGGATAAATCCCAGGTAAAGCCCTTGGGCCAACGGGTCCAAACATTGCCGCTTTTCCAGCCAATTTTCGGCCAAAGCTTGGTAAATTCTTTTCCGGACGCCAACCAGAGTCGTCGTTGCACCGAAAAACCAAAATTACCGTTGGAGTGGAGCCACCACAAAGCATTAATGGTGTGCAGGTCTAGGGCAGGAAATTTTTCTACTTCTGTGAAATAGAGCCATTGTCTTTGACTGGCCCCAGGCCCCGCCAGTTCGCACAATTTATCCCGGGTTATTTCATCCGCTGTTTCAAAATCCTGGCTTCCTAGGGCTTCCTGGAGCGGCAGATAATCAATGCCCTGGGCCGATTGTAAGGGGAAAATGCCTGTGGGGTAA",
+                    "Second Fature");             
+            assertEquals(expValue, result.get(expKey));
+                    
+        } catch (IOException e) {
+
+        } catch (ExcelFormatException e) {
+
+        }
+    }
     /**
      * Test of readWorksheetRows method, of class FeaturesReader.
      */
