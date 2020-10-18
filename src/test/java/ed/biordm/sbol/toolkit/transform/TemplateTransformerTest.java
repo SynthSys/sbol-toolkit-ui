@@ -11,15 +11,18 @@ import java.net.URI;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import static org.junit.Assert.assertEquals;
+import javax.xml.namespace.QName;
+import static org.junit.Assert.*;
 import org.junit.Test;
 import org.junit.Before;
 import org.sbolstandard.core2.Component;
 import org.sbolstandard.core2.ComponentDefinition;
+import org.sbolstandard.core2.Location;
 import org.sbolstandard.core2.SBOLConversionException;
 import org.sbolstandard.core2.SBOLDocument;
 import org.sbolstandard.core2.SBOLReader;
 import org.sbolstandard.core2.SBOLValidationException;
+import org.sbolstandard.core2.SequenceAnnotation;
 
 /**
  *
@@ -81,6 +84,55 @@ public class TemplateTransformerTest {
         assertEquals(region.getRoles(), newCmp.getRoles());
     }
 
+    @Test
+    public void instantiateFromTemplateCreatesNewDefinitionWithGivenAttributesPreservingExistingFeatures() throws Exception {
+        
+        assertNotNull(doc);
+
+        ComponentDefinition org = doc.getComponentDefinition("ampr_origin", "1.0.0");
+        org.createAnnotation(new QName("https://ed.ac.uk/", "bio"), "tomek");
+        
+        assertNotNull(org);
+        
+        String newName = "region2";
+        String newVersion = "1.0.1";
+        String newDescription = "Deep copy of DNA_REGION component";
+
+        ComponentDefinition newCmp = templateTransformer.instantiateFromTemplate(org,
+                newName, newVersion, newDescription, doc);
+        
+        assertNotSame(org, newCmp);
+
+        assertEquals(newName, newCmp.getDisplayId());
+        assertEquals(newVersion, newCmp.getVersion());
+        assertEquals(newDescription, newCmp.getDescription());
+        assertEquals(org.getTypes(), newCmp.getTypes());
+        assertEquals(org.getRoles(), newCmp.getRoles());
+        assertEquals(org.getSequences(), newCmp.getSequences());
+        assertEquals(org.getAnnotations(), newCmp.getAnnotations());
+        
+        assertEquals(org.getSequenceAnnotations().size(), newCmp.getSequenceAnnotations().size());
+        for (SequenceAnnotation orgAnn : org.getSequenceAnnotations()) {
+            SequenceAnnotation cpy = newCmp.getSequenceAnnotation(orgAnn.getDisplayId());
+            assertNotNull(cpy);
+            assertEquals(orgAnn.getRoles(), cpy.getRoles());
+            assertEquals(orgAnn.getLocations().size(), cpy.getLocations().size());
+            if (orgAnn.getComponent() != null) {
+                Component orgComp = orgAnn.getComponent();
+                Component cpyComp = cpy.getComponent();
+                assertNotNull(cpyComp);
+                assertEquals(orgComp.getDefinitionIdentity(), cpyComp.getDefinitionIdentity());
+            }
+        }
+        
+        assertEquals(org.getComponents().size(), newCmp.getComponents().size());
+        for (Component orgComp: org.getComponents()) {
+            Component cpy = newCmp.getComponent(orgComp.getDisplayId());
+            assertNotNull(cpy);
+            assertEquals(orgComp.getDefinitionIdentity(), cpy.getDefinitionIdentity());
+        }
+    }
+    
     /**
      * Test of instantiateFromTemplate method, of class TemplateTransformer.
      */

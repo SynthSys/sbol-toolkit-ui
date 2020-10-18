@@ -50,10 +50,14 @@ public class TemplateTransformer {
         //SBOLDocument newDoc = doc.createRecursiveCopy(template);
         String cleanName = sanitizeName(newName);
 
-        ComponentDefinition copy = doc.createComponentDefinition(cleanName, version, template.getIdentity());
-        copy.setRoles(template.getRoles());
+        ComponentDefinition copy = (ComponentDefinition)doc.createCopy(template, cleanName, version);
+        //ComponentDefinition copy = doc.createComponentDefinition(cleanName, version, template.getIdentity());
+        //copy.setRoles(template.getRoles());
+        copy.setName(newName);
         copy.setDescription(description);
-
+        copy.addWasDerivedFrom(template.getIdentity());
+        
+        /*
         // see edu.utah.ece.async.sboldesigner.sbol.CombinatorialExpansionUtil.createTemplateCopy
         Component prev = null;
         Component curr = null;
@@ -71,6 +75,7 @@ public class TemplateTransformer {
         for (Component component : copy.getComponents()) {
             component.addWasDerivedFrom(template.getComponent(component.getDisplayId()).getIdentity());
         }
+        */
         return copy;
     }
 
