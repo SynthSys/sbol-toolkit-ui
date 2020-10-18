@@ -231,7 +231,7 @@ public class TemplateTransformer {
      * @param name
      * @return
      */
-    private String sanitizeName(String name) {
+    protected String sanitizeName(String name) {
         String cleanName = name.replaceAll("[^\\p{IsAlphabetic}\\p{IsDigit}]", "_");
         return cleanName;
     }

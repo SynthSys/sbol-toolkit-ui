@@ -22,6 +22,7 @@ import org.sbolstandard.core2.SBOLConversionException;
 import org.sbolstandard.core2.SBOLDocument;
 import org.sbolstandard.core2.SBOLReader;
 import org.sbolstandard.core2.SBOLValidationException;
+import org.sbolstandard.core2.Sequence;
 import org.sbolstandard.core2.SequenceAnnotation;
 
 /**
@@ -94,7 +95,7 @@ public class TemplateTransformerTest {
         
         assertNotNull(org);
         
-        String newName = "region2";
+        String newName = "escape! Me";
         String newVersion = "1.0.1";
         String newDescription = "Deep copy of DNA_REGION component";
 
@@ -103,7 +104,8 @@ public class TemplateTransformerTest {
         
         assertNotSame(org, newCmp);
 
-        assertEquals(newName, newCmp.getDisplayId());
+        assertEquals(newName, newCmp.getName());
+        assertEquals("escape__Me", newCmp.getDisplayId());
         assertEquals(newVersion, newCmp.getVersion());
         assertEquals(newDescription, newCmp.getDescription());
         assertEquals(org.getTypes(), newCmp.getTypes());
@@ -132,6 +134,56 @@ public class TemplateTransformerTest {
             assertEquals(orgComp.getDefinitionIdentity(), cpy.getDefinitionIdentity());
         }
     }
+    
+    @Test
+    public void concreatizeComponentReplacesComponentWithANewConcreteDefinition() throws Exception {
+        
+        assertNotNull(doc);
+        ComponentDefinition parent = doc.getComponentDefinition("cyano_codA_Km", "1.0.0");
+        assertNotNull(parent);
+        
+        String genericComponentId = "right";
+        Component replaced = parent.getComponent(genericComponentId); 
+        assertNotNull(replaced);
+        ComponentDefinition replacedDef = doc.getComponentDefinition(replaced.getDefinitionIdentity());
+        assertNotNull(replacedDef);
+        
+        String newName = "right!/new";
+        String newSequence = "GATTACA";
+        
+        ComponentDefinition newDeff = templateTransformer.concreatizePart(parent, genericComponentId, newName, newSequence, doc);
+        assertNotNull(newDeff);
+        
+        //it is being replaced
+        assertNull(parent.getComponent(genericComponentId));
+        String newDisplayId = templateTransformer.sanitizeName(newName);
+        
+        Component newComp = parent.getComponent(newDisplayId);
+        assertNotNull(newComp);
+        
+        assertEquals(newName, newComp.getName());
+        assertEquals(parent.getVersion(),newComp.getVersion());
+        assertEquals(newDeff.getIdentity(),newComp.getDefinitionIdentity());
+        assertEquals(replaced.getRoles(), newComp.getRoles());
+        
+        //check if newDefinition is correct        
+        assertEquals(newName, newDeff.getName());
+        assertEquals(newDisplayId, newDeff.getDisplayId());
+        
+        assertTrue(newDeff.getSequences().stream().findFirst().isPresent());
+        Sequence seq = newDeff.getSequences().stream().findFirst().get();
+        assertEquals(newSequence, seq.getElements());
+        assertEquals(Sequence.IUPAC_DNA, seq.getEncoding());
+        
+        assertEquals(replacedDef.getTypes(), newDeff.getTypes());
+        assertEquals(replacedDef.getRoles(), newDeff.getRoles());
+        
+        //write teest if the sequences constraints have been replaced with new one
+        //that points to newComp instead to the replaced
+        
+        
+    }
+    
     
     /**
      * Test of instantiateFromTemplate method, of class TemplateTransformer.
