@@ -42,10 +42,12 @@ public class FeaturesReader {
      * @return map with id, value pairs from the read rows
      */
     public Map<String, String> readSimpleFeatures(Path file, int skipRows,
-            int sheetNr) throws IOException, ExcelFormatException {
-        Map<String, String> features = new HashMap<>();
-        try {
-            Workbook workbook = WorkbookFactory.create(file.toFile(), null, true);
+            int sheetNr) throws IOException {
+        
+        try (Workbook workbook = WorkbookFactory.create(file.toFile(), null, true)) {
+            
+            Map<String, String> features = new HashMap<>();
+            
             FormulaEvaluator formEval = workbook.getCreationHelper().createFormulaEvaluator();
             formEval.setIgnoreMissingWorkbooks(true);
 
@@ -67,10 +69,11 @@ public class FeaturesReader {
                 features.put(key, featureVal);
                 
             });
+            return features;
         } catch (IllegalArgumentException | NotOLE2FileException e) {
-            throw new ExcelFormatException("Not valid excel: " + e.getMessage(), e);
+            throw new IOException("Not valid excel: " + e.getMessage(), e);
         }
-        return features;
+        
     }
 
     /**
@@ -84,20 +87,22 @@ public class FeaturesReader {
      * @return map with id and the list of read features values
      */
     public Map<String, List<String>> readMultiFeatures(Path file, int skipRows,
-            int sheetNr) throws IOException, ExcelFormatException {
-        Map<String, List<String>> features = new HashMap<>();
-        try {
-            Workbook workbook = WorkbookFactory.create(file.toFile(), null, true);
+            int sheetNr) throws IOException {
+        
+        try(Workbook workbook = WorkbookFactory.create(file.toFile(), null, true)) {
+            Map<String, List<String>> features = new HashMap<>();
+            
             FormulaEvaluator formEval = workbook.getCreationHelper().createFormulaEvaluator();
             formEval.setIgnoreMissingWorkbooks(true);
 
             Sheet sheet = workbook.getSheetAt(sheetNr);
 
             features = readWorksheetRows(sheet, skipRows);
+            return features;
         } catch (IllegalArgumentException | NotOLE2FileException e) {
-            throw new ExcelFormatException("Not valid excel: " + e.getMessage(), e);
+            throw new IOException("Not valid excel: " + e.getMessage(), e);
         }
-        return features;
+
     }
 
     /**
