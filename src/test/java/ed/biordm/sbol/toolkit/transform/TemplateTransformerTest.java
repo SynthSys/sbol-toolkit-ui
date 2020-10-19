@@ -17,7 +17,6 @@ import org.junit.Test;
 import org.junit.Before;
 import org.sbolstandard.core2.Component;
 import org.sbolstandard.core2.ComponentDefinition;
-import org.sbolstandard.core2.Location;
 import org.sbolstandard.core2.SBOLConversionException;
 import org.sbolstandard.core2.SBOLDocument;
 import org.sbolstandard.core2.SBOLReader;
@@ -33,7 +32,7 @@ public class TemplateTransformerTest {
 
     TemplateTransformer templateTransformer = new TemplateTransformer();
     SBOLDocument doc;
-    
+
     @Before
     public void generateSBOLDocument() throws IOException, SBOLValidationException, SBOLConversionException {
         String fName = "cyano_template.xml";
@@ -87,21 +86,21 @@ public class TemplateTransformerTest {
 
     @Test
     public void instantiateFromTemplateCreatesNewDefinitionWithGivenAttributesPreservingExistingFeatures() throws Exception {
-        
+
         assertNotNull(doc);
 
         ComponentDefinition org = doc.getComponentDefinition("ampr_origin", "1.0.0");
         org.createAnnotation(new QName("https://ed.ac.uk/", "bio"), "tomek");
-        
+
         assertNotNull(org);
-        
+
         String newName = "escape! Me";
         String newVersion = "1.0.1";
         String newDescription = "Deep copy of DNA_REGION component";
 
         ComponentDefinition newCmp = templateTransformer.instantiateFromTemplate(org,
                 newName, newVersion, newDescription, doc);
-        
+
         assertNotSame(org, newCmp);
 
         assertEquals(newName, newCmp.getName());
@@ -112,7 +111,7 @@ public class TemplateTransformerTest {
         assertEquals(org.getRoles(), newCmp.getRoles());
         assertEquals(org.getSequences(), newCmp.getSequences());
         assertEquals(org.getAnnotations(), newCmp.getAnnotations());
-        
+
         assertEquals(org.getSequenceAnnotations().size(), newCmp.getSequenceAnnotations().size());
         for (SequenceAnnotation orgAnn : org.getSequenceAnnotations()) {
             SequenceAnnotation cpy = newCmp.getSequenceAnnotation(orgAnn.getDisplayId());
@@ -126,107 +125,103 @@ public class TemplateTransformerTest {
                 assertEquals(orgComp.getDefinitionIdentity(), cpyComp.getDefinitionIdentity());
             }
         }
-        
+
         assertEquals(org.getComponents().size(), newCmp.getComponents().size());
-        for (Component orgComp: org.getComponents()) {
+        for (Component orgComp : org.getComponents()) {
             Component cpy = newCmp.getComponent(orgComp.getDisplayId());
             assertNotNull(cpy);
             assertEquals(orgComp.getDefinitionIdentity(), cpy.getDefinitionIdentity());
         }
     }
-    
+
     @Test
     public void concreatizeComponentReplacesComponentWithANewConcreteDefinition() throws Exception {
-        
+
         assertNotNull(doc);
         ComponentDefinition parent = doc.getComponentDefinition("cyano_codA_Km", "1.0.0");
         assertNotNull(parent);
-        
+
         String genericComponentId = "right";
-        Component replaced = parent.getComponent(genericComponentId); 
+        Component replaced = parent.getComponent(genericComponentId);
         assertNotNull(replaced);
         ComponentDefinition replacedDef = doc.getComponentDefinition(replaced.getDefinitionIdentity());
         assertNotNull(replacedDef);
-        
+
         String newName = "right!/new";
         String newSequence = "GATTACA";
-        
+
         ComponentDefinition newDeff = templateTransformer.concreatizePart(parent, genericComponentId, newName, newSequence, doc);
         assertNotNull(newDeff);
-        
+
         //it is being replaced
         assertNull(parent.getComponent(genericComponentId));
         String newDisplayId = templateTransformer.sanitizeName(newName);
-        
+
         Component newComp = parent.getComponent(newDisplayId);
         assertNotNull(newComp);
-        
+
         assertEquals(newName, newComp.getName());
-        assertEquals(parent.getVersion(),newComp.getVersion());
-        assertEquals(newDeff.getIdentity(),newComp.getDefinitionIdentity());
+        assertEquals(parent.getVersion(), newComp.getVersion());
+        assertEquals(newDeff.getIdentity(), newComp.getDefinitionIdentity());
         assertEquals(replaced.getRoles(), newComp.getRoles());
-        
+
         //check if newDefinition is correct        
         assertEquals(newName, newDeff.getName());
         assertEquals(newDisplayId, newDeff.getDisplayId());
-        
+
         assertTrue(newDeff.getSequences().stream().findFirst().isPresent());
         Sequence seq = newDeff.getSequences().stream().findFirst().get();
         assertEquals(newSequence, seq.getElements());
         assertEquals(Sequence.IUPAC_DNA, seq.getEncoding());
-        
+
         assertEquals(replacedDef.getTypes(), newDeff.getTypes());
         assertEquals(replacedDef.getRoles(), newDeff.getRoles());
-        
+
         //write teest if the sequences constraints have been replaced with new one
         //that points to newComp instead to the replaced
-        
-        
     }
-    
-    
+
     /**
      * Test of instantiateFromTemplate method, of class TemplateTransformer.
      */
     @Test
     public void testConcreatizeComponent() throws Exception {
         Set<ComponentDefinition> cmpDefs = doc.getComponentDefinitions();
-        
-        for(ComponentDefinition cmpDef: cmpDefs) {
+
+        for (ComponentDefinition cmpDef : cmpDefs) {
             System.out.println(cmpDef.getDisplayId());
             System.out.println(cmpDef.getIdentity());
-            
+
             String cmpDefId = cmpDef.getDisplayId();
-            
-            if(cmpDefId.equals("sll00199_codA_Km") || cmpDefId.equals("cyano_codA_Km")) {
+
+            if (cmpDefId.equals("sll00199_codA_Km") || cmpDefId.equals("cyano_codA_Km")) {
                 // Create new sub-component belonging to one of these parent CDs
                 Component subCmp = cmpDef.getComponent("left");
                 String genericComponentId = subCmp.getIdentity().toString();
                 System.out.println(genericComponentId);
                 String newName = "test_left";
                 String newSequence = "test_sequence";
-                
+
                 ComponentDefinition newParent = templateTransformer.concreatizePart(cmpDef, genericComponentId,
-                    newName, newSequence, doc);
+                        newName, newSequence, doc);
 
                 // Get child components and verify they match in new component
                 List<Component> origCmps = cmpDef.getSortedComponents();
                 List<Component> newCmps = newParent.getSortedComponents();
                 int count = 0;
-                
-                for(Component child: origCmps) {
+
+                for (Component child : origCmps) {
                     Component newCmp = newCmps.get(count);
-                    
+
                     System.out.println(child.getDisplayId());
                     System.out.println(newCmp.getDisplayId());
                 }
                 // Get sequence constraints and verify they match in new component
-                
-                
+
                 // Get sequence annos and verify they match in new component
             }
         }
-        
+
         /*
         ComponentDefinition concreatizePart(ComponentDefinition parent, String genericComponentId,
             String newName, String newSequence, SBOLDocument doc)*/
