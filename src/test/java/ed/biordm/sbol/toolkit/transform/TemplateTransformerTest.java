@@ -188,6 +188,7 @@ public class TemplateTransformerTest {
 
         String genericComponentId = "right";
         Component replaced = parent.getComponent(genericComponentId);
+        System.out.println("Replaced component displayId: "+replaced.getDisplayId());
         assertNotNull(replaced);
         ComponentDefinition replacedDef = doc.getComponentDefinition(replaced.getDefinitionIdentity());
         assertNotNull(replacedDef);
@@ -199,10 +200,17 @@ public class TemplateTransformerTest {
         assertNotNull(newDeff);
 
         //it is being replaced
-        assertNull(parent.getComponent(genericComponentId));
+        //assertNull(newDeff.getComponent(genericComponentId));
+
+        // Shouldn't the genericComponentId return the newly created replacement
+        // component? Won't the new component and the old component share the
+        // same genericComponentId i.e. the String returned from 'getIdentity',
+        // but they will simply have different names (i.e. 'getName') and/or
+        // display IDs (i.e. 'getDisplayId')?
+        assertNotNull(newDeff.getComponent(genericComponentId));
         String newDisplayId = templateTransformer.sanitizeName(newName);
 
-        Component newComp = parent.getComponent(newDisplayId);
+        Component newComp = newDeff.getComponent(newDisplayId);
         assertNotNull(newComp);
 
         assertEquals(newName, newComp.getName());
