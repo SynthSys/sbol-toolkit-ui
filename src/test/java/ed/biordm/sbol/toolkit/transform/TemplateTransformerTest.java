@@ -232,6 +232,7 @@ public class TemplateTransformerTest {
     @Test
     public void testConcreatizeComponent() throws Exception {
         Set<ComponentDefinition> cmpDefs = doc.getComponentDefinitions();
+        int cmpCount = 0;
 
         for (ComponentDefinition cmpDef : cmpDefs) {
             System.out.println(cmpDef.getDisplayId());
@@ -244,8 +245,8 @@ public class TemplateTransformerTest {
                 Component subCmp = cmpDef.getComponent("left");
                 String genericComponentId = subCmp.getIdentity().toString();
                 System.out.println(genericComponentId);
-                String newName = "test_left";
-                String newSequence = "test_sequence";
+                String newName = "test_left_".concat(String.valueOf(cmpCount));
+                String newSequence = "GATTACA";
 
                 ComponentDefinition newParent = templateTransformer.concreatizePart(cmpDef, genericComponentId,
                         newName, newSequence, doc);
@@ -261,6 +262,8 @@ public class TemplateTransformerTest {
                     System.out.println(child.getDisplayId());
                     System.out.println(newCmp.getDisplayId());
                 }
+                
+                cmpCount += 1;
                 // Get sequence constraints and verify they match in new component
 
                 // Get sequence annos and verify they match in new component

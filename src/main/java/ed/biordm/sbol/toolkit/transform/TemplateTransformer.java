@@ -7,7 +7,9 @@ package ed.biordm.sbol.toolkit.transform;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import org.sbolstandard.core2.AccessType;
 import org.sbolstandard.core2.Component;
@@ -113,58 +115,37 @@ public class TemplateTransformer {
         ComponentDefinition prevCmpDef = null;
         ComponentDefinition newCmpDef = null;
 
+        List<Component> cmpsToRemove = new ArrayList<>();
+
         for (Component c : parent.getSortedComponents()) {
             // If this component identity matches the generic component ID, replace it
             if (c.getIdentity().equals(URI.create(genericComponentId))) {
-                System.out.println(c.getVersion());
-                System.out.println(c.getDisplayId());
-                System.out.println(c.getIdentity().toString());
-                System.out.println(c.getDefinitionURI().toString());
-                // find the ComponentDefinition in the SBOL document
-                prevCmpDef = doc.getComponentDefinition(c.getDefinitionURI().toString(), c.getVersion());
+                prevCmpDef = c.getDefinition();
 
                 // make copy of existing component definition - does version have to be supplied?
-                // should we use 'createRecursiveCopy' here?
-                newCmpDef = (ComponentDefinition) doc.createCopy(prevCmpDef, cleanName, c.getVersion());
-
-                HashSet<ComponentDefinition> children = new HashSet<>();
-
-                // add sequence constraints for children if present
-                Component prev = null;
-                Component curr = null;
-                for (Component child : prevCmpDef.getSortedComponents()) {
-                    ComponentDefinition childCD = doc.getComponentDefinition(child.getDefinitionURI());
-                    children.add(childCD);
-
-                    curr = newCmpDef.createComponent(child.getDisplayId(), child.getAccess(), child.getDefinitionURI());
-                    if (prev != null) {
-                        String constraintName = newCmpDef.getDisplayId().concat("_SequenceConstraint");
-                        newCmpDef.createSequenceConstraint(constraintName, RestrictionType.PRECEDES,
-                                prev.getIdentity(), curr.getIdentity());
-                    }
-                    prev = curr;
-                }
-
-                addChildren(prevCmpDef, c, newCmpDef, children);
-
+                // should use instantiateFromTemplate method here
+                newCmpDef = (ComponentDefinition) doc.createCopy(prevCmpDef, cleanName, prevCmpDef.getVersion());
+                newCmpDef.setName(newName);
                 newCmpDef.addWasDerivedFrom(prevCmpDef.getIdentity());
 
-                for (Component component : newCmpDef.getComponents()) {
-                    component.addWasDerivedFrom(prevCmpDef.getComponent(component.getDisplayId()).getIdentity());
+                // How do we validate that it's the correct sequence we're setting,
+                // if there are multiple sequences in the component definition?
+                // Perhaps an optional 'sequenceName' parameter could be provided?
+                for (Sequence seq : newCmpDef.getSequences()) {
+                    seq.setElements(newSequence);
+                    break;
                 }
 
                 // see edu.utah.ece.async.sboldesigner.sbol.editor.SBOLDesign.rebuildSequences
                 // add sequence to the new component
-                if (newSequence != "") {
+                /*if (newSequence != "") {
                     if (newCmpDef.getSequences().isEmpty()) {
-                        /*String uniqueId = SBOLUtils.getUniqueDisplayId(null, null,
-                                        comp.getDisplayId() + "Sequence", comp.getVersion(), "Sequence", doc);*/
                         String sequenceName = newCmpDef.getDisplayId().concat("_Sequence");
                         newCmpDef.addSequence(doc.createSequence(sequenceName, newCmpDef.getVersion(), newSequence, Sequence.IUPAC_DNA));
                     } else {
                         newCmpDef.getSequences().iterator().next().setElements(newSequence);
                     }
-                }
+                }*/
 
                 // update links in parent component
                 SequenceConstraint seqCon = parent.getSequenceConstraint(genericComponentId);
@@ -172,12 +153,30 @@ public class TemplateTransformer {
                 Component link = parent.createComponent(cleanName.concat("_Component"), AccessType.PUBLIC, newCmpDef.getIdentity());
                 link.addWasDerivedFrom(c.getIdentity());
 
-                Component bc = getBeforeComponent(prevCmpDef, c);
-                Component ac = getAfterComponent(prevCmpDef, c);
-                parent.removeComponent(c); // remove original component to be replaced
+                cmpsToRemove.add(c);
 
-                parent.createSequenceConstraint(cleanName, RestrictionType.PRECEDES, ac.getIdentity(), bc.getIdentity());
+                for (SequenceConstraint sc : parent.getSequenceConstraints()) {
+                    Component object = sc.getObject();
+                    Component subject = sc.getSubject();
+
+                    if(subject.getIdentity().equals(c.getIdentity())) {
+                        parent.removeSequenceConstraint(sc);
+                        System.out.println("Subject identities match!");
+                        parent.createSequenceConstraint(sc.getDisplayId(), RestrictionType.PRECEDES, object.getIdentity(), link.getIdentity());
+                    } else if(object.getIdentity().equals(c.getIdentity())) {
+                        parent.removeSequenceConstraint(sc);
+                        System.out.println("Object identities match!");
+                        parent.createSequenceConstraint(sc.getDisplayId(), RestrictionType.PRECEDES, link.getIdentity(), object.getIdentity());      
+                    }
+                }
+
+                //parent.createSequenceConstraint(cleanName, RestrictionType.PRECEDES, ac.getIdentity(), bc.getIdentity());
             }
+        }
+
+        for(Component cmp : cmpsToRemove) {
+            removeConstraintReferences(parent, cmp);
+            parent.removeComponent(cmp);
         }
 
         // Add the flattened sequences to the parent component's SequenceAnnotation component
