@@ -188,7 +188,7 @@ public class TemplateTransformerTest {
 
         String genericComponentId = "right";
         Component replaced = parent.getComponent(genericComponentId);
-        System.out.println("Replaced component displayId: "+replaced.getDisplayId());
+        System.out.println("Replaced component displayId: " + replaced.getDisplayId());
         assertNotNull(replaced);
         ComponentDefinition replacedDef = doc.getComponentDefinition(replaced.getDefinitionIdentity());
         assertNotNull(replacedDef);
@@ -280,9 +280,41 @@ public class TemplateTransformerTest {
                 // Get sequence annos and verify they match in new component
             }
         }
+    }
 
-        /*
-        ComponentDefinition concretizePart(ComponentDefinition parent, String genericComponentId,
-            String newName, String newSequence, SBOLDocument doc)*/
+    /**
+     * Test of instantiateFromTemplate method, of class TemplateTransformer.
+     */
+    @Test
+    public void testFlattenSequences() throws Exception {
+        assertNotNull(doc);
+        ComponentDefinition template = doc.getComponentDefinition("sll00199_codA_Km", "1.0.0");
+        assertNotNull(template);
+
+        // Assume we are adding a new sequence to the component
+        String version = "1.0.0"; // should this be the version of the component definition?
+
+        int cmpCount = 0;
+
+        for (Sequence sequence : template.getSequences()) {
+            System.out.println("Initial sequence: " + sequence.getElements());
+        }
+
+        for (Component cmp : template.getComponents()) {
+            ComponentDefinition cmpDef = cmp.getDefinition();
+            String newSequence = "GATTACA";
+            Sequence seq = doc.createSequence(cmpDef.getDisplayId() + "_" + cmpCount + "_seq", version,
+                    newSequence, Sequence.IUPAC_DNA);
+            cmpDef.addSequence(seq);
+        }
+
+        String newName = "right!/new";
+        ComponentDefinition parent = templateTransformer.flattenSequences(template, newName, doc);
+
+        assertNotNull(parent);
+
+        for (Sequence sequence : parent.getSequences()) {
+            System.out.println("Flattened sequence: " + sequence.getElements());
+        }
     }
 }

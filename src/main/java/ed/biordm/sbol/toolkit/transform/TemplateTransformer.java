@@ -109,7 +109,7 @@ public class TemplateTransformer {
 
                 // Assume we are adding a new sequence to the component
                 String version = "1.0.0"; // should this be the version of the component definition?
-                Sequence seq = doc.createSequence(cleanName+"_seq", version,
+                Sequence seq = doc.createSequence(cleanName + "_seq", version,
                         newSequence, Sequence.IUPAC_DNA);
                 newCmpDef.addSequence(seq);
 
@@ -123,18 +123,18 @@ public class TemplateTransformer {
                     Component object = sc.getObject();
                     Component subject = sc.getSubject();
 
-                    if(subject.getIdentity().equals(c.getIdentity())) {
+                    if (subject.getIdentity().equals(c.getIdentity())) {
                         parent.removeSequenceConstraint(sc);
                         parent.createSequenceConstraint(sc.getDisplayId(), RestrictionType.PRECEDES, object.getIdentity(), link.getIdentity());
-                    } else if(object.getIdentity().equals(c.getIdentity())) {
+                    } else if (object.getIdentity().equals(c.getIdentity())) {
                         parent.removeSequenceConstraint(sc);
-                        parent.createSequenceConstraint(sc.getDisplayId(), RestrictionType.PRECEDES, link.getIdentity(), object.getIdentity());      
+                        parent.createSequenceConstraint(sc.getDisplayId(), RestrictionType.PRECEDES, link.getIdentity(), object.getIdentity());
                     }
                 }
             }
         }
 
-        for(Component cmp : cmpsToRemove) {
+        for (Component cmp : cmpsToRemove) {
             removeConstraintReferences(parent, cmp);
             parent.removeComponent(cmp);
         }
@@ -176,7 +176,15 @@ public class TemplateTransformer {
         // a new component instance has to be created in the top component using the same component definition
         // and then it has to be set in the sequence annotations (grandfather cannot use its granchilids components directly
         // in the sequence annotations.
-        throw new UnsupportedOperationException("Not supported yet.");
+        String cleanName = sanitizeName(newName);
+
+        ComponentDefinition newCmpDef = (ComponentDefinition) doc.createCopy(template, cleanName, template.getVersion());
+        newCmpDef.setName(cleanName);
+        newCmpDef.addWasDerivedFrom(template.getIdentity());
+
+        rebuildSequences(newCmpDef, doc);
+
+        return newCmpDef;
     }
 
     /**
@@ -223,8 +231,11 @@ public class TemplateTransformer {
 
             OrientationType o = OrientationType.INLINE;
             for (SequenceAnnotation sa : oldSequenceAnn) {
-                if (sa.getComponent().getIdentity() == c.getIdentity()) {
-                    o = sa.getLocations().iterator().next().getOrientation();
+                Component saCmp = sa.getComponent();
+                if (saCmp != null) {
+                    if (saCmp.getIdentity() == c.getIdentity()) {
+                        o = sa.getLocations().iterator().next().getOrientation();
+                    }
                 }
             }
 
@@ -243,7 +254,7 @@ public class TemplateTransformer {
             if (comp.getSequences().isEmpty()) {
                 /*String uniqueId = SBOLUtils.getUniqueDisplayId(null, null,
                                 comp.getDisplayId() + "Sequence", comp.getVersion(), "Sequence", doc);*/
-                String uniqueId = comp.getDisplayId().concat("Sequence");
+                String uniqueId = comp.getDisplayId().concat("_seq");
                 comp.addSequence(doc.createSequence(uniqueId, comp.getVersion(), newSeq, Sequence.IUPAC_DNA));
             } else {
                 comp.getSequences().iterator().next().setElements(newSeq);
