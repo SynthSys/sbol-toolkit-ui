@@ -48,35 +48,13 @@ public class TemplateTransformer {
         // name should be sanitized for conversion into display id as alphanumeric with _ (replace all non alphanumeric characters with _)
         // it should be deep copy, i.e. the owned object must be copied like component, sequenceanotations, sequenceConstraints
         // that should be already handled by doc.crateCopy method.
-        //SBOLDocument newDoc = doc.createRecursiveCopy(template);
         String cleanName = sanitizeName(newName);
 
         ComponentDefinition copy = (ComponentDefinition) doc.createCopy(template, cleanName, version);
-        //ComponentDefinition copy = doc.createComponentDefinition(cleanName, version, template.getIdentity());
-        //copy.setRoles(template.getRoles());
         copy.setName(newName);
         copy.setDescription(description);
         copy.addWasDerivedFrom(template.getIdentity());
 
-        /*
-        // see edu.utah.ece.async.sboldesigner.sbol.CombinatorialExpansionUtil.createTemplateCopy
-        Component prev = null;
-        Component curr = null;
-        for (Component c : template.getSortedComponents()) {
-            curr = copy.createComponent(c.getDisplayId(), c.getAccess(), c.getDefinitionURI());
-            if (prev != null) {
-                String constraintName = copy.getDisplayId().concat("_SequenceConstraint");
-                copy.createSequenceConstraint(constraintName, RestrictionType.PRECEDES,
-                        prev.getIdentity(), curr.getIdentity());
-            }
-            prev = curr;
-        }
-        copy.addWasDerivedFrom(template.getIdentity());
-
-        for (Component component : copy.getComponents()) {
-            component.addWasDerivedFrom(template.getComponent(component.getDisplayId()).getIdentity());
-        }
-         */
         return copy;
     }
 
@@ -97,7 +75,7 @@ public class TemplateTransformer {
      * @throws SBOLValidationException
      * @throws URISyntaxException
      */
-    public ComponentDefinition concreatizePart(ComponentDefinition parent, String genericComponentId,
+    public ComponentDefinition concretizePart(ComponentDefinition parent, String genericComponentId,
             String newName, String newSequence, SBOLDocument doc) throws SBOLValidationException, URISyntaxException {
 
         // name shoudl be sanitize for conversion into display id as alphanumeric with _ (replace all not alphanumeri caracters with _)
@@ -129,33 +107,11 @@ public class TemplateTransformer {
                 newCmpDef.setName(cleanName);
                 newCmpDef.addWasDerivedFrom(prevCmpDef.getIdentity());
 
-                // How do we validate that it's the correct sequence we're setting,
-                // if there are multiple sequences in the component definition?
-                // Perhaps an optional 'sequenceName' parameter could be provided?
-                /*for (Sequence seq : newCmpDef.getSequences()) {
-                    seq.setElements(newSequence);
-                    break;
-                }*/
-
                 // Assume we are adding a new sequence to the component
                 String version = "1.0.0"; // should this be the version of the component definition?
                 Sequence seq = doc.createSequence(cleanName+"_seq", version,
                         newSequence, Sequence.IUPAC_DNA);
                 newCmpDef.addSequence(seq);
-
-                // see edu.utah.ece.async.sboldesigner.sbol.editor.SBOLDesign.rebuildSequences
-                // add sequence to the new component
-                /*if (newSequence != "") {
-                    if (newCmpDef.getSequences().isEmpty()) {
-                        String sequenceName = newCmpDef.getDisplayId().concat("_Sequence");
-                        newCmpDef.addSequence(doc.createSequence(sequenceName, newCmpDef.getVersion(), newSequence, Sequence.IUPAC_DNA));
-                    } else {
-                        newCmpDef.getSequences().iterator().next().setElements(newSequence);
-                    }
-                }*/
-
-                // update links in parent component
-                SequenceConstraint seqCon = parent.getSequenceConstraint(genericComponentId);
 
                 Component link = parent.createComponent(cleanName, AccessType.PUBLIC, newCmpDef.getIdentity());
                 link.addWasDerivedFrom(c.getIdentity());
@@ -169,23 +125,18 @@ public class TemplateTransformer {
 
                     if(subject.getIdentity().equals(c.getIdentity())) {
                         parent.removeSequenceConstraint(sc);
-                        System.out.println("Subject identities match!");
                         parent.createSequenceConstraint(sc.getDisplayId(), RestrictionType.PRECEDES, object.getIdentity(), link.getIdentity());
                     } else if(object.getIdentity().equals(c.getIdentity())) {
                         parent.removeSequenceConstraint(sc);
-                        System.out.println("Object identities match!");
                         parent.createSequenceConstraint(sc.getDisplayId(), RestrictionType.PRECEDES, link.getIdentity(), object.getIdentity());      
                     }
                 }
-
-                //parent.createSequenceConstraint(cleanName, RestrictionType.PRECEDES, ac.getIdentity(), bc.getIdentity());
             }
         }
 
         for(Component cmp : cmpsToRemove) {
             removeConstraintReferences(parent, cmp);
-            boolean removed = parent.removeComponent(cmp);
-            System.out.println("Removed success: ".concat(String.valueOf(removed)));
+            parent.removeComponent(cmp);
         }
 
         // Add the flattened sequences to the parent component's SequenceAnnotation component

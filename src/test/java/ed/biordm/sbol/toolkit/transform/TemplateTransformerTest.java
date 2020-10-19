@@ -180,7 +180,7 @@ public class TemplateTransformerTest {
     }
 
     @Test
-    public void concreatizeComponentReplacesComponentWithANewConcreteDefinition() throws Exception {
+    public void concretizeComponentReplacesComponentWithANewConcreteDefinition() throws Exception {
 
         assertNotNull(doc);
         ComponentDefinition parent = doc.getComponentDefinition("cyano_codA_Km", "1.0.0");
@@ -196,7 +196,7 @@ public class TemplateTransformerTest {
         String newName = "right!/new";
         String newSequence = "GATTACA";
 
-        ComponentDefinition newDeff = templateTransformer.concreatizePart(parent, genericComponentId, newName, newSequence, doc);
+        ComponentDefinition newDeff = templateTransformer.concretizePart(parent, genericComponentId, newName, newSequence, doc);
         assertNotNull(newDeff);
 
         //it is being replaced
@@ -238,7 +238,7 @@ public class TemplateTransformerTest {
      * Test of instantiateFromTemplate method, of class TemplateTransformer.
      */
     @Test
-    public void testConcreatizeComponent() throws Exception {
+    public void testConcretizeComponent() throws Exception {
         Set<ComponentDefinition> cmpDefs = doc.getComponentDefinitions();
         int cmpCount = 0;
 
@@ -260,7 +260,7 @@ public class TemplateTransformerTest {
                 // Get list of original components in parent before concretize
                 List<Component> origCmps = cmpDef.getSortedComponents();
 
-                ComponentDefinition newSubCmpDef = templateTransformer.concreatizePart(cmpDef, genericComponentId,
+                ComponentDefinition newSubCmpDef = templateTransformer.concretizePart(cmpDef, genericComponentId,
                         newName, newSequence, doc);
 
                 // Get child components and verify they match in new component
@@ -282,7 +282,7 @@ public class TemplateTransformerTest {
         }
 
         /*
-        ComponentDefinition concreatizePart(ComponentDefinition parent, String genericComponentId,
+        ComponentDefinition concretizePart(ComponentDefinition parent, String genericComponentId,
             String newName, String newSequence, SBOLDocument doc)*/
     }
 }
