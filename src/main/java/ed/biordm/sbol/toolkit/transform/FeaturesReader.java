@@ -15,7 +15,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.function.BiConsumer;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.poifs.filesystem.NotOLE2FileException;
 import org.apache.poi.ss.usermodel.DateUtil;
@@ -43,11 +42,11 @@ public class FeaturesReader {
      */
     public Map<String, String> readSimpleFeatures(Path file, int skipRows,
             int sheetNr) throws IOException {
-        
+
         try (Workbook workbook = WorkbookFactory.create(file.toFile(), null, true)) {
-            
+
             Map<String, String> features = new HashMap<>();
-            
+
             FormulaEvaluator formEval = workbook.getCreationHelper().createFormulaEvaluator();
             formEval.setIgnoreMissingWorkbooks(true);
 
@@ -67,13 +66,13 @@ public class FeaturesReader {
                 }
 
                 features.put(key, featureVal);
-                
+
             });
             return features;
         } catch (IllegalArgumentException | NotOLE2FileException e) {
             throw new IOException("Not valid excel: " + e.getMessage(), e);
         }
-        
+
     }
 
     /**
@@ -88,10 +87,10 @@ public class FeaturesReader {
      */
     public Map<String, List<String>> readMultiFeatures(Path file, int skipRows,
             int sheetNr) throws IOException {
-        
-        try(Workbook workbook = WorkbookFactory.create(file.toFile(), null, true)) {
+
+        try (Workbook workbook = WorkbookFactory.create(file.toFile(), null, true)) {
             Map<String, List<String>> features = new HashMap<>();
-            
+
             FormulaEvaluator formEval = workbook.getCreationHelper().createFormulaEvaluator();
             formEval.setIgnoreMissingWorkbooks(true);
 
