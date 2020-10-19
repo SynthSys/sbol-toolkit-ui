@@ -119,22 +119,29 @@ public class TemplateTransformer {
 
         for (Component c : parent.getSortedComponents()) {
             // If this component identity matches the generic component ID, replace it
-            if (c.getIdentity().equals(URI.create(genericComponentId))) {
+            // if (c.getIdentity().equals(URI.create(genericComponentId))) {
+            if (c.getDisplayId().equals(genericComponentId)) {
                 prevCmpDef = c.getDefinition();
 
                 // make copy of existing component definition - does version have to be supplied?
                 // should use instantiateFromTemplate method here
                 newCmpDef = (ComponentDefinition) doc.createCopy(prevCmpDef, cleanName, prevCmpDef.getVersion());
-                newCmpDef.setName(newName);
+                newCmpDef.setName(cleanName);
                 newCmpDef.addWasDerivedFrom(prevCmpDef.getIdentity());
 
                 // How do we validate that it's the correct sequence we're setting,
                 // if there are multiple sequences in the component definition?
                 // Perhaps an optional 'sequenceName' parameter could be provided?
-                for (Sequence seq : newCmpDef.getSequences()) {
+                /*for (Sequence seq : newCmpDef.getSequences()) {
                     seq.setElements(newSequence);
                     break;
-                }
+                }*/
+
+                // Assume we are adding a new sequence to the component
+                String version = "1.0.0"; // should this be the version of the component definition?
+                Sequence seq = doc.createSequence(cleanName+"_seq", version,
+                        newSequence, Sequence.IUPAC_DNA);
+                newCmpDef.addSequence(seq);
 
                 // see edu.utah.ece.async.sboldesigner.sbol.editor.SBOLDesign.rebuildSequences
                 // add sequence to the new component
@@ -150,8 +157,9 @@ public class TemplateTransformer {
                 // update links in parent component
                 SequenceConstraint seqCon = parent.getSequenceConstraint(genericComponentId);
 
-                Component link = parent.createComponent(cleanName.concat("_Component"), AccessType.PUBLIC, newCmpDef.getIdentity());
+                Component link = parent.createComponent(cleanName, AccessType.PUBLIC, newCmpDef.getIdentity());
                 link.addWasDerivedFrom(c.getIdentity());
+                link.setName(cleanName);
 
                 cmpsToRemove.add(c);
 
@@ -176,12 +184,13 @@ public class TemplateTransformer {
 
         for(Component cmp : cmpsToRemove) {
             removeConstraintReferences(parent, cmp);
-            parent.removeComponent(cmp);
+            boolean removed = parent.removeComponent(cmp);
+            System.out.println("Removed success: ".concat(String.valueOf(removed)));
         }
 
         // Add the flattened sequences to the parent component's SequenceAnnotation component
         //parent = flattenSequences(parent, newName, doc);
-        return parent;
+        return newCmpDef;
     }
 
     /**

@@ -200,26 +200,26 @@ public class TemplateTransformerTest {
         assertNotNull(newDeff);
 
         //it is being replaced
-        //assertNull(newDeff.getComponent(genericComponentId));
+        assertNull(parent.getComponent(genericComponentId));
 
         // Shouldn't the genericComponentId return the newly created replacement
         // component? Won't the new component and the old component share the
         // same genericComponentId i.e. the String returned from 'getIdentity',
         // but they will simply have different names (i.e. 'getName') and/or
         // display IDs (i.e. 'getDisplayId')?
-        assertNotNull(newDeff.getComponent(genericComponentId));
+        //assertNotNull(newDeff.getComponent(genericComponentId));
         String newDisplayId = templateTransformer.sanitizeName(newName);
 
-        Component newComp = newDeff.getComponent(newDisplayId);
+        Component newComp = parent.getComponent(newDisplayId);
         assertNotNull(newComp);
 
-        assertEquals(newName, newComp.getName());
+        assertEquals(newDisplayId, newComp.getName());
         assertEquals(parent.getVersion(), newComp.getVersion());
         assertEquals(newDeff.getIdentity(), newComp.getDefinitionIdentity());
         assertEquals(replaced.getRoles(), newComp.getRoles());
 
         //check if newDefinition is correct        
-        assertEquals(newName, newDeff.getName());
+        assertEquals(newDisplayId, newDeff.getName());
         assertEquals(newDisplayId, newDeff.getDisplayId());
 
         assertTrue(newDeff.getSequences().stream().findFirst().isPresent());
@@ -251,17 +251,20 @@ public class TemplateTransformerTest {
             if (cmpDefId.equals("sll00199_codA_Km") || cmpDefId.equals("cyano_codA_Km")) {
                 // Create new sub-component belonging to one of these parent CDs
                 Component subCmp = cmpDef.getComponent("left");
-                String genericComponentId = subCmp.getIdentity().toString();
+                // String genericComponentId = subCmp.getIdentity().toString();
+                String genericComponentId = subCmp.getDisplayId();
                 System.out.println(genericComponentId);
                 String newName = "test_left_".concat(String.valueOf(cmpCount));
                 String newSequence = "GATTACA";
 
-                ComponentDefinition newParent = templateTransformer.concreatizePart(cmpDef, genericComponentId,
+                // Get list of original components in parent before concretize
+                List<Component> origCmps = cmpDef.getSortedComponents();
+
+                ComponentDefinition newSubCmpDef = templateTransformer.concreatizePart(cmpDef, genericComponentId,
                         newName, newSequence, doc);
 
                 // Get child components and verify they match in new component
-                List<Component> origCmps = cmpDef.getSortedComponents();
-                List<Component> newCmps = newParent.getSortedComponents();
+                List<Component> newCmps = cmpDef.getSortedComponents();
                 int count = 0;
 
                 for (Component child : origCmps) {
@@ -270,7 +273,7 @@ public class TemplateTransformerTest {
                     System.out.println(child.getDisplayId());
                     System.out.println(newCmp.getDisplayId());
                 }
-                
+
                 cmpCount += 1;
                 // Get sequence constraints and verify they match in new component
 
