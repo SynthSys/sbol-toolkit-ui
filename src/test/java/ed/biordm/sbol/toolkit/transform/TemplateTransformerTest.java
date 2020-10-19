@@ -69,10 +69,6 @@ public class TemplateTransformerTest {
         String newName = "region2";
         String newVersion = "1.0.1";
         String newDescription = "Deep copy of DNA_REGION component";
-        URI expTypeURI = URI.create(defaultURIPrefix.concat(region.getDisplayId())
-                .concat("/").concat(region.getVersion()));
-        Set<URI> expTypesSet = new HashSet<>();
-        expTypesSet.add(expTypeURI);
 
         ComponentDefinition newCmp = templateTransformer.instantiateFromTemplate(region,
                 newName, newVersion, newDescription, doc);
@@ -80,7 +76,7 @@ public class TemplateTransformerTest {
         assertEquals(newName, newCmp.getDisplayId());
         assertEquals(newVersion, newCmp.getVersion());
         assertEquals(newDescription, newCmp.getDescription());
-        assertEquals(expTypesSet, newCmp.getTypes());
+        assertEquals(region.getTypes(), newCmp.getTypes());
         assertEquals(region.getRoles(), newCmp.getRoles());
     }
 
@@ -124,6 +120,56 @@ public class TemplateTransformerTest {
                 assertNotNull(cpyComp);
                 assertEquals(orgComp.getDefinitionIdentity(), cpyComp.getDefinitionIdentity());
             }
+        }
+
+        assertEquals(org.getComponents().size(), newCmp.getComponents().size());
+        for (Component orgComp : org.getComponents()) {
+            Component cpy = newCmp.getComponent(orgComp.getDisplayId());
+            assertNotNull(cpy);
+            assertEquals(orgComp.getDefinitionIdentity(), cpy.getDefinitionIdentity());
+        }
+    }
+
+    @Test
+    public void testInstantiateFromTemplatePreservingSequenceConstraints() throws Exception {
+        assertNotNull(doc);
+
+        ComponentDefinition org = doc.getComponentDefinition("ampr_origin", "1.0.0");
+        org.createAnnotation(new QName("https://ed.ac.uk/", "bio"), "johnny");
+
+        assertNotNull(org);
+
+        String newName = "escape! Me";
+        String newVersion = "1.0.1";
+        String newDescription = "Deep copy of DNA_REGION component";
+
+        ComponentDefinition newCmp = templateTransformer.instantiateFromTemplate(org,
+                newName, newVersion, newDescription, doc);
+
+        assertNotSame(org, newCmp);
+
+        assertEquals(newName, newCmp.getName());
+        assertEquals("escape__Me", newCmp.getDisplayId());
+        assertEquals(newVersion, newCmp.getVersion());
+        assertEquals(newDescription, newCmp.getDescription());
+        assertEquals(org.getTypes(), newCmp.getTypes());
+        assertEquals(org.getRoles(), newCmp.getRoles());
+        assertEquals(org.getSequences(), newCmp.getSequences());
+        assertEquals(org.getAnnotations(), newCmp.getAnnotations());
+
+        assertEquals(org.getSequenceConstraints().size(), newCmp.getSequenceConstraints().size());
+
+        for (SequenceConstraint orgCon : org.getSequenceConstraints()) {
+            SequenceConstraint cpy = newCmp.getSequenceConstraint(orgCon.getDisplayId());
+            assertNotNull(cpy);
+            assertEquals(orgCon.getRoles(), cpy.getRoles());
+            /*assertEquals(orgCon.getLocations().size(), cpy.getLocations().size());
+            if (orgCon.getComponent() != null) {
+                Component orgComp = orgCon.getComponent();
+                Component cpyComp = cpy.getComponent();
+                assertNotNull(cpyComp);
+                assertEquals(orgComp.getDefinitionIdentity(), cpyComp.getDefinitionIdentity());
+            }*/
         }
 
         assertEquals(org.getComponents().size(), newCmp.getComponents().size());
