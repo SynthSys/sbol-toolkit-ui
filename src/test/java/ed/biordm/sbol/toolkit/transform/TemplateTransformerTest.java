@@ -7,8 +7,6 @@ package ed.biordm.sbol.toolkit.transform;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URI;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import javax.xml.namespace.QName;
@@ -23,6 +21,7 @@ import org.sbolstandard.core2.SBOLReader;
 import org.sbolstandard.core2.SBOLValidationException;
 import org.sbolstandard.core2.Sequence;
 import org.sbolstandard.core2.SequenceAnnotation;
+import org.sbolstandard.core2.SequenceConstraint;
 
 /**
  *
@@ -162,8 +161,8 @@ public class TemplateTransformerTest {
         for (SequenceConstraint orgCon : org.getSequenceConstraints()) {
             SequenceConstraint cpy = newCmp.getSequenceConstraint(orgCon.getDisplayId());
             assertNotNull(cpy);
-            assertEquals(orgCon.getRoles(), cpy.getRoles());
-            /*assertEquals(orgCon.getLocations().size(), cpy.getLocations().size());
+            /*assertEquals(orgCon.getRoles(), cpy.getRoles());
+            assertEquals(orgCon.getLocations().size(), cpy.getLocations().size());
             if (orgCon.getComponent() != null) {
                 Component orgComp = orgCon.getComponent();
                 Component cpyComp = cpy.getComponent();
