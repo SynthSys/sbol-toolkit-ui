@@ -347,9 +347,7 @@ public class TemplateTransformerTest {
         assertNotNull(gapSeq);
 
         String flattenedSequence = amprOrigSeq.getElements();
-        System.out.println(flattenedSequence);
         flattenedSequence = flattenedSequence.concat(leftSeq.getElements());
-        System.out.println(flattenedSequence);
         flattenedSequence = flattenedSequence.concat(codAKmSeq.getElements());
         flattenedSequence = flattenedSequence.concat(rightSeq.getElements());
         flattenedSequence = flattenedSequence.concat(gapSeq.getElements());
