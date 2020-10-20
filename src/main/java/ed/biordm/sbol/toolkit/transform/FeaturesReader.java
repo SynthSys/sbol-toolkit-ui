@@ -122,12 +122,13 @@ public class FeaturesReader {
             if (row.getRowNum() < skipRows) {
                 continue;
             }
-            Iterator<Cell> cellItr = row.cellIterator();
             List<String> colVals = new ArrayList<>();
 
             // Iterate each cell in a row
-            while (cellItr.hasNext()) {
-                Cell cell = cellItr.next();
+            int lastColumn = row.getLastCellNum();
+
+            for (int cn = 0; cn < lastColumn; cn++) {
+                Cell cell = row.getCell(cn, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
                 int index = cell.getColumnIndex();
 
                 String cellValue = getStringValueFromCell(cell);
