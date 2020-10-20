@@ -75,7 +75,12 @@ public class ExcelConverterTest {
         leftSheet.forEach((key, value) -> {
             List<String> colVals = (List<String>) value;
             String leftFlankName = key;
-            String leftFlankSequence = value.get(0);
+            String leftFlankSequence = "";
+            String rightFlankSequence = "";
+
+            if(value.size() > 0) {
+                leftFlankSequence = value.get(0);
+            }
 
             String[] nameStrs = leftFlankName.split("_left");
             // prepend the organism type so it's valid (must begin with letter)
@@ -86,7 +91,9 @@ public class ExcelConverterTest {
 
             List<String> rightFlankVal = rightSheet.get(rightFlankName);
 
-            String rightFlankSequence = value.get(0);
+            if(value.size() > 0) {
+                rightFlankSequence = value.get(0);
+            }
             
             //String lfGenericId = "left_flank";
             //String rfGenericId = "right_flank";
@@ -95,7 +102,7 @@ public class ExcelConverterTest {
 
             // Create new plasmid with the two replaced flank components
             // String newPlasmidName = flankNamePrefix.concat("_codA_Km");
-            String newPlasmidName = "codA_Km_".concat(flankNamePrefix);
+            String newPlasmidName = flankNamePrefix;
             String version = "1.0.0";
             String description = "Plasmid with both flanks replaced";
 
@@ -107,11 +114,11 @@ public class ExcelConverterTest {
                 sbolFile = copySBOLFile(newPlasmidName);
                 newDoc = readSBOLFile(sbolFile);
             } catch (IOException ex) {
-                Logger.getLogger(ExcelConverterTest.class.getName()).log(Level.SEVERE, null, ex);
+                ex.printStackTrace();
             } catch (SBOLValidationException ex) {
-                Logger.getLogger(ExcelConverterTest.class.getName()).log(Level.SEVERE, null, ex);
+                ex.printStackTrace();
             } catch (SBOLConversionException ex) {
-                Logger.getLogger(ExcelConverterTest.class.getName()).log(Level.SEVERE, null, ex);
+                ex.printStackTrace();
             }
 
             ComponentDefinition newCyanoCD;
@@ -138,9 +145,9 @@ public class ExcelConverterTest {
                 // Finally, flatten the new sequences into the parent plasmid definition
                 newCyanoCDFlat = templateTransformer.flattenSequences(newCyanoCD, newPlasmidName.concat("_flat"), newDoc);
             } catch (SBOLValidationException ex) {
-                Logger.getLogger(ExcelConverterTest.class.getName()).log(Level.SEVERE, null, ex);
+                ex.printStackTrace();
             } catch (URISyntaxException ex) {
-                Logger.getLogger(ExcelConverterTest.class.getName()).log(Level.SEVERE, null, ex);
+                ex.printStackTrace();
             }
 
             // Remove extraneous components/definitions
@@ -157,11 +164,11 @@ public class ExcelConverterTest {
             }
 
             try {
-                SBOLWriter.write(newDoc, "D:/Temp/"+fName+".xml");
-            } catch (IOException e) {
-                e.printStackTrace();
+                SBOLWriter.write(newDoc, "D:/Temp/sbol/"+fName+".xml");
+            } catch (IOException ex) {
+                ex.printStackTrace();
             } catch (SBOLConversionException ex) {
-                Logger.getLogger(ExcelConverterTest.class.getName()).log(Level.SEVERE, null, ex);
+                ex.printStackTrace();
             }
         });
 
