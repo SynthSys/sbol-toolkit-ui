@@ -300,6 +300,17 @@ public class TemplateTransformerTest {
             System.out.println("Initial sequence: " + sequence.getElements());
         }
 
+        String newName = "sll00199_codA_Km!/new_1";
+        ComponentDefinition parent = templateTransformer.flattenSequences(template, newName, doc);
+
+        assertNotNull(parent);
+
+        String expFlattenedSeq = buildSll00199CodAKmSequence();
+        for (Sequence sequence : parent.getSequences()) {
+            System.out.println("Flattened sequence:\n" + sequence.getElements());
+            assertEquals(expFlattenedSeq, sequence.getElements());
+        }
+
         for (Component cmp : template.getComponents()) {
             ComponentDefinition cmpDef = cmp.getDefinition();
             String newSequence = "GATTACA";
@@ -308,13 +319,41 @@ public class TemplateTransformerTest {
             cmpDef.addSequence(seq);
         }
 
-        String newName = "right!/new";
-        ComponentDefinition parent = templateTransformer.flattenSequences(template, newName, doc);
+        newName = "sll00199_codA_Km!/new_2";
+        parent = templateTransformer.flattenSequences(template, newName, doc);
 
         assertNotNull(parent);
 
         for (Sequence sequence : parent.getSequences()) {
-            System.out.println("Flattened sequence: " + sequence.getElements());
+            System.out.println("Flattened sequence:\n" + sequence.getElements());
+            assertNotEquals(expFlattenedSeq, sequence.getElements());
         }
+    }
+
+    private String buildSll00199CodAKmSequence() {
+        assertNotNull(doc);
+
+        // ampr -> left -> insert -> right -> gap
+        Sequence amprOrigSeq = doc.getSequence("ampr_origin_seq", "1.0.0");
+        Sequence leftSeq = doc.getSequence("sll00199_left_seq", "1.0.0");
+        Sequence codAKmSeq = doc.getSequence("codA_Km_seq", "1.0.0");
+        Sequence rightSeq = doc.getSequence("sll00199_right_seq", "1.0.0");
+        Sequence gapSeq = doc.getSequence("gap_seq", "1.0.0");
+
+        assertNotNull(amprOrigSeq);
+        assertNotNull(leftSeq);
+        assertNotNull(codAKmSeq);
+        assertNotNull(rightSeq);
+        assertNotNull(gapSeq);
+
+        String flattenedSequence = amprOrigSeq.getElements();
+        System.out.println(flattenedSequence);
+        flattenedSequence = flattenedSequence.concat(leftSeq.getElements());
+        System.out.println(flattenedSequence);
+        flattenedSequence = flattenedSequence.concat(codAKmSeq.getElements());
+        flattenedSequence = flattenedSequence.concat(rightSeq.getElements());
+        flattenedSequence = flattenedSequence.concat(gapSeq.getElements());
+
+        return flattenedSequence;
     }
 }
