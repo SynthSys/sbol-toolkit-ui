@@ -90,54 +90,41 @@ public class TemplateTransformer {
         // it returns the new sub component definion not the parent so it can be further customized if needed
         String cleanName = sanitizeName(newName);
 
-        ComponentDefinition prevCmpDef = null;
-        ComponentDefinition newCmpDef = null;
+        Component cmp = parent.getComponent(genericComponentId);
+        ComponentDefinition prevCmpDef = cmp.getDefinition();
 
-        List<Component> cmpsToRemove = new ArrayList<>();
+        // make copy of existing component definition - does version have to be supplied?
+        // should use instantiateFromTemplate method here
+        ComponentDefinition newCmpDef = (ComponentDefinition) doc.createCopy(prevCmpDef, cleanName, prevCmpDef.getVersion());
+        newCmpDef.setName(cleanName);
+        newCmpDef.addWasDerivedFrom(prevCmpDef.getIdentity());
 
-        for (Component c : parent.getSortedComponents()) {
-            // If this component identity matches the generic component ID, replace it
-            // if (c.getIdentity().equals(URI.create(genericComponentId))) {
-            if (c.getDisplayId().equals(genericComponentId)) {
-                prevCmpDef = c.getDefinition();
+        // Assume we are adding a new sequence to the component
+        String version = "1.0.0"; // should this be the version of the component definition?
+        Sequence seq = doc.createSequence(cleanName + "_seq", version,
+                newSequence, Sequence.IUPAC_DNA);
+        newCmpDef.addSequence(seq);
 
-                // make copy of existing component definition - does version have to be supplied?
-                // should use instantiateFromTemplate method here
-                newCmpDef = (ComponentDefinition) doc.createCopy(prevCmpDef, cleanName, prevCmpDef.getVersion());
-                newCmpDef.setName(cleanName);
-                newCmpDef.addWasDerivedFrom(prevCmpDef.getIdentity());
+        Component link = parent.createComponent(cleanName, AccessType.PUBLIC, newCmpDef.getIdentity());
+        link.addWasDerivedFrom(cmp.getIdentity());
+        link.setName(cleanName);
 
-                // Assume we are adding a new sequence to the component
-                String version = "1.0.0"; // should this be the version of the component definition?
-                Sequence seq = doc.createSequence(cleanName + "_seq", version,
-                        newSequence, Sequence.IUPAC_DNA);
-                newCmpDef.addSequence(seq);
+        for (SequenceConstraint sc : parent.getSequenceConstraints()) {
+            Component object = sc.getObject();
+            Component subject = sc.getSubject();
 
-                Component link = parent.createComponent(cleanName, AccessType.PUBLIC, newCmpDef.getIdentity());
-                link.addWasDerivedFrom(c.getIdentity());
-                link.setName(cleanName);
-
-                cmpsToRemove.add(c);
-
-                for (SequenceConstraint sc : parent.getSequenceConstraints()) {
-                    Component object = sc.getObject();
-                    Component subject = sc.getSubject();
-
-                    if (subject.getIdentity().equals(c.getIdentity())) {
-                        parent.removeSequenceConstraint(sc);
-                        parent.createSequenceConstraint(sc.getDisplayId(), RestrictionType.PRECEDES, link.getIdentity(), object.getIdentity());
-                    } else if (object.getIdentity().equals(c.getIdentity())) {
-                        parent.removeSequenceConstraint(sc);
-                        parent.createSequenceConstraint(sc.getDisplayId(), RestrictionType.PRECEDES, object.getIdentity(), link.getIdentity());
-                    }
-                }
+            if (subject.getIdentity().equals(cmp.getIdentity())) {
+                parent.removeSequenceConstraint(sc);
+                parent.createSequenceConstraint(sc.getDisplayId(), RestrictionType.PRECEDES, link.getIdentity(), object.getIdentity());
+            } else if (object.getIdentity().equals(cmp.getIdentity())) {
+                parent.removeSequenceConstraint(sc);
+                parent.createSequenceConstraint(sc.getDisplayId(), RestrictionType.PRECEDES, object.getIdentity(), link.getIdentity());
             }
         }
 
-        for (Component cmp : cmpsToRemove) {
-            removeConstraintReferences(parent, cmp);
-            parent.removeComponent(cmp);
-        }
+        // Remove old constraints and previous component instance
+        removeConstraintReferences(parent, cmp);
+        parent.removeComponent(cmp);
 
         // Add the flattened sequences to the parent component's SequenceAnnotation component
         //parent = flattenSequences(parent, newName, doc);
