@@ -95,7 +95,7 @@ public class TemplateTransformer {
 
         // make copy of existing component definition - does version have to be supplied?
         // should use instantiateFromTemplate method here
-        ComponentDefinition newCmpDef = (ComponentDefinition) doc.createCopy(prevCmpDef, cleanName, prevCmpDef.getVersion());
+        ComponentDefinition newCmpDef = (ComponentDefinition) doc.createCopy(prevCmpDef, cleanName, parent.getVersion());
         newCmpDef.setName(cleanName);
         newCmpDef.addWasDerivedFrom(prevCmpDef.getIdentity());
 
