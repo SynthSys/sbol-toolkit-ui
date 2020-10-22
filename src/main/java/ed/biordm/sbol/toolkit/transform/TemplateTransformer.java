@@ -105,26 +105,60 @@ public class TemplateTransformer {
                 newSequence, Sequence.IUPAC_DNA);
         newCmpDef.addSequence(seq);
 
+        // Create instance of new component definition
         Component link = parent.createComponent(cleanName, AccessType.PUBLIC, newCmpDef.getIdentity());
         link.addWasDerivedFrom(cmp.getIdentity());
         link.setName(cleanName);
 
-        for (SequenceConstraint sc : parent.getSequenceConstraints()) {
+        // Create SequenceAnnotation for new component definition and link to instance
+        SequenceAnnotation seqAnn = parent.createSequenceAnnotation(cleanName + "_sa", cleanName + "_sa", 1, newSequence.length());
+        seqAnn.setComponent(link.getIdentity());
+
+        replaceComponent(parent, cmp, link);
+        //parent.removeComponent(cmp);
+        /*Set<SequenceConstraint> oldSeqCons = parent.getSequenceConstraints();
+
+        parent.clearSequenceConstraints();
+        parent.removeComponent(cmp);
+
+        // Generate sequence constraints for instance of new component definition
+        for (SequenceConstraint sc : oldSeqCons) {
             Component object = sc.getObject();
             Component subject = sc.getSubject();
+            ComponentDefinition objectCD = sc.getObjectDefinition();
+            ComponentDefinition subjectCD = sc.getSubjectDefinition();
 
-            if (subject.getIdentity().equals(cmp.getIdentity())) {
+            System.out.println("\nComponent ID:");
+            System.out.println(object.getIdentity());
+            System.out.println(subject.getIdentity());
+            System.out.println(cmp.getIdentity());
+
+            System.out.println("\nComponentDefinition ID:");
+            System.out.println(objectCD.getIdentity());
+            System.out.println(subjectCD.getIdentity());
+            System.out.println(cmp.getDefinition().getIdentity());
+            System.out.println("--------");
+
+            if (subject.getIdentity().equals(cmp.getIdentity())) { // removes/adds cs2
+                System.out.println("HERE4: "+sc.getDisplayId());
                 parent.removeSequenceConstraint(sc);
                 parent.createSequenceConstraint(sc.getDisplayId(), RestrictionType.PRECEDES, link.getIdentity(), object.getIdentity());
-            } else if (object.getIdentity().equals(cmp.getIdentity())) {
+            } else if (object.getIdentity().equals(cmp.getIdentity())) { // removes/adds cs1
+                System.out.println("HERE5: "+sc.getDisplayId());
                 parent.removeSequenceConstraint(sc);
                 parent.createSequenceConstraint(sc.getDisplayId(), RestrictionType.PRECEDES, object.getIdentity(), link.getIdentity());
+            } else if (objectCD.getIdentity().equals(cmp.getDefinition().getIdentity())) {
+                System.out.println("HERE1: "+sc.getDisplayId());
+            } else if (subjectCD.getIdentity().equals(cmp.getDefinition().getIdentity())) {
+                System.out.println("HERE2: "+sc.getDisplayId());
+            } else {
+                parent.createSequenceConstraint(sc.getDisplayId(), RestrictionType.PRECEDES, subject.getIdentity(), object.getIdentity());
             }
         }
 
         // Remove old constraints and previous component instance
-        removeConstraintReferences(parent, cmp);
-        parent.removeComponent(cmp);
+        //removeConstraintReferences(parent, cmp);
+        //parent.removeComponent(cmp);*/
 
         // Add the flattened sequences to the parent component's SequenceAnnotation component
         //parent = flattenSequences(parent, newName, doc);
@@ -202,6 +236,21 @@ public class TemplateTransformer {
         }
     }
 
+    protected void replaceComponent(ComponentDefinition parent, Component oldComponent, Component newComponent) throws SBOLValidationException {
+        for (SequenceConstraint sc : parent.getSequenceConstraints()) {
+            if (sc.getSubject().equals(oldComponent)) {
+                // Replace the subject in the constraint with the new component
+                sc.setSubject(newComponent.getIdentity());
+            }
+            if (sc.getObject().equals(oldComponent)) {
+                // Replace the object in the constraint with the new component
+                sc.setObject(newComponent.getIdentity());
+            }
+        }
+
+        parent.removeComponent(oldComponent);
+    }
+
     /**
      * Copied from
      * edu.utah.ece.async.sboldesigner.sbol.editor.SBOLDesign.rebuildSequences
@@ -238,10 +287,24 @@ public class TemplateTransformer {
             length += currSeq.length();*/
 
             OrientationType o = OrientationType.INLINE;
+            for(SequenceAnnotation seqAnn : curr.getSequenceAnnotations()) {
+                if(seqAnn == null) {
+                    if (length == 0) {
+                        seqAnn = comp.createSequenceAnnotation(seqAnn.getDisplayId(), "GenericLocation", o);
+                    } else {
+                        seqAnn = comp.createSequenceAnnotation(seqAnn.getDisplayId(), "Range", start, start + length - 1, o);
+                        start += length;
+                    }
+                    seqAnn.setComponent(c.getIdentity());
+                }
+
+                newSequenceAnns.add(seqAnn);
+            }
+
             for (SequenceAnnotation sa : oldSequenceAnns) {
-                Component saCmp = sa.getComponent();
-                if (saCmp != null) {
-                    if (saCmp.getIdentity() == c.getIdentity()) {
+                ComponentDefinition saCmpDef = sa.getComponentDefinition();
+                if (saCmpDef != null) {
+                    if (saCmpDef.getDisplayId().equals(c.getDisplayId())) {
                         o = sa.getLocations().iterator().next().getOrientation();
                         SequenceAnnotation seqAnn = comp.getSequenceAnnotation(sa.getDisplayId());
 
@@ -272,8 +335,6 @@ public class TemplateTransformer {
                 comp.getSequences().iterator().next().setElements(newSeq);
             }
         }
-
-        comp.getSequenceAnnotations().addAll(newSequenceAnns);
     }
 
     /**

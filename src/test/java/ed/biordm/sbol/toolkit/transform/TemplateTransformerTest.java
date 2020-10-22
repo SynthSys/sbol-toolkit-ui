@@ -16,6 +16,7 @@ import org.junit.Test;
 import org.junit.Before;
 import org.sbolstandard.core2.Component;
 import org.sbolstandard.core2.ComponentDefinition;
+import org.sbolstandard.core2.Location;
 import org.sbolstandard.core2.SBOLConversionException;
 import org.sbolstandard.core2.SBOLDocument;
 import org.sbolstandard.core2.SBOLReader;
@@ -391,5 +392,155 @@ public class TemplateTransformerTest {
             System.out.println(seqAnn.getIdentity());
             System.out.println(seqAnn.getComponentIdentity());
         }
+
+        ComponentDefinition templateFlat = doc.getComponentDefinition("sll00199_codA_Km_flat", "1.0.0");
+        //ComponentDefinition template = doc.getComponentDefinition("cyano_codA_Km", "1.0.0");
+        assertNotNull(template);
+
+        for (SequenceAnnotation seqAnn : templateFlat.getSequenceAnnotations()) {
+            //System.out.println(seqAnn.getComponentDefinition().getDisplayId());
+            //System.out.println(seqAnn.getComponent().getDisplayId());
+            System.out.println(seqAnn.getIdentity());
+            System.out.println(seqAnn.getComponentIdentity());
+        }
+
+        // template.getSequenceAnnotations().addAll(childSeqAnns);
+        //template.createSequenceAnnotation(displayId, locationId, 0, 0, OrientationType.INLINE)
+        for (SequenceAnnotation seqAnn : template.getSequenceAnnotations()) {
+            //System.out.println(seqAnn.getComponentDefinition().getDisplayId());
+            //System.out.println(seqAnn.getComponent().getDisplayId());
+            //template.createSequenceAnnotation(seqAnn.getDisplayId(), seqAnn.getLocation(displayId), seqAnn.);
+            List<Location> locations = seqAnn.getSortedLocations();
+            locations.get(0).getSequence().getElements();
+        }
+    }
+
+    /**
+     * Test of instantiateFromTemplate method, of class TemplateTransformer.
+     */
+    @Test
+    public void testCreateNewPlasmid() throws Exception {
+        // Get original sll00199 component definition for comparison
+        assertNotNull(doc);
+
+        ComponentDefinition sll00199Plasmid = doc.getComponentDefinition("sll00199_codA_Km", "1.0.0");
+
+        // Copy Template
+        ComponentDefinition templatePlasmid = doc.getComponentDefinition("cyano_codA_Km", "1.0.0");
+
+        String newName = "sll00199_codA_Km_johnny";
+        String version = "1.0.0";
+        String description = "Test plasmid creation";
+        ComponentDefinition newPlasmid = templateTransformer.instantiateFromTemplate(templatePlasmid, newName, version, description, doc);
+
+        // Check component instances match
+        for (Component cmp : sll00199Plasmid.getSortedComponents()) {
+            System.out.println(cmp.getDisplayId());
+            assertNotNull(newPlasmid.getComponent(cmp.getDisplayId()));
+        }
+
+        for (Component cmp : newPlasmid.getSortedComponents()) {
+            System.out.println(cmp.getDisplayId());
+            assertNotNull(sll00199Plasmid.getComponent(cmp.getDisplayId()));
+        }
+
+        // Left sequence elements
+        // doc.getSequence("sll00199_left_seq")
+        String ltSeq = "caaggcaaaaccaccgttatcagcagaacgacggcgggaaaaaatgattaaacgaaaaaatttgcaaggattcatagcggttgcccaatctaactcagggagcgacttcagcccacaaaaaacaccactgggcctactgggctattcccattatcatctacattgaagggatagcaagctaatttttatgacggcgatcgccaaaaacaaagaaaattcagcaattaccgtgggtagcaaaaaatccccatctaaagttcagtaaatatagctagaacaaccaagcattttcggcaaagtactattcagatagaacgagaaatgagcttgttctatccgcccggggctgaggctgtataatctacgacgggctgtcaaacattgtgataccatgggcagaagaaaggaaaaacgtccctgatcgcctttttgggcacggagtagggcgttaccccggcccgttcaaccacaagtccctatAGATACAATCGCCAAGAAGT";
+        String genericCmpId = "left";
+
+        templateTransformer.concretizePart(newPlasmid, genericCmpId, "test_left",
+                ltSeq, doc);
+
+        // Right sequence elements
+        // doc.getSequence("sll00199_right_seq")
+        String rtSeq = "tcagccagctcaatctgtgtgtcgttgatttaagcttaatgctacggggtctgtctccaactccctcagcttctcgcaatggcaaggcaaataatgtttctcttgctgagtagatgttcaggaggacggatcgaaagtctacaaaacagattcttgaccaagccatctacttagaaaaacttctgcgttttggcgatcgcatcttttaagcgagatgcgatttttttgtccattagtttgtattttaatactcttttgttgtttgatttcgtccaagcttttcttggtatgtgggatcttccgtgcccaaaattttatcccagaaagtgaaatatagtcatttcaattaacgatgagagaatttaatgtaaaattatggagtgtacaaaatgaacaggtttaaacaatggcttacagtttagatttaaggcaaagggtagtagcttatatagaagctggaggaaaaataactgaggcttccaagatatataaaataggaaaagcctcgatatacagatggttaaatagagtagatttaagcccaacaaaagtagagcgtcgccatagg";
+        genericCmpId = "right";
+
+        templateTransformer.concretizePart(newPlasmid, genericCmpId, "test_right",
+                rtSeq, doc);
+
+        // Check component instances match
+        for (Component cmp : sll00199Plasmid.getSortedComponents()) {
+            System.out.println(cmp.getDisplayId());
+            //assertNotNull(newPlasmid.getComponent(cmp.getDisplayId()));
+        }
+
+        for (Component cmp : newPlasmid.getSortedComponents()) {
+            System.out.println(cmp.getDisplayId());
+            //assertNotNull(sll00199Plasmid.getComponent(cmp.getDisplayId()));
+        }
+
+        // Check left and right flank sequences match
+        ComponentDefinition sll00199LtCD = sll00199Plasmid.getComponent("left").getDefinition();
+        ComponentDefinition sll00199RtCD = sll00199Plasmid.getComponent("right").getDefinition();
+
+        ComponentDefinition newLtCD = newPlasmid.getComponent("test_left").getDefinition();
+        ComponentDefinition newRtCD = newPlasmid.getComponent("test_right").getDefinition();
+
+        Set<Sequence> sll00199LtCDSeqs = sll00199LtCD.getSequences();
+        Set<Sequence> sll00199RtCDSeqs = sll00199RtCD.getSequences();
+
+        // assuming only one sequence per flank
+        String sll00199LtSeqEls = ((Sequence)sll00199LtCDSeqs.toArray()[0]).getElements();
+        String sll00199RtSeqEls = ((Sequence)sll00199RtCDSeqs.toArray()[0]).getElements();
+
+        Set<Sequence> newLtCDSeqs = newLtCD.getSequences();
+        Set<Sequence> newRtCDSeqs = newRtCD.getSequences();
+
+        // assuming only one sequence per flank
+        String newLtSeqEls = ((Sequence)newLtCDSeqs.toArray()[0]).getElements();
+        String newRtSeqEls = ((Sequence)newRtCDSeqs.toArray()[0]).getElements();
+
+        assertEquals(ltSeq, sll00199LtSeqEls);
+        assertEquals(ltSeq, newLtSeqEls);
+        assertEquals(sll00199LtSeqEls, newLtSeqEls);
+
+        assertEquals(rtSeq, sll00199RtSeqEls);
+        assertEquals(rtSeq, newRtSeqEls);
+        assertEquals(sll00199RtSeqEls, newRtSeqEls);
+
+        // Check sequence constraints match
+        Set<SequenceConstraint> sll00199SCs = sll00199Plasmid.getSequenceConstraints();
+        Set<SequenceConstraint> npSCs = newPlasmid.getSequenceConstraints();
+
+        for (SequenceConstraint sc : npSCs) {
+            System.out.println(sc.getDisplayId());
+            SequenceConstraint npSc = newPlasmid.getSequenceConstraint(sc.getDisplayId());
+            //assertEquals(sc.getSubject().getDefinition().getWasDerivedFroms(), npSc.getSubject().getDefinition().getWasDerivedFroms());
+            assertNotNull(sll00199Plasmid.getSequenceConstraint(npSc.getDisplayId()));
+        }
+
+        for (SequenceConstraint sc : sll00199SCs) {
+            System.out.println(sc.getDisplayId());
+            SequenceConstraint sll00199Sc = newPlasmid.getSequenceConstraint(sc.getDisplayId());
+            //assertNotNull(npSc);
+            //assertEquals(sc.getObject().getDefinition().getWasDerivedFroms(), npSc.getObject().getDefinition().getWasDerivedFroms());
+            //assertEquals(sc.getSubject().getDefinition().getWasDerivedFroms(), npSc.getSubject().getDefinition().getWasDerivedFroms());
+            assertNotNull(newPlasmid.getSequenceConstraint(sll00199Sc.getDisplayId()));
+        }
+
+        // Check sequence annotations match
+        // Get sequence annos and verify they match in new component
+        /*for (SequenceAnnotation seqAnn : childSeqAnns) {
+            //System.out.println(seqAnn.getComponentDefinition().getDisplayId());
+            //System.out.println(seqAnn.getComponent().getDisplayId());
+            System.out.println(seqAnn.getIdentity());
+            System.out.println(seqAnn.getComponentIdentity());
+        }
+
+        for (SequenceAnnotation seqAnn : template.getSequenceAnnotations()) {
+            //System.out.println(seqAnn.getComponentDefinition().getDisplayId());
+            //System.out.println(seqAnn.getComponent().getDisplayId());
+            System.out.println(seqAnn.getIdentity());
+            System.out.println(seqAnn.getComponentIdentity());
+        }
+
+        for (SequenceAnnotation seqAnn : templateFlat.getSequenceAnnotations()) {
+            //System.out.println(seqAnn.getComponentDefinition().getDisplayId());
+            //System.out.println(seqAnn.getComponent().getDisplayId());
+            System.out.println(seqAnn.getIdentity());
+            System.out.println(seqAnn.getComponentIdentity());
+        }*/
     }
 }
