@@ -169,7 +169,10 @@ public class TemplateTransformer {
         newCmpDef.setName(cleanName);
         newCmpDef.addWasDerivedFrom(template.getIdentity());
 
-        rebuildSequences(newCmpDef, doc);
+        rebuildSequences(newCmpDef, doc, new HashSet<SequenceAnnotation>());
+        /*String allCmpSeq = newCmpDef.getImpliedNucleicAcidSequence();
+        Sequence newSequence = doc.createSequence(cleanName.concat("_seq"), allCmpSeq, Sequence.IUPAC_DNA);
+        newCmpDef.addSequence(newSequence);*/
 
         return newCmpDef;
     }
@@ -186,6 +189,19 @@ public class TemplateTransformer {
         return cleanName;
     }
 
+    protected void addChildSequenceAnnotations(ComponentDefinition comp, SBOLDocument doc, Set<SequenceAnnotation> childSequenceAnns) throws SBOLValidationException {
+        Set<SequenceAnnotation> oldSequenceAnn = comp.getSequenceAnnotations();
+
+        for(Component child : comp.getComponents()) {
+            ComponentDefinition cmpDef = child.getDefinition();
+            for(SequenceAnnotation seqAn : cmpDef.getSequenceAnnotations()) {
+                childSequenceAnns.add(seqAn);
+            }
+
+            addChildSequenceAnnotations(cmpDef, doc, childSequenceAnns);
+        }
+    }
+
     /**
      * Copied from
      * edu.utah.ece.async.sboldesigner.sbol.editor.SBOLDesign.rebuildSequences
@@ -194,10 +210,12 @@ public class TemplateTransformer {
      * @param doc
      * @throws SBOLValidationException
      */
-    private void rebuildSequences(ComponentDefinition comp, SBOLDocument doc) throws SBOLValidationException {
-        Set<SequenceAnnotation> oldSequenceAnn = comp.getSequenceAnnotations();
-        comp.clearSequenceAnnotations();
+    protected void rebuildSequences(ComponentDefinition comp, SBOLDocument doc, Set<SequenceAnnotation> newSequenceAnns) throws SBOLValidationException {
+        Set<SequenceAnnotation> oldSequenceAnns = comp.getSequenceAnnotations();
+
+        //comp.clearSequenceAnnotations();
         Set<Sequence> currSequences = new HashSet<Sequence>();
+
         int start = 1;
         int length;
         int count = 0;
@@ -206,7 +224,80 @@ public class TemplateTransformer {
         for (org.sbolstandard.core2.Component c : comp.getSortedComponents()) {
             curr = c.getDefinition();
             if (!curr.getComponents().isEmpty()) {
-                rebuildSequences(curr, doc);
+                rebuildSequences(curr, doc, newSequenceAnns);
+            }
+            length = 0;
+            //Append sequences to build newly constructed sequence
+            for (Sequence s : curr.getSequences()) {
+                currSequences.add(s);
+                newSeq = newSeq.concat(s.getElements());
+                length += s.getElements().length();
+            }
+            /*String currSeq = curr.getImpliedNucleicAcidSequence();
+            newSeq = newSeq.concat(currSeq);
+            length += currSeq.length();*/
+
+            OrientationType o = OrientationType.INLINE;
+            for (SequenceAnnotation sa : oldSequenceAnns) {
+                Component saCmp = sa.getComponent();
+                if (saCmp != null) {
+                    if (saCmp.getIdentity() == c.getIdentity()) {
+                        o = sa.getLocations().iterator().next().getOrientation();
+                        SequenceAnnotation seqAnn = comp.getSequenceAnnotation(sa.getDisplayId());
+
+                        if(seqAnn == null) {
+                            if (length == 0) {
+                                seqAnn = comp.createSequenceAnnotation(sa.getDisplayId(), "GenericLocation", o);
+                            } else {
+                                seqAnn = comp.createSequenceAnnotation(sa.getDisplayId(), "Range", start, start + length - 1, o);
+                                start += length;
+                            }
+                            seqAnn.setComponent(c.getIdentity());
+                        }
+
+                        newSequenceAnns.add(seqAnn);
+                    }
+                }
+            }
+
+            count++;
+        }
+        if (!newSeq.isBlank()) {
+            if (comp.getSequences().isEmpty()) {
+                /*String uniqueId = SBOLUtils.getUniqueDisplayId(null, null,
+                                comp.getDisplayId() + "Sequence", comp.getVersion(), "Sequence", doc);*/
+                String uniqueId = comp.getDisplayId().concat("_seq");
+                comp.addSequence(doc.createSequence(uniqueId, comp.getVersion(), newSeq, Sequence.IUPAC_DNA));
+            } else {
+                comp.getSequences().iterator().next().setElements(newSeq);
+            }
+        }
+
+        comp.getSequenceAnnotations().addAll(newSequenceAnns);
+    }
+
+    /**
+     * Copied from
+     * edu.utah.ece.async.sboldesigner.sbol.editor.SBOLDesign.rebuildSequences
+     *
+     * @param comp
+     * @param doc
+     * @throws SBOLValidationException
+     */
+    private void rebuildSequences2(ComponentDefinition comp, SBOLDocument doc) throws SBOLValidationException {
+        Set<SequenceAnnotation> oldSequenceAnn = comp.getSequenceAnnotations();
+        comp.clearSequenceAnnotations();
+        Set<Sequence> currSequences = new HashSet<Sequence>();
+
+        int start = 1;
+        int length;
+        int count = 0;
+        String newSeq = "";
+        ComponentDefinition curr;
+        for (org.sbolstandard.core2.Component c : comp.getSortedComponents()) {
+            curr = c.getDefinition();
+            if (!curr.getComponents().isEmpty()) {
+                rebuildSequences2(curr, doc);
             }
             length = 0;
             //Append sequences to build newly constructed sequence

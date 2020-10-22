@@ -7,6 +7,7 @@ package ed.biordm.sbol.toolkit.transform;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import javax.xml.namespace.QName;
@@ -301,7 +302,8 @@ public class TemplateTransformerTest {
         }
 
         String newName = "sll00199_codA_Km!/new_1";
-        ComponentDefinition parent = templateTransformer.flattenSequences(template, newName, doc);
+        ComponentDefinition parent = (ComponentDefinition) doc.createCopy(template, "copy", "1.0.0");
+        templateTransformer.flattenSequences(parent, newName, doc);
 
         assertNotNull(parent);
 
@@ -320,7 +322,7 @@ public class TemplateTransformerTest {
         }
 
         newName = "sll00199_codA_Km!/new_2";
-        parent = templateTransformer.flattenSequences(template, newName, doc);
+        templateTransformer.flattenSequences(parent, newName, doc);
 
         assertNotNull(parent);
 
@@ -353,5 +355,41 @@ public class TemplateTransformerTest {
         flattenedSequence = flattenedSequence.concat(gapSeq.getElements());
 
         return flattenedSequence;
+    }
+    
+    @Test
+    public void testAddChildren() throws SBOLValidationException {
+        assertNotNull(doc);
+        //ComponentDefinition template = doc.getComponentDefinition("sll00199_codA_Km", "1.0.0");
+        ComponentDefinition template = doc.getComponentDefinition("cyano_codA_Km", "1.0.0");
+        assertNotNull(template);
+
+        Set<SequenceAnnotation> childSeqAnns = new HashSet<>();
+        templateTransformer.addChildSequenceAnnotations(template, doc, childSeqAnns);
+
+        for (SequenceAnnotation seqAnn : childSeqAnns) {
+            //System.out.println(seqAnn.getComponentDefinition().getDisplayId());
+            //System.out.println(seqAnn.getComponent().getDisplayId());
+            System.out.println(seqAnn.getIdentity());
+            System.out.println(seqAnn.getComponentIdentity());
+        }
+    }
+
+    @Test
+    public void testRebuildSequences() throws SBOLValidationException {
+        assertNotNull(doc);
+        ComponentDefinition template = doc.getComponentDefinition("sll00199_codA_Km", "1.0.0");
+        //ComponentDefinition template = doc.getComponentDefinition("cyano_codA_Km", "1.0.0");
+        assertNotNull(template);
+
+        Set<SequenceAnnotation> childSeqAnns = new HashSet<>();
+        templateTransformer.rebuildSequences(template, doc, childSeqAnns);
+
+        for (SequenceAnnotation seqAnn : childSeqAnns) {
+            //System.out.println(seqAnn.getComponentDefinition().getDisplayId());
+            //System.out.println(seqAnn.getComponent().getDisplayId());
+            System.out.println(seqAnn.getIdentity());
+            System.out.println(seqAnn.getComponentIdentity());
+        }
     }
 }
