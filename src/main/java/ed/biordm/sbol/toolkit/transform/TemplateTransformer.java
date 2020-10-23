@@ -157,9 +157,7 @@ public class TemplateTransformer {
         newCmpDef.addWasDerivedFrom(template.getIdentity());
 
         Set<SequenceAnnotation> flatSAs = new HashSet<>();
-        addChildSequenceAnnotations(newCmpDef, doc, flatSAs);
-
-        rebuildSequences(newCmpDef, doc, flatSAs);
+        //addChildSequenceAnnotations(newCmpDef, doc, flatSAs);
 
         for (SequenceAnnotation sa : flatSAs) {
             if(!newCmpDef.getSequenceAnnotations().contains(sa)) {
@@ -185,10 +183,11 @@ public class TemplateTransformer {
             //System.out.println(((Location)sa.getLocations().toArray()[0]).getSequence().getElements());
         }
 
-        //rebuildSequences(newCmpDef, doc, flatSAs);
+        rebuildSequences(newCmpDef, doc, flatSAs);
+        //rebuildSequencesOrig(newCmpDef, doc);
 
         // this sort of works
-        //addSequenceAnnotationsToParent(newCmpDef);
+        addSequenceAnnotationsToParent(newCmpDef);
 
         //addChildSequenceAnnotations(newCmpDef, doc, flatSAs);
 
@@ -200,13 +199,21 @@ public class TemplateTransformer {
      * with _ (replace all non alphanumeric characters with _)
      *
      * @param name
-     * @return
+     * @return The sanitized string
      */
     protected String sanitizeName(String name) {
         String cleanName = name.replaceAll("[^\\p{IsAlphabetic}\\p{IsDigit}]", "_");
         return cleanName;
     }
 
+    /**
+     * recursively adds SequenceAnnotation objects from child components into
+     * Set parameter
+     *
+     * @param comp The parent component definition to descend through children from
+     * @param doc The top level SBOL document
+     * @param childSequenceAnns The set to populate with all child sequence annotations
+     */
     protected void addChildSequenceAnnotations(ComponentDefinition comp, SBOLDocument doc, Set<SequenceAnnotation> childSequenceAnns) throws SBOLValidationException {
         Set<SequenceAnnotation> oldSequenceAnn = comp.getSequenceAnnotations();
         int saCount = 1;
@@ -235,6 +242,13 @@ public class TemplateTransformer {
         }
     }
 
+    /**
+     * remove old component and replace with new component in parent component definition
+     *
+     * @param parent The parent component definition to replace component in
+     * @param oldComponent The child component to be replaced
+     * @param newComponent The new child component that will replace the existing
+     */
     protected void replaceComponent(ComponentDefinition parent, Component oldComponent, Component newComponent) throws SBOLValidationException {
         for (SequenceConstraint sc : parent.getSequenceConstraints()) {
             if (sc.getSubject().equals(oldComponent)) {
@@ -250,6 +264,12 @@ public class TemplateTransformer {
         parent.removeComponent(oldComponent);
     }
 
+    /**
+     * Iterate through child components of parent component definition and add
+     * all sub-components' sequence annotations to the parent
+     *
+     * @param parent The parent component definition to iterate over
+     */
     protected void addSequenceAnnotationsToParent(ComponentDefinition parent) throws SBOLValidationException {
         Set<SequenceConstraint> flatSCs = parent.getSequenceConstraints();
         int length = 0;
@@ -259,7 +279,6 @@ public class TemplateTransformer {
 
         for (Component cmp : flatCmps) {
             length = 0;
-            System.out.println(cmp.getDisplayId());
 
             ComponentDefinition cmpDef = cmp.getDefinition();
             Set<Sequence> cmpDefSeqs = cmpDef.getSequences();
@@ -270,13 +289,9 @@ public class TemplateTransformer {
 
             Set<SequenceAnnotation> seqAnns = cmpDef.getSequenceAnnotations();
             for (SequenceAnnotation seqAnn : seqAnns) {
-                /*System.out.println("Sorted Cmp Def: "+cmpDef.getDisplayId());
-                System.out.println("Seq Ann Cmp Def: "+seqAnn.getComponent().getDisplayId());*/
+
                 Set<Location> seqAnnLocs = seqAnn.getLocations();
 
-                /*for (Location seqAnnLoc : seqAnnLocs) {
-
-                }*/
                 SequenceAnnotation newSA = parent.createSequenceAnnotation(seqAnn.getDisplayId(), seqAnn.getDisplayId(), start, start+length);
 
                 if (newSA.getComponent() == null) {
@@ -291,10 +306,13 @@ public class TemplateTransformer {
 
     /**
      * Copied from
-     * edu.utah.ece.async.sboldesigner.sbol.editor.SBOLDesign.rebuildSequences
+     * edu.utah.ece.async.sboldesigner.sbol.editor.SBOLDesign.rebuildSequences.
+     * Modified to create new Sequence Annotations for each sequence in all 
+     * sub-components.
      *
      * @param comp
      * @param doc
+     * @param newSequenceAnns The set of SequenceAnnotation objects to recursively collect from sub-components
      * @throws SBOLValidationException
      */
     protected void rebuildSequences(ComponentDefinition comp, SBOLDocument doc, Set<SequenceAnnotation> newSequenceAnns) throws SBOLValidationException {
@@ -361,13 +379,10 @@ public class TemplateTransformer {
                 }
             }
 
-            //rebuildSequences(curr, doc, newSequenceAnns);
             count++;
         }
         if (!newSeq.isBlank()) {
             if (comp.getSequences().isEmpty()) {
-                /*String uniqueId = SBOLUtils.getUniqueDisplayId(null, null,
-                                comp.getDisplayId() + "Sequence", comp.getVersion(), "Sequence", doc);*/
                 String uniqueId = comp.getDisplayId().concat("_seq");
                 comp.addSequence(doc.createSequence(uniqueId, comp.getVersion(), newSeq, Sequence.IUPAC_DNA));
             } else {
@@ -384,7 +399,7 @@ public class TemplateTransformer {
      * @param doc
      * @throws SBOLValidationException
      */
-    private void rebuildSequences2(ComponentDefinition comp, SBOLDocument doc) throws SBOLValidationException {
+    private void rebuildSequencesOrig(ComponentDefinition comp, SBOLDocument doc) throws SBOLValidationException {
         Set<SequenceAnnotation> oldSequenceAnn = comp.getSequenceAnnotations();
         comp.clearSequenceAnnotations();
         Set<Sequence> currSequences = new HashSet<Sequence>();
@@ -397,7 +412,7 @@ public class TemplateTransformer {
         for (org.sbolstandard.core2.Component c : comp.getSortedComponents()) {
             curr = c.getDefinition();
             if (!curr.getComponents().isEmpty()) {
-                rebuildSequences2(curr, doc);
+                rebuildSequencesOrig(curr, doc);
             }
             length = 0;
             //Append sequences to build newly constructed sequence
@@ -439,232 +454,4 @@ public class TemplateTransformer {
             }
         }
     }
-
-    /**
-     * following method is copied from
-     * edu.utah.ece.async.sboldesigner.sbol.CombinatorialExpansionUtil
-     *
-     * @param originalTemplate
-     * @param originalComponent
-     * @param newParent
-     * @param children
-     * @throws SBOLValidationException
-     */
-    private static void addChildren(ComponentDefinition originalTemplate, Component originalComponent,
-            ComponentDefinition newParent, HashSet<ComponentDefinition> children) throws SBOLValidationException {
-        /* private static void addChildren(ComponentDefinition originalTemplate, Component originalComponent,
-                    ComponentDefinition newParent, List<ComponentDefinition> children) throws SBOLValidationException {*/
-        Component newComponent = newParent.getComponent(originalComponent.getDisplayId());
-        newComponent.addWasDerivedFrom(originalComponent.getIdentity());
-
-        if (children.isEmpty()) {
-            removeConstraintReferences(newParent, newComponent);
-            for (SequenceAnnotation sa : newParent.getSequenceAnnotations()) {
-                if (sa.isSetComponent() && sa.getComponentURI().equals(newComponent.getIdentity())) {
-                    newParent.removeSequenceAnnotation(sa);
-                }
-            }
-            newParent.removeComponent(newComponent);
-            return;
-        }
-
-        boolean first = true;
-        for (ComponentDefinition child : children) {
-            if (first) {
-                // take over the definition of newParent's version of the
-                // original component
-                newComponent.setDefinition(child.getIdentity());
-                first = false;
-            } else {
-                // create a new component
-                /*String uniqueId = SBOLUtils.getUniqueDisplayId(newParent, null, child.getDisplayId() + "_Component",
-                                            "1", "Component", null);*/
-                String childId = child.getDisplayId().concat("_Component");
-                Component link = newParent.createComponent(childId, AccessType.PUBLIC, child.getIdentity());
-                link.addWasDerivedFrom(originalComponent.getIdentity());
-
-                // create a new 'prev precedes link' constraint
-                Component oldPrev = getBeforeComponent(originalTemplate, originalComponent);
-                if (oldPrev != null) {
-                    Component newPrev = newParent.getComponent(oldPrev.getDisplayId());
-                    if (newPrev != null) {
-                        String seqId = newParent.getDisplayId().concat("_SequenceConstraint");
-                        /*uniqueId = SBOLUtils.getUniqueDisplayId(newParent, null,
-                                                            newParent.getDisplayId() + "_SequenceConstraint", null, "SequenceConstraint", null);*/
-                        newParent.createSequenceConstraint(seqId, RestrictionType.PRECEDES, newPrev.getIdentity(),
-                                link.getIdentity());
-                    }
-                }
-
-                // create a new 'link precedes next' constraint
-                Component oldNext = getAfterComponent(originalTemplate, originalComponent);
-                if (oldNext != null) {
-                    Component newNext = newParent.getComponent(oldNext.getDisplayId());
-                    if (newNext != null) {
-                        String seqId = newParent.getDisplayId().concat("_SequenceConstraint");
-                        /*uniqueId = SBOLUtils.getUniqueDisplayId(newParent, null,
-                                                            newParent.getDisplayId() + "_SequenceConstraint", null, "SequenceConstraint", null);*/
-                        newParent.createSequenceConstraint(seqId, RestrictionType.PRECEDES, link.getIdentity(),
-                                newNext.getIdentity());
-                    }
-                }
-            }
-        }
-    }
-
-    /**
-     * following method is copied from
-     * edu.utah.ece.async.sboldesigner.sbol.CombinatorialExpansionUtil
-     *
-     * @param newParent
-     * @param newComponent
-     * @throws SBOLValidationException
-     */
-    private static void removeConstraintReferences(ComponentDefinition newParent, Component newComponent) throws SBOLValidationException {
-        Component subject = null;
-        Component object = null;
-        for (SequenceConstraint sc : newParent.getSequenceConstraints()) {
-            if (sc.getSubject().equals(newComponent)) {
-                object = sc.getObject();
-                //If we know what the new subject of this sequence constraint should be, modify it
-                if (subject != null) {
-                    sc.setSubject(subject.getIdentity());
-                    object = null;
-                    subject = null;
-                } else {//else remove it
-                    newParent.removeSequenceConstraint(sc);
-                }
-            }
-            if (sc.getObject().equals(newComponent)) {
-                subject = sc.getSubject();
-                //If we know what the new object of this sequence constraint should be, modify it
-                if (object != null) {
-                    sc.setObject(object.getIdentity());
-                    object = null;
-                    subject = null;
-                } else {//else remove it
-                    newParent.removeSequenceConstraint(sc);
-                }
-            }
-        }
-    }
-
-    /**
-     * following method is copied from
-     * edu.utah.ece.async.sboldesigner.sbol.CombinatorialExpansionUtil
-     *
-     * @param template
-     * @param component
-     * @return
-     */
-    private static Component getBeforeComponent(ComponentDefinition template, Component component) {
-        for (SequenceConstraint sc : template.getSequenceConstraints()) {
-            if (sc.getRestriction().equals(RestrictionType.PRECEDES) && sc.getObject().equals(component)) {
-                return sc.getSubject();
-            }
-        }
-        return null;
-    }
-
-    /**
-     * following method is copied from
-     * edu.utah.ece.async.sboldesigner.sbol.CombinatorialExpansionUtil
-     *
-     * @param template
-     * @param component
-     * @return
-     */
-    private static Component getAfterComponent(ComponentDefinition template, Component component) {
-        for (SequenceConstraint sc : template.getSequenceConstraints()) {
-            if (sc.getRestriction().equals(RestrictionType.PRECEDES) && sc.getSubject().equals(component)) {
-                return sc.getObject();
-            }
-        }
-        return null;
-    }
-
-    private static HashSet<HashSet<ComponentDefinition>> group(HashSet<ComponentDefinition> variants,
-            OperatorType operator) {
-        HashSet<HashSet<ComponentDefinition>> groups = new HashSet<>();
-
-        for (ComponentDefinition CD : variants) {
-            HashSet<ComponentDefinition> group = new HashSet<>();
-            group.add(CD);
-            groups.add(group);
-        }
-
-        if (operator == OperatorType.ONE) {
-            return groups;
-        }
-
-        if (operator == OperatorType.ZEROORONE) {
-            groups.add(new HashSet<>());
-            return groups;
-        }
-
-        groups.clear();
-        generateCombinations(groups, variants.toArray(new ComponentDefinition[0]), 0, new HashSet<>());
-        if (operator == OperatorType.ONEORMORE) {
-            return groups;
-        }
-
-        if (operator == OperatorType.ZEROORMORE) {
-            groups.add(new HashSet<>());
-            return groups;
-        }
-
-        throw new IllegalArgumentException(operator.toString() + " operator not supported");
-    }
-
-    /**
-     * Generates all combinations except the empty set.
-     */
-    private static void generateCombinations(HashSet<HashSet<ComponentDefinition>> groups,
-            ComponentDefinition[] variants, int i, HashSet<ComponentDefinition> set) {
-        if (i == variants.length) {
-            if (!set.isEmpty()) {
-                groups.add(set);
-            }
-            return;
-        }
-
-        HashSet<ComponentDefinition> no = new HashSet<>(set);
-        generateCombinations(groups, variants, i + 1, no);
-
-        HashSet<ComponentDefinition> yes = new HashSet<>(set);
-        yes.add(variants[i]);
-        generateCombinations(groups, variants, i + 1, yes);
-    }
-
-    /*private static HashSet<ComponentDefinition> collectVariants(SBOLDocument doc, VariableComponent vc)
-                    throws SBOLValidationException {
-            HashSet<ComponentDefinition> variants = new HashSet<>();
-
-            //Recursively collect variants from possible nested VariantDerivations 
-//		for(CombinatorialDerivation cd : vc.getVariantDerivations())
-//		{
-//			for (VariableComponent v : cd.getVariableComponents()) {
-//				variants.addAll(collectVariants(doc, v));
-//				
-//			}
-//		}
-            // add all variants
-            variants.addAll(vc.getVariants());
-
-            // add all variants from variantCollections
-            for (Collection c : vc.getVariantCollections()) {
-                    for (TopLevel tl : c.getMembers()) {
-                            if (tl instanceof ComponentDefinition) {
-                                    variants.add((ComponentDefinition) tl);
-                            }
-                    }
-            }
-
-            // add all variants from variantDerivations
-            for (CombinatorialDerivation derivation : vc.getVariantDerivations()) {
-                    variants.addAll(enumerate(doc, derivation));
-            }
-
-            return variants;
-    }*/
 }
