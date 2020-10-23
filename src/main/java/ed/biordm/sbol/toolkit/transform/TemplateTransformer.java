@@ -391,7 +391,8 @@ public class TemplateTransformer {
 
     /**
      * Copied from
-     * edu.utah.ece.async.sboldesigner.sbol.editor.SBOLDesign.rebuildSequences
+     * edu.utah.ece.async.sboldesigner.sbol.editor.SBOLDesign.rebuildSequences.
+     * Unused at present (23/10/20).
      *
      * @param comp
      * @param doc

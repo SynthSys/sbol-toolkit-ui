@@ -8,6 +8,7 @@ package ed.biordm.sbol.toolkit.transform;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -365,14 +366,16 @@ public class TemplateTransformerTest {
         ComponentDefinition template = doc.getComponentDefinition("cyano_codA_Km", "1.0.0");
         assertNotNull(template);
 
+        String[] saDisplayIdsArr = new String[]{"ori", "ori_instance", "AmpR_prom", "null", "ann1", "gap", "AmpR", "ann2", "insert"};
+        Set<String> saDisplayIds = new HashSet<>( Arrays.asList(saDisplayIdsArr) );
+
         Set<SequenceAnnotation> childSeqAnns = new HashSet<>();
         templateTransformer.addChildSequenceAnnotations(template, doc, childSeqAnns);
 
         for (SequenceAnnotation seqAnn : childSeqAnns) {
-            //System.out.println(seqAnn.getComponentDefinition().getDisplayId());
-            //System.out.println(seqAnn.getComponent().getDisplayId());
             System.out.println(seqAnn.getIdentity());
             System.out.println(seqAnn.getComponentIdentity());
+            assertTrue(saDisplayIds.contains(seqAnn.getDisplayId()));
         }
     }
 
@@ -389,11 +392,15 @@ public class TemplateTransformerTest {
         Set<SequenceAnnotation> childSeqAnns = new HashSet<>();
         templateTransformer.rebuildSequences(template, doc, childSeqAnns);
 
+        String[] saDisplayIdsArr = new String[]{"ori", "ori_instance", "AmpR_prom", "null", "ann1", "gap", "AmpR", "ann2", "insert"};
+        Set<String> saDisplayIds = new HashSet<>( Arrays.asList(saDisplayIdsArr) );
+
         for (SequenceAnnotation seqAnn : childSeqAnns) {
             //System.out.println(seqAnn.getComponentDefinition().getDisplayId());
             //System.out.println(seqAnn.getComponent().getDisplayId());
             System.out.println(seqAnn.getIdentity());
             System.out.println(seqAnn.getComponentIdentity());
+            assertTrue(saDisplayIds.contains(seqAnn.getDisplayId()));
         }
 
         ComponentDefinition templateFlat = doc.getComponentDefinition("sll00199_codA_Km_flat", "1.0.0");
@@ -405,6 +412,7 @@ public class TemplateTransformerTest {
             //System.out.println(seqAnn.getComponent().getDisplayId());
             System.out.println(seqAnn.getIdentity());
             System.out.println(seqAnn.getComponentIdentity());
+            assertTrue(saDisplayIds.contains(seqAnn.getDisplayId()));
         }
 
         // template.getSequenceAnnotations().addAll(childSeqAnns);
@@ -415,7 +423,59 @@ public class TemplateTransformerTest {
             //template.createSequenceAnnotation(seqAnn.getDisplayId(), seqAnn.getLocation(displayId), seqAnn.);
             List<Location> locations = seqAnn.getSortedLocations();
             locations.get(0).getSequence().getElements();
+            assertTrue(saDisplayIds.contains(seqAnn.getDisplayId()));
         }
+    }
+
+    @Test
+    public void testAddSequenceAnnotationsToParent() throws Exception {
+        assertNotNull(doc);
+
+        ComponentDefinition sll00199Plasmid = doc.getComponentDefinition("sll00199_codA_Km", "1.0.0");
+        assertNotNull(sll00199Plasmid);
+
+        templateTransformer.addSequenceAnnotationsToParent(sll00199Plasmid);
+        Set<SequenceAnnotation> sll00199PlasmidSAs = sll00199Plasmid.getSequenceAnnotations();
+
+        Set<Component> children = sll00199Plasmid.getComponents();
+        int childSeqAnnCount = 0;
+
+        for (Component child : children) {
+            ComponentDefinition cmpDef = child.getDefinition();
+            childSeqAnnCount += cmpDef.getSequenceAnnotations().size();
+        }
+
+        assertEquals(childSeqAnnCount, sll00199PlasmidSAs.size());
+    }
+
+    @Test
+    public void testReplaceComponent() throws Exception {
+        assertNotNull(doc);
+        ComponentDefinition parent = doc.getComponentDefinition("cyano_codA_Km", "1.0.0");
+        assertNotNull(parent);
+
+        String genericComponentId = "right";
+        Component replaced = parent.getComponent(genericComponentId);
+        System.out.println("Replaced component displayId: " + replaced.getDisplayId());
+        assertNotNull(replaced);
+        ComponentDefinition replacedDef = doc.getComponentDefinition(replaced.getDefinitionIdentity());
+        assertNotNull(replacedDef);
+
+        String newDisplayId = "test_ampr_origin";
+        ComponentDefinition replacementDef = doc.getComponentDefinition("ampr_origin", "1.0.0");
+        Component replacement = parent.createComponent(newDisplayId, AccessType.PUBLIC, replacementDef.getIdentity());
+
+        assertNotNull(replacementDef);
+        assertNotNull(replacement);
+
+        //ComponentDefinition newDef = templateTransformer.concretizePart(parent, genericComponentId, newName, newSequence, doc);
+        templateTransformer.replaceComponent(parent, replaced, replacement);
+
+        //it is being replaced
+        assertNull(parent.getComponent(genericComponentId));
+
+        Component newComp = parent.getComponent(newDisplayId);
+        assertNotNull(newComp);
     }
 
     /**
