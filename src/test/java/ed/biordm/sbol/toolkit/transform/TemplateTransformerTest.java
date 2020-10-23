@@ -201,18 +201,12 @@ public class TemplateTransformerTest {
         String newName = "right!/new";
         String newSequence = "GATTACA";
 
-        ComponentDefinition newDeff = templateTransformer.concretizePart(parent, genericComponentId, newName, newSequence, doc);
-        assertNotNull(newDeff);
+        ComponentDefinition newDef = templateTransformer.concretizePart(parent, genericComponentId, newName, newSequence, doc);
+        assertNotNull(newDef);
 
         //it is being replaced
         assertNull(parent.getComponent(genericComponentId));
 
-        // Shouldn't the genericComponentId return the newly created replacement
-        // component? Won't the new component and the old component share the
-        // same genericComponentId i.e. the String returned from 'getIdentity',
-        // but they will simply have different names (i.e. 'getName') and/or
-        // display IDs (i.e. 'getDisplayId')?
-        //assertNotNull(newDeff.getComponent(genericComponentId));
         String newDisplayId = templateTransformer.sanitizeName(newName);
 
         Component newComp = parent.getComponent(newDisplayId);
@@ -220,27 +214,27 @@ public class TemplateTransformerTest {
 
         assertEquals(newDisplayId, newComp.getName());
         assertEquals(parent.getVersion(), newComp.getVersion());
-        assertEquals(newDeff.getIdentity(), newComp.getDefinitionIdentity());
+        assertEquals(newDef.getIdentity(), newComp.getDefinitionIdentity());
         assertEquals(replaced.getRoles(), newComp.getRoles());
 
         //check if newDefinition is correct        
-        assertEquals(newDisplayId, newDeff.getName());
-        assertEquals(newDisplayId, newDeff.getDisplayId());
+        assertEquals(newDisplayId, newDef.getName());
+        assertEquals(newDisplayId, newDef.getDisplayId());
 
-        assertTrue(newDeff.getSequences().stream().findFirst().isPresent());
-        Sequence seq = newDeff.getSequences().stream().findFirst().get();
+        assertTrue(newDef.getSequences().stream().findFirst().isPresent());
+        Sequence seq = newDef.getSequences().stream().findFirst().get();
         assertEquals(newSequence, seq.getElements());
         assertEquals(Sequence.IUPAC_DNA, seq.getEncoding());
 
-        assertEquals(replacedDef.getTypes(), newDeff.getTypes());
-        assertEquals(replacedDef.getRoles(), newDeff.getRoles());
+        assertEquals(replacedDef.getTypes(), newDef.getTypes());
+        assertEquals(replacedDef.getRoles(), newDef.getRoles());
 
         //write teest if the sequences constraints have been replaced with new one
         //that points to newComp instead to the replaced
     }
 
     /**
-     * Test of instantiateFromTemplate method, of class TemplateTransformer.
+     * Test of concretizeComponent method, of class TemplateTransformer.
      */
     @Test
     public void testConcretizeComponent() throws Exception {
@@ -360,7 +354,10 @@ public class TemplateTransformerTest {
 
         return flattenedSequence;
     }
-    
+
+    /**
+     * Test of addChildSequenceAnnotations method, of class TemplateTransformer.
+     */
     @Test
     public void testAddChildren() throws SBOLValidationException {
         assertNotNull(doc);
@@ -379,6 +376,9 @@ public class TemplateTransformerTest {
         }
     }
 
+    /**
+    * Test of rebuildSequences method, of class TemplateTransformer.
+    */
     @Test
     public void testRebuildSequences() throws SBOLValidationException {
         assertNotNull(doc);
@@ -419,7 +419,8 @@ public class TemplateTransformerTest {
     }
 
     /**
-     * Test of instantiateFromTemplate method, of class TemplateTransformer.
+     * Test of entire E2E process for instantiating/conretizing/flattening
+     * methods, of class TemplateTransformer.
      */
     @Test
     public void testCreateNewPlasmid() throws Exception {
@@ -441,46 +442,16 @@ public class TemplateTransformerTest {
         String description = "Test plasmid creation";
         ComponentDefinition newPlasmid = templateTransformer.instantiateFromTemplate(templatePlasmid, newName, version, description, doc);
 
+        assertEquals(sll00199Plasmid.getComponents().size(), newPlasmid.getComponents().size());
+
         // Check component instances match
         for (Component cmp : sll00199Plasmid.getSortedComponents()) {
-            System.out.println(cmp.getDisplayId());
             assertNotNull(newPlasmid.getComponent(cmp.getDisplayId()));
         }
 
         for (Component cmp : newPlasmid.getSortedComponents()) {
-            System.out.println(cmp.getDisplayId());
             assertNotNull(sll00199Plasmid.getComponent(cmp.getDisplayId()));
         }
-
-        /*String ampRSeq = "AAAGGGCCTCGTGATACGCCTATTTTTATAGGTTAATGTCATGATAATAATGGTTTCTTAGACGTCAGGTGGCACTTTTCGGGGAAATGTGCGCGGAACCCCTATTTGTTTATTTTTCTAAATACATTCAAATATGTATCCGCTCATGAGACAATAACCCTGATAAATGCTTCAATAATATTGAAAAAGGAAGAGTATGAGTATTCAACATTTCCGTGTCGCCCTTATTCCCTTTTTTGCGGCATTTTGCCTTCCTGTTTTTGCTCACCCAGAAACGCTGGTGAAAGTAAAAGATGCTGAAGATCAGTTGGGTGCACGAGTGGGTTACATCGAACTGGATCTCAACAGCGGTAAGATCCTTGAGAGTTTTCGCCCCGAAGAACGTTTTCCAATGATGAGCACTTTTAAAGTTCTGCTATGTGGCGCGGTATTATCCCGTATTGACGCCGGGCAAGAGCAACTCGGTCGCCGCATACACTATTCTCAGAATGACTTGGTTGAGTACTCACCAGTCACAGAAAAGCATCTTACGGATGGCATGACAGTAAGAGAATTATGCAGTGCTGCCATAACCATGAGTGATAACACTGCGGCCAACTTACTTCTGACAACGATCGGAGGACCGAAGGAGCTAACCGCTTTTTTGCACAACATGGGGGATCATGTAACTCGCCTTGATCGTTGGGAACCGGAGCTGAATGAAGCCATACCAAACGACGAGCGTGACACCACGATGCCTGTAGCAATGGCAACAACGTTGCGCAAACTATTAACTGGCGAACTACTTACTCTAGCTTCCCGGCAACAATTAATAGACTGGATGGAGGCGGATAAAGTTGCAGGACCACTTCTGCGCTCGGCCCTTCCGGCTGGCTGGTTTATTGCTGATAAATCTGGAGCCGGTGAGCGTGGTTCTCGCGGTATCATTGCAGCACTGGGGCCAGATGGTAAGCCCTCCCGTATCGTAGTTATCTACACGACGGGGAGTCAGGCAACTATGGATGAACGAAATAGACAGATCGCTGAGATAGGTGCCTCACTGATTAAGCATTGGTAACTGTCAGACCAAGTTTACTCATATATACTTTAGATTGATTTAAAACTTCATTTTTAATTTAAAAGGATCTAGGTGAAGATCCTTTTTGATAATCTCATGACCAAAATCCCTTAACGTGAGTTTTCGTTCCACTGAGCGTCAGACCCCGTAGAAAAGATCAAAGGATCTTCTTGAGATCCTTTTTTTCTGCGCGTAATCTGCTGCTTGCAAACAAAAAAACCACCGCTACCAGCGGTGGTTTGTTTGCCGGATCAAGAGCTACCAACTCTTTTTCCGAAGGTAACTGGCTTCAGCAGAGCGCAGATACCAAATACTGTTCTTCTAGTGTAGCCGTAGTTAGGCCACCACTTCAAGAACTCTGTAGCACCGCCTACATACCTCGCTCTGCTAATCCTGTTACCAGTGGCTGCTGCCAGTGGCGATAAGTCGTGTCTTACCGGGTTGGACTCAAGACGATAGTTACCGGATAAGGCGCAGCGGTCGGGCTGAACGGGGGGTTCGTGCACACAGCCCAGCTTGGAGCGAACGACCTACACCGAACTGAGATACCTACAGCGTGAGCTATGAGAAAGCGCCACGCTTCCCGAAGGGAGAAAGGCGGACAGGTATCCGGTAAGCGGCAGGGTCGGAACAGGAGAGCGCACGAGGGAGCTTCCAGGGGGAAACGCCTGGTATCTTTATAGTCCTGTCGGGTTTCGCCACCTCTGACTTGAGCGTCGATTTTTGTGATGCTCGTCAGGGGGGCGGAGCCTATGGAAAAACGCCAGCAACGCGGCCTTTTTACGGTTCCTGGCCTTTTGCTGGCCTTTTGCTCACATGTTCTTTCCTGCGTTATCCCCTGATTCTGTGGATAACCGTATTACCGCCTTTGAGTGAGCTGATACCGCTCGCCGCAGCCGAACGACCGAGCGCAGCGAGTCAGTGAGCGAGGAAGCGGATGAGCGCCCAATACGCAAACCGCCTCTCCCCGCGCGTTGGCCGATTCATTAATGCAGCTGGCACGACAGGTTTCggag";
-        String genericCmpId = "ampR";
-
-        templateTransformer.concretizePart(newPlasmid, genericCmpId, "test_ampR",
-                ampRSeq, doc);
-
-        String gapSeq = "CGCTGCTTACAGACAAGCTGTGACCGTCTCCGGGAGCTGCATGTGTCAGAGGTTTTCACCGTCATCACCGAAACGCGCGAGACG";
-        genericCmpId = "gap";
-        templateTransformer.concretizePart(newPlasmid, genericCmpId, "test_gap",
-                gapSeq, doc);
-
-        String insertSeq = "ATGaGAAGAGCACGGTAGCCTTNNNNNNNNNNNNNNNNNNTGCCCAGTCTTCTGCCTAAGGCAGGTGCCGCGGTGCGGGTGCCAGGGCGTGCCCCCGGGCTCCCCGGGCGCGTACTCCACtttacagctagctcagtcctaggtattatgctagctattgtgagcggataacaatttcacacatactagagaaagaggagaaatactaaATGTCTAACAACGCGCTGCAAACCATCATCAATGCACGCCTGCCTGGAGAGGAAGGGTTGTGGCAGATTCACTTACAGGACGGCAAAATCTCCGCGATCGACGCACAATCTGGGGTTATGCCGATCACCGAAAACTCTTTGGATGCCGAACAAGGGTTAGTCATTCCCCCATTCGTTGAACCACATATTCACCTGGATACTACTCAGACAGCCGGTCAGCCCAATTGGAACCAGTCCGGTACGCTGTTCGAAGGTATCGAACGATGGGCGGAGCGAAAAGCTCTACTCACGCATGACGATGTCAAGCAACGGGCCTGGCAGACCCTGAAGTGGCAGATCGCCAACGGAATACAGCACGTACGCACTCACGTGGATGTTTCCGATGCCACTTTGACGGCATTGAAGGCAATGCTCGAAGTTAAGCAGGAAGTAGCCCCGTGGATTGACTTGCAAATCGCTGCCTTCCCTCAGGAAGGCATCCTAAGTTATCCGAATGGAGAAGCGCTCCTGGAGGAGGCATTGCGGTTAGGAGCAGACGTGGTGGGAGCGATTCCCCATTTCGAGTTTACCCGCGAGTACGGTGTTGAATCTCTGCATAAAACATTTGCTTTAGCTCAGAAGTATGACCGTCTGATCGACGTACACTGCGACGAGATCGATGACGAACAGAGTCGCTTCGTGGAGACGGTGGCTGCGCTGGCGCATCACGAAGGCATGGGTGCACGTGTAACTGCAAGCCATACGACGGCTATGCACAGCTATAATGGGGCATATACATCTCGTTTGTTCCGATTACTAAAAATGAGCGGAATCAACTTTGTTGCCAATCCATTGGTCAACATTCATCTACAAGGACGCTTCGACACCTACCCGAAACGGCGAGGAATCACACGAGTTAAGGAAATGCTAGAGTCTGGTATCAATGTGTGTTTCGGGCATGATGACGTGTGTGGTCCCTGGTACCCTCTAGGAACAGCCAACATGCTGCAAGTTCTCCACATGGGTCTACACGTGTGTCAACTCATGGGGTATGGACAAATTAACGATGGACTCAATCTAATTACACACCATTCCGCCCGAACACTGAACCTCCAGGATTACGGGATCGCGGCGGGAAATTCTGCCAACCTCATCATTCTGCCCGCGGAAAACGGGTTCGACGCTCTACGCCGTCAAGTGCCAGTTCGGTATTCTGTTCGTGGGGGTAAGGTAATTGCAAGTACCCAACCGGCTCAGACCACGGTCTATTTAGAGCAACCGGAAGCTATCGACTACAAACGATGAgcttcaaataaaacgaaaggctcagtcgaaagactgggcctttcgttttatctgttgtttgtcggtgaacgctctctactagagtcacactggctcaccttcgggtgggcctttctgcgcgctCTGAGGTCTGCCTCGTGAAGAAGGTGTTGCTGACTCATACCAGGCCTGAATCGCCCCATCATCCAGCCAGAAAGTGAGGGAGCCACGGTTGATGAGAGCTTTGTTGTAGGTGGACCAGTTGGTGATTTTGAACTTTTGCTTTGCCACGGAACGGTCTGCGTTGTCGGGAAGATGCGTGATCTGATCCTTCAACTCAGCAAAAGTTCGATTTATTCAACAAAGCCGCCGTCCCGTCAAGTCAGCGTAATGCTCTGCCAGTGTTACAACCAATTAACCAATTCTGATTAGAAAAACTCATCGAGCATCAAATGAAACTGCAATTTATTCATATCAGGATTATCAATACCATATTTTTGAAAAAGCCGTTTCTGTAATGAAGGAGAAAACTCACCGAGGCAGTTCCATAGGATGGCAAGATCCTGGTATCGGTCTGCGATTCCGACTCGTCCAACATCAATACAACCTATTAATTTCCCCTCGTCAAAAATAAGGTTATCAAGTGAGAAATCACCATGAGTGACGACTGAATCCGGTGAGAATGGCAAAAGCTTATGCATTTCTTTCCAGACTTGTTCAACAGGCCAGCCATTACGCTCGTCATCAAAATCACTCGCATCAACCAAACCGTTATTCATTCGTGATTGCGCCTGAGCGAGACGAAATACGCGATCGCTGTTAAAAGGACAATTACAAACAGGAATCGAATGCAACCGGCGCAGGAACACTGCCAGCGCATCAACAATATTTTCACCTGAATCAGGATATTCTTCTAATACCTGGAATGCTGTTTTCCCGGGGATCGCAGTGGTGAGTAACCATGCATCATCAGGAGTACGGATAAAATGCTTGATGGTCGGAAGAGGCATAAATTCCGTCAGCCAGTTTAGTCTGACCATCTCATCTGTAACATCATTGGCAACGCTACCTTTGCCATGTTTCAGAAACAACTCTGGCGCATCGGGCTTCCCATACAATCGATAGATTGTCGCACCTGATTGCCCGACATTATCGCGAGCCCATTTATACCCATATAAATCAGCATCCATGTTGGAATTTAATCGCGGCCTCGAGCAAGACGTTTCCCGTTGAATATGGCTCATAACACCCCTTGTATTACTGTTTATGTAAGCAGACAGTTTTATTGTTCATGATGATATATTTTTATCTTGTGCAATGTAACATCAGAGATTTTGAGACACAACGTGGCTTTCCGCGGTGCGGGTGCCAGGGCGTGCCCTTGGGCTCCCCGGGCGCGTACTCCACCACCTGCCATTGGGAGAAGACTTGGGAGCTCTTCataa";
-        genericCmpId = "insert";
-        templateTransformer.concretizePart(newPlasmid, genericCmpId, "test_insert",
-                insertSeq, doc);*/
-
-        /*ComponentDefinition originD = doc.getComponentDefinition("ori", version);
-        Component origin =  plasmid.createComponent("ori_instance", AccessType.PUBLIC, originD.getIdentity());
-        an = plasmid.createSequenceAnnotation("ori", "ori", 1228, 1816);
-        an.setComponent(origin.getIdentity());*/
-
-        /*ComponentDefinition templateOrigin = doc.getComponentDefinition("ampr_origin", "1.0.0");
-        assertNotNull(templateOrigin);
-        ComponentDefinition amprOrigin = templateTransformer.instantiateFromTemplate(templateOrigin, "ori_instance_johnny", version, description, doc);
-        
-        String originSeq = "";
-        genericCmpId = "ampr_origin";
-        templateTransformer.concretizePart(newPlasmid, genericCmpId, "test_ori_instance",
-                originSeq, doc);*/
 
         ComponentDefinition originD = doc.getComponentDefinition("ori", version);
         Component origin =  newPlasmid.createComponent("ori_instance", AccessType.PUBLIC, originD.getIdentity());
@@ -548,18 +519,12 @@ public class TemplateTransformerTest {
         Set<SequenceConstraint> npSCs = newPlasmid.getSequenceConstraints();
 
         for (SequenceConstraint sc : npSCs) {
-            System.out.println(sc.getDisplayId());
             SequenceConstraint npSc = newPlasmid.getSequenceConstraint(sc.getDisplayId());
-            //assertEquals(sc.getSubject().getDefinition().getWasDerivedFroms(), npSc.getSubject().getDefinition().getWasDerivedFroms());
             assertNotNull(sll00199Plasmid.getSequenceConstraint(npSc.getDisplayId()));
         }
 
         for (SequenceConstraint sc : sll00199SCs) {
-            System.out.println(sc.getDisplayId());
             SequenceConstraint sll00199Sc = sll00199Plasmid.getSequenceConstraint(sc.getDisplayId());
-            //assertNotNull(npSc);
-            //assertEquals(sc.getObject().getDefinition().getWasDerivedFroms(), npSc.getObject().getDefinition().getWasDerivedFroms());
-            //assertEquals(sc.getSubject().getDefinition().getWasDerivedFroms(), npSc.getSubject().getDefinition().getWasDerivedFroms());
             assertNotNull(newPlasmid.getSequenceConstraint(sll00199Sc.getDisplayId()));
         }
 
@@ -569,25 +534,14 @@ public class TemplateTransformerTest {
 
         // Get sequence annos and verify they match in new component
         for (SequenceAnnotation seqAnn : npSAs) {
-            //System.out.println(seqAnn.getComponentDefinition().getDisplayId());
-            //System.out.println(seqAnn.getComponent().getDisplayId());
             System.out.println(seqAnn.getIdentity());
             System.out.println(seqAnn.getComponentIdentity());
         }
 
         for (SequenceAnnotation seqAnn : sll00199SAs) {
-            //System.out.println(seqAnn.getComponentDefinition().getDisplayId());
-            //System.out.println(seqAnn.getComponent().getDisplayId());
             System.out.println(seqAnn.getIdentity());
             System.out.println(seqAnn.getComponentIdentity());
         }
-
-        /*for (SequenceAnnotation seqAnn : templateFlat.getSequenceAnnotations()) {
-            //System.out.println(seqAnn.getComponentDefinition().getDisplayId());
-            //System.out.println(seqAnn.getComponent().getDisplayId());
-            System.out.println(seqAnn.getIdentity());
-            System.out.println(seqAnn.getComponentIdentity());
-        }*/
 
         // Add the flattened sequences to the parent component's SequenceAnnotation components
         ComponentDefinition newPlasmidFlat = templateTransformer.flattenSequences(newPlasmid, newName.concat("_flat"), doc);
@@ -609,8 +563,7 @@ public class TemplateTransformerTest {
 
         // Get sequence annos and verify they match in new component
         for (SequenceAnnotation seqAnn : npFlatSAs) {
-            //System.out.println(seqAnn.getComponentDefinition().getDisplayId());
-            //System.out.println(seqAnn.getComponent().getDisplayId());
+            // How to verify these objets are equivalent in each plasmid?
             System.out.println(seqAnn.getIdentity());
             System.out.println(seqAnn.getComponentIdentity());
         }
@@ -639,14 +592,12 @@ public class TemplateTransformerTest {
         Set<SequenceConstraint> npFlatSCs = newPlasmidFlat.getSequenceConstraints();
 
         for (SequenceConstraint sc : npFlatSCs) {
-            System.out.println(sc.getDisplayId());
             SequenceConstraint npSc = newPlasmid.getSequenceConstraint(sc.getDisplayId());
             //assertEquals(sc.getSubject().getDefinition().getWasDerivedFroms(), npSc.getSubject().getDefinition().getWasDerivedFroms());
             assertNotNull(sll00199PlasmidFlat.getSequenceConstraint(npSc.getDisplayId()));
         }
 
         for (SequenceConstraint sc : sll00199SFlatSCs) {
-            System.out.println(sc.getDisplayId());
             SequenceConstraint sll00199Sc = sll00199PlasmidFlat.getSequenceConstraint(sc.getDisplayId());
             //assertNotNull(npSc);
             //assertEquals(sc.getObject().getDefinition().getWasDerivedFroms(), npSc.getObject().getDefinition().getWasDerivedFroms());
