@@ -7,6 +7,7 @@ package ed.biordm.sbol.toolkit.transform;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -14,6 +15,7 @@ import javax.xml.namespace.QName;
 import static org.junit.Assert.*;
 import org.junit.Test;
 import org.junit.Before;
+import org.sbolstandard.core2.AccessType;
 import org.sbolstandard.core2.Component;
 import org.sbolstandard.core2.ComponentDefinition;
 import org.sbolstandard.core2.Location;
@@ -33,6 +35,7 @@ public class TemplateTransformerTest {
 
     TemplateTransformer templateTransformer = new TemplateTransformer();
     SBOLDocument doc;
+    static String seqenceOntoPref = "http://identifiers.org/so/";
 
     @Before
     public void generateSBOLDocument() throws IOException, SBOLValidationException, SBOLConversionException {
@@ -424,9 +427,14 @@ public class TemplateTransformerTest {
         assertNotNull(doc);
 
         ComponentDefinition sll00199Plasmid = doc.getComponentDefinition("sll00199_codA_Km", "1.0.0");
+        assertNotNull(sll00199Plasmid);
+
+        ComponentDefinition sll00199PlasmidFlat = doc.getComponentDefinition("sll00199_codA_Km_flat", "1.0.0");
+        assertNotNull(sll00199PlasmidFlat);
 
         // Copy Template
         ComponentDefinition templatePlasmid = doc.getComponentDefinition("cyano_codA_Km", "1.0.0");
+        assertNotNull(templatePlasmid);
 
         String newName = "sll00199_codA_Km_johnny";
         String version = "1.0.0";
@@ -443,6 +451,41 @@ public class TemplateTransformerTest {
             System.out.println(cmp.getDisplayId());
             assertNotNull(sll00199Plasmid.getComponent(cmp.getDisplayId()));
         }
+
+        /*String ampRSeq = "AAAGGGCCTCGTGATACGCCTATTTTTATAGGTTAATGTCATGATAATAATGGTTTCTTAGACGTCAGGTGGCACTTTTCGGGGAAATGTGCGCGGAACCCCTATTTGTTTATTTTTCTAAATACATTCAAATATGTATCCGCTCATGAGACAATAACCCTGATAAATGCTTCAATAATATTGAAAAAGGAAGAGTATGAGTATTCAACATTTCCGTGTCGCCCTTATTCCCTTTTTTGCGGCATTTTGCCTTCCTGTTTTTGCTCACCCAGAAACGCTGGTGAAAGTAAAAGATGCTGAAGATCAGTTGGGTGCACGAGTGGGTTACATCGAACTGGATCTCAACAGCGGTAAGATCCTTGAGAGTTTTCGCCCCGAAGAACGTTTTCCAATGATGAGCACTTTTAAAGTTCTGCTATGTGGCGCGGTATTATCCCGTATTGACGCCGGGCAAGAGCAACTCGGTCGCCGCATACACTATTCTCAGAATGACTTGGTTGAGTACTCACCAGTCACAGAAAAGCATCTTACGGATGGCATGACAGTAAGAGAATTATGCAGTGCTGCCATAACCATGAGTGATAACACTGCGGCCAACTTACTTCTGACAACGATCGGAGGACCGAAGGAGCTAACCGCTTTTTTGCACAACATGGGGGATCATGTAACTCGCCTTGATCGTTGGGAACCGGAGCTGAATGAAGCCATACCAAACGACGAGCGTGACACCACGATGCCTGTAGCAATGGCAACAACGTTGCGCAAACTATTAACTGGCGAACTACTTACTCTAGCTTCCCGGCAACAATTAATAGACTGGATGGAGGCGGATAAAGTTGCAGGACCACTTCTGCGCTCGGCCCTTCCGGCTGGCTGGTTTATTGCTGATAAATCTGGAGCCGGTGAGCGTGGTTCTCGCGGTATCATTGCAGCACTGGGGCCAGATGGTAAGCCCTCCCGTATCGTAGTTATCTACACGACGGGGAGTCAGGCAACTATGGATGAACGAAATAGACAGATCGCTGAGATAGGTGCCTCACTGATTAAGCATTGGTAACTGTCAGACCAAGTTTACTCATATATACTTTAGATTGATTTAAAACTTCATTTTTAATTTAAAAGGATCTAGGTGAAGATCCTTTTTGATAATCTCATGACCAAAATCCCTTAACGTGAGTTTTCGTTCCACTGAGCGTCAGACCCCGTAGAAAAGATCAAAGGATCTTCTTGAGATCCTTTTTTTCTGCGCGTAATCTGCTGCTTGCAAACAAAAAAACCACCGCTACCAGCGGTGGTTTGTTTGCCGGATCAAGAGCTACCAACTCTTTTTCCGAAGGTAACTGGCTTCAGCAGAGCGCAGATACCAAATACTGTTCTTCTAGTGTAGCCGTAGTTAGGCCACCACTTCAAGAACTCTGTAGCACCGCCTACATACCTCGCTCTGCTAATCCTGTTACCAGTGGCTGCTGCCAGTGGCGATAAGTCGTGTCTTACCGGGTTGGACTCAAGACGATAGTTACCGGATAAGGCGCAGCGGTCGGGCTGAACGGGGGGTTCGTGCACACAGCCCAGCTTGGAGCGAACGACCTACACCGAACTGAGATACCTACAGCGTGAGCTATGAGAAAGCGCCACGCTTCCCGAAGGGAGAAAGGCGGACAGGTATCCGGTAAGCGGCAGGGTCGGAACAGGAGAGCGCACGAGGGAGCTTCCAGGGGGAAACGCCTGGTATCTTTATAGTCCTGTCGGGTTTCGCCACCTCTGACTTGAGCGTCGATTTTTGTGATGCTCGTCAGGGGGGCGGAGCCTATGGAAAAACGCCAGCAACGCGGCCTTTTTACGGTTCCTGGCCTTTTGCTGGCCTTTTGCTCACATGTTCTTTCCTGCGTTATCCCCTGATTCTGTGGATAACCGTATTACCGCCTTTGAGTGAGCTGATACCGCTCGCCGCAGCCGAACGACCGAGCGCAGCGAGTCAGTGAGCGAGGAAGCGGATGAGCGCCCAATACGCAAACCGCCTCTCCCCGCGCGTTGGCCGATTCATTAATGCAGCTGGCACGACAGGTTTCggag";
+        String genericCmpId = "ampR";
+
+        templateTransformer.concretizePart(newPlasmid, genericCmpId, "test_ampR",
+                ampRSeq, doc);
+
+        String gapSeq = "CGCTGCTTACAGACAAGCTGTGACCGTCTCCGGGAGCTGCATGTGTCAGAGGTTTTCACCGTCATCACCGAAACGCGCGAGACG";
+        genericCmpId = "gap";
+        templateTransformer.concretizePart(newPlasmid, genericCmpId, "test_gap",
+                gapSeq, doc);
+
+        String insertSeq = "ATGaGAAGAGCACGGTAGCCTTNNNNNNNNNNNNNNNNNNTGCCCAGTCTTCTGCCTAAGGCAGGTGCCGCGGTGCGGGTGCCAGGGCGTGCCCCCGGGCTCCCCGGGCGCGTACTCCACtttacagctagctcagtcctaggtattatgctagctattgtgagcggataacaatttcacacatactagagaaagaggagaaatactaaATGTCTAACAACGCGCTGCAAACCATCATCAATGCACGCCTGCCTGGAGAGGAAGGGTTGTGGCAGATTCACTTACAGGACGGCAAAATCTCCGCGATCGACGCACAATCTGGGGTTATGCCGATCACCGAAAACTCTTTGGATGCCGAACAAGGGTTAGTCATTCCCCCATTCGTTGAACCACATATTCACCTGGATACTACTCAGACAGCCGGTCAGCCCAATTGGAACCAGTCCGGTACGCTGTTCGAAGGTATCGAACGATGGGCGGAGCGAAAAGCTCTACTCACGCATGACGATGTCAAGCAACGGGCCTGGCAGACCCTGAAGTGGCAGATCGCCAACGGAATACAGCACGTACGCACTCACGTGGATGTTTCCGATGCCACTTTGACGGCATTGAAGGCAATGCTCGAAGTTAAGCAGGAAGTAGCCCCGTGGATTGACTTGCAAATCGCTGCCTTCCCTCAGGAAGGCATCCTAAGTTATCCGAATGGAGAAGCGCTCCTGGAGGAGGCATTGCGGTTAGGAGCAGACGTGGTGGGAGCGATTCCCCATTTCGAGTTTACCCGCGAGTACGGTGTTGAATCTCTGCATAAAACATTTGCTTTAGCTCAGAAGTATGACCGTCTGATCGACGTACACTGCGACGAGATCGATGACGAACAGAGTCGCTTCGTGGAGACGGTGGCTGCGCTGGCGCATCACGAAGGCATGGGTGCACGTGTAACTGCAAGCCATACGACGGCTATGCACAGCTATAATGGGGCATATACATCTCGTTTGTTCCGATTACTAAAAATGAGCGGAATCAACTTTGTTGCCAATCCATTGGTCAACATTCATCTACAAGGACGCTTCGACACCTACCCGAAACGGCGAGGAATCACACGAGTTAAGGAAATGCTAGAGTCTGGTATCAATGTGTGTTTCGGGCATGATGACGTGTGTGGTCCCTGGTACCCTCTAGGAACAGCCAACATGCTGCAAGTTCTCCACATGGGTCTACACGTGTGTCAACTCATGGGGTATGGACAAATTAACGATGGACTCAATCTAATTACACACCATTCCGCCCGAACACTGAACCTCCAGGATTACGGGATCGCGGCGGGAAATTCTGCCAACCTCATCATTCTGCCCGCGGAAAACGGGTTCGACGCTCTACGCCGTCAAGTGCCAGTTCGGTATTCTGTTCGTGGGGGTAAGGTAATTGCAAGTACCCAACCGGCTCAGACCACGGTCTATTTAGAGCAACCGGAAGCTATCGACTACAAACGATGAgcttcaaataaaacgaaaggctcagtcgaaagactgggcctttcgttttatctgttgtttgtcggtgaacgctctctactagagtcacactggctcaccttcgggtgggcctttctgcgcgctCTGAGGTCTGCCTCGTGAAGAAGGTGTTGCTGACTCATACCAGGCCTGAATCGCCCCATCATCCAGCCAGAAAGTGAGGGAGCCACGGTTGATGAGAGCTTTGTTGTAGGTGGACCAGTTGGTGATTTTGAACTTTTGCTTTGCCACGGAACGGTCTGCGTTGTCGGGAAGATGCGTGATCTGATCCTTCAACTCAGCAAAAGTTCGATTTATTCAACAAAGCCGCCGTCCCGTCAAGTCAGCGTAATGCTCTGCCAGTGTTACAACCAATTAACCAATTCTGATTAGAAAAACTCATCGAGCATCAAATGAAACTGCAATTTATTCATATCAGGATTATCAATACCATATTTTTGAAAAAGCCGTTTCTGTAATGAAGGAGAAAACTCACCGAGGCAGTTCCATAGGATGGCAAGATCCTGGTATCGGTCTGCGATTCCGACTCGTCCAACATCAATACAACCTATTAATTTCCCCTCGTCAAAAATAAGGTTATCAAGTGAGAAATCACCATGAGTGACGACTGAATCCGGTGAGAATGGCAAAAGCTTATGCATTTCTTTCCAGACTTGTTCAACAGGCCAGCCATTACGCTCGTCATCAAAATCACTCGCATCAACCAAACCGTTATTCATTCGTGATTGCGCCTGAGCGAGACGAAATACGCGATCGCTGTTAAAAGGACAATTACAAACAGGAATCGAATGCAACCGGCGCAGGAACACTGCCAGCGCATCAACAATATTTTCACCTGAATCAGGATATTCTTCTAATACCTGGAATGCTGTTTTCCCGGGGATCGCAGTGGTGAGTAACCATGCATCATCAGGAGTACGGATAAAATGCTTGATGGTCGGAAGAGGCATAAATTCCGTCAGCCAGTTTAGTCTGACCATCTCATCTGTAACATCATTGGCAACGCTACCTTTGCCATGTTTCAGAAACAACTCTGGCGCATCGGGCTTCCCATACAATCGATAGATTGTCGCACCTGATTGCCCGACATTATCGCGAGCCCATTTATACCCATATAAATCAGCATCCATGTTGGAATTTAATCGCGGCCTCGAGCAAGACGTTTCCCGTTGAATATGGCTCATAACACCCCTTGTATTACTGTTTATGTAAGCAGACAGTTTTATTGTTCATGATGATATATTTTTATCTTGTGCAATGTAACATCAGAGATTTTGAGACACAACGTGGCTTTCCGCGGTGCGGGTGCCAGGGCGTGCCCTTGGGCTCCCCGGGCGCGTACTCCACCACCTGCCATTGGGAGAAGACTTGGGAGCTCTTCataa";
+        genericCmpId = "insert";
+        templateTransformer.concretizePart(newPlasmid, genericCmpId, "test_insert",
+                insertSeq, doc);*/
+
+        /*ComponentDefinition originD = doc.getComponentDefinition("ori", version);
+        Component origin =  plasmid.createComponent("ori_instance", AccessType.PUBLIC, originD.getIdentity());
+        an = plasmid.createSequenceAnnotation("ori", "ori", 1228, 1816);
+        an.setComponent(origin.getIdentity());*/
+
+        /*ComponentDefinition templateOrigin = doc.getComponentDefinition("ampr_origin", "1.0.0");
+        assertNotNull(templateOrigin);
+        ComponentDefinition amprOrigin = templateTransformer.instantiateFromTemplate(templateOrigin, "ori_instance_johnny", version, description, doc);
+        
+        String originSeq = "";
+        genericCmpId = "ampr_origin";
+        templateTransformer.concretizePart(newPlasmid, genericCmpId, "test_ori_instance",
+                originSeq, doc);*/
+
+        ComponentDefinition originD = doc.getComponentDefinition("ori", version);
+        Component origin =  newPlasmid.createComponent("ori_instance", AccessType.PUBLIC, originD.getIdentity());
+        //SequenceAnnotation an = newPlasmid.createSequenceAnnotation("ori", "ori", 1228, 1816);
+        //an.setComponent(origin.getIdentity());
 
         // Left sequence elements
         // doc.getSequence("sll00199_left_seq")
@@ -513,7 +556,7 @@ public class TemplateTransformerTest {
 
         for (SequenceConstraint sc : sll00199SCs) {
             System.out.println(sc.getDisplayId());
-            SequenceConstraint sll00199Sc = newPlasmid.getSequenceConstraint(sc.getDisplayId());
+            SequenceConstraint sll00199Sc = sll00199Plasmid.getSequenceConstraint(sc.getDisplayId());
             //assertNotNull(npSc);
             //assertEquals(sc.getObject().getDefinition().getWasDerivedFroms(), npSc.getObject().getDefinition().getWasDerivedFroms());
             //assertEquals(sc.getSubject().getDefinition().getWasDerivedFroms(), npSc.getSubject().getDefinition().getWasDerivedFroms());
@@ -521,26 +564,94 @@ public class TemplateTransformerTest {
         }
 
         // Check sequence annotations match
+        Set<SequenceAnnotation> sll00199SAs = sll00199Plasmid.getSequenceAnnotations();
+        Set<SequenceAnnotation> npSAs = newPlasmid.getSequenceAnnotations();
+
         // Get sequence annos and verify they match in new component
-        /*for (SequenceAnnotation seqAnn : childSeqAnns) {
+        for (SequenceAnnotation seqAnn : npSAs) {
             //System.out.println(seqAnn.getComponentDefinition().getDisplayId());
             //System.out.println(seqAnn.getComponent().getDisplayId());
             System.out.println(seqAnn.getIdentity());
             System.out.println(seqAnn.getComponentIdentity());
         }
 
-        for (SequenceAnnotation seqAnn : template.getSequenceAnnotations()) {
+        for (SequenceAnnotation seqAnn : sll00199SAs) {
             //System.out.println(seqAnn.getComponentDefinition().getDisplayId());
             //System.out.println(seqAnn.getComponent().getDisplayId());
             System.out.println(seqAnn.getIdentity());
             System.out.println(seqAnn.getComponentIdentity());
         }
 
-        for (SequenceAnnotation seqAnn : templateFlat.getSequenceAnnotations()) {
+        /*for (SequenceAnnotation seqAnn : templateFlat.getSequenceAnnotations()) {
             //System.out.println(seqAnn.getComponentDefinition().getDisplayId());
             //System.out.println(seqAnn.getComponent().getDisplayId());
             System.out.println(seqAnn.getIdentity());
             System.out.println(seqAnn.getComponentIdentity());
         }*/
+
+        // Add the flattened sequences to the parent component's SequenceAnnotation components
+        ComponentDefinition newPlasmidFlat = templateTransformer.flattenSequences(newPlasmid, newName.concat("_flat"), doc);
+        newPlasmidFlat.addRole(new URI(seqenceOntoPref+"SO:0000637"));
+
+        // Check component instances match
+        for (Component cmp : sll00199PlasmidFlat.getSortedComponents()) {
+            System.out.println(cmp.getDisplayId());
+            //assertNotNull(newPlasmidFlat.getComponent(cmp.getDisplayId()));
+        }
+
+        for (Component cmp : newPlasmidFlat.getSortedComponents()) {
+            System.out.println(cmp.getDisplayId());
+            //assertNotNull(sll00199PlasmidFlat.getComponent(cmp.getDisplayId()));
+        }
+
+        Set<SequenceAnnotation> sll00199PlasmidFlatSAs = sll00199PlasmidFlat.getSequenceAnnotations();
+        Set<SequenceAnnotation> npFlatSAs = newPlasmidFlat.getSequenceAnnotations();
+
+        // Get sequence annos and verify they match in new component
+        for (SequenceAnnotation seqAnn : npFlatSAs) {
+            //System.out.println(seqAnn.getComponentDefinition().getDisplayId());
+            //System.out.println(seqAnn.getComponent().getDisplayId());
+            System.out.println(seqAnn.getIdentity());
+            System.out.println(seqAnn.getComponentIdentity());
+        }
+
+        //assertEquals(sll00199PlasmidFlatSAs.size(), npFlatSAs.size());
+
+        // why does this method return 'NNN...' strings for new plasmid?
+        // something to do with the SequenceAnnotations having null linked components.
+        // But can't set the components on the SAs because of circular reference error?
+        System.out.println(sll00199PlasmidFlat.getImpliedNucleicAcidSequence());
+        System.out.println(newPlasmidFlat.getImpliedNucleicAcidSequence());
+
+        assertEquals(sll00199PlasmidFlat.getImpliedNucleicAcidSequence().length(),
+                newPlasmidFlat.getImpliedNucleicAcidSequence().length());
+
+        Set<Sequence> sll00199PlasmidFlatSeqs = sll00199PlasmidFlat.getSequences();
+        Set<Sequence> npFlatSeqs = newPlasmidFlat.getSequences();
+        
+        String npFlatSeqEls = ((Sequence)npFlatSeqs.toArray()[0]).getElements();
+        String sll00199PlasmidFlatSeqEls = ((Sequence)sll00199PlasmidFlatSeqs.toArray()[0]).getElements();
+
+        assertEquals(npFlatSeqEls, sll00199PlasmidFlatSeqEls);
+
+        // Check sequence constraints match
+        Set<SequenceConstraint> sll00199SFlatSCs = sll00199PlasmidFlat.getSequenceConstraints();
+        Set<SequenceConstraint> npFlatSCs = newPlasmidFlat.getSequenceConstraints();
+
+        for (SequenceConstraint sc : npFlatSCs) {
+            System.out.println(sc.getDisplayId());
+            SequenceConstraint npSc = newPlasmid.getSequenceConstraint(sc.getDisplayId());
+            //assertEquals(sc.getSubject().getDefinition().getWasDerivedFroms(), npSc.getSubject().getDefinition().getWasDerivedFroms());
+            assertNotNull(sll00199PlasmidFlat.getSequenceConstraint(npSc.getDisplayId()));
+        }
+
+        for (SequenceConstraint sc : sll00199SFlatSCs) {
+            System.out.println(sc.getDisplayId());
+            SequenceConstraint sll00199Sc = sll00199PlasmidFlat.getSequenceConstraint(sc.getDisplayId());
+            //assertNotNull(npSc);
+            //assertEquals(sc.getObject().getDefinition().getWasDerivedFroms(), npSc.getObject().getDefinition().getWasDerivedFroms());
+            //assertEquals(sc.getSubject().getDefinition().getWasDerivedFroms(), npSc.getSubject().getDefinition().getWasDerivedFroms());
+            assertNotNull(newPlasmid.getSequenceConstraint(sll00199Sc.getDisplayId()));
+        }
     }
 }

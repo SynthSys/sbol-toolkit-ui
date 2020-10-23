@@ -5,15 +5,14 @@
  */
 package ed.biordm.sbol.toolkit.transform;
 
-import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import org.sbolstandard.core2.AccessType;
 import org.sbolstandard.core2.Component;
 import org.sbolstandard.core2.ComponentDefinition;
+import org.sbolstandard.core2.Location;
 import org.sbolstandard.core2.OperatorType;
 import org.sbolstandard.core2.OrientationType;
 import org.sbolstandard.core2.RestrictionType;
@@ -111,57 +110,11 @@ public class TemplateTransformer {
         link.setName(cleanName);
 
         // Create SequenceAnnotation for new component definition and link to instance
-        SequenceAnnotation seqAnn = parent.createSequenceAnnotation(cleanName + "_sa", cleanName + "_sa", 1, newSequence.length());
-        seqAnn.setComponent(link.getIdentity());
+        SequenceAnnotation seqAnn = newCmpDef.createSequenceAnnotation(cleanName + "_sa", cleanName + "_sa", 1, newSequence.length());
+        //seqAnn.setComponent(link.getDisplayId());
 
         replaceComponent(parent, cmp, link);
-        //parent.removeComponent(cmp);
-        /*Set<SequenceConstraint> oldSeqCons = parent.getSequenceConstraints();
 
-        parent.clearSequenceConstraints();
-        parent.removeComponent(cmp);
-
-        // Generate sequence constraints for instance of new component definition
-        for (SequenceConstraint sc : oldSeqCons) {
-            Component object = sc.getObject();
-            Component subject = sc.getSubject();
-            ComponentDefinition objectCD = sc.getObjectDefinition();
-            ComponentDefinition subjectCD = sc.getSubjectDefinition();
-
-            System.out.println("\nComponent ID:");
-            System.out.println(object.getIdentity());
-            System.out.println(subject.getIdentity());
-            System.out.println(cmp.getIdentity());
-
-            System.out.println("\nComponentDefinition ID:");
-            System.out.println(objectCD.getIdentity());
-            System.out.println(subjectCD.getIdentity());
-            System.out.println(cmp.getDefinition().getIdentity());
-            System.out.println("--------");
-
-            if (subject.getIdentity().equals(cmp.getIdentity())) { // removes/adds cs2
-                System.out.println("HERE4: "+sc.getDisplayId());
-                parent.removeSequenceConstraint(sc);
-                parent.createSequenceConstraint(sc.getDisplayId(), RestrictionType.PRECEDES, link.getIdentity(), object.getIdentity());
-            } else if (object.getIdentity().equals(cmp.getIdentity())) { // removes/adds cs1
-                System.out.println("HERE5: "+sc.getDisplayId());
-                parent.removeSequenceConstraint(sc);
-                parent.createSequenceConstraint(sc.getDisplayId(), RestrictionType.PRECEDES, object.getIdentity(), link.getIdentity());
-            } else if (objectCD.getIdentity().equals(cmp.getDefinition().getIdentity())) {
-                System.out.println("HERE1: "+sc.getDisplayId());
-            } else if (subjectCD.getIdentity().equals(cmp.getDefinition().getIdentity())) {
-                System.out.println("HERE2: "+sc.getDisplayId());
-            } else {
-                parent.createSequenceConstraint(sc.getDisplayId(), RestrictionType.PRECEDES, subject.getIdentity(), object.getIdentity());
-            }
-        }
-
-        // Remove old constraints and previous component instance
-        //removeConstraintReferences(parent, cmp);
-        //parent.removeComponent(cmp);*/
-
-        // Add the flattened sequences to the parent component's SequenceAnnotation component
-        //parent = flattenSequences(parent, newName, doc);
         return newCmpDef;
     }
 
@@ -203,7 +156,41 @@ public class TemplateTransformer {
         newCmpDef.setName(cleanName);
         newCmpDef.addWasDerivedFrom(template.getIdentity());
 
-        rebuildSequences(newCmpDef, doc, new HashSet<SequenceAnnotation>());
+        Set<SequenceAnnotation> flatSAs = new HashSet<>();
+        rebuildSequences(newCmpDef, doc, flatSAs);
+
+        // this sort of works
+        addSequenceAnnotationsToParent(newCmpDef);
+
+        //addChildSequenceAnnotations(newCmpDef, doc, flatSAs);
+
+        /*for (SequenceConstraint sc : flatSCs) {
+            Component scObject = sc.getObject();
+            Component scSubject = sc.getSubject();
+
+            for (SequenceAnnotation sa : flatSAs) {
+                // newCmpDef.createSequenceAnnotation(sa.getDisplayId(), cleanName);
+                System.out.println(sa.getDisplayId());
+                Component saCmp = sa.getComponent();
+
+                length = 0;
+
+                if (newCmpDef.getSequenceAnnotation(saCmp) == null) {
+                    if (saCmp == scObject) {
+                        System.out.println("It's the object!");
+                    } else if (saCmp == scSubject) {
+                        Set<Sequence> saCmpDefSeqs = saCmp.getDefinition().getSequences();
+
+                        for (Sequence seq : saCmpDefSeqs) {
+                            length += seq.getElements().length();
+                        }
+                        SequenceAnnotation newSA = newCmpDef.createSequenceAnnotation(sa.getDisplayId(), sa.getDisplayId(), start, length);
+                        newSA.setComponent(newName);
+                        start += length;
+                    }
+                }
+            }
+        }*/
         /*String allCmpSeq = newCmpDef.getImpliedNucleicAcidSequence();
         Sequence newSequence = doc.createSequence(cleanName.concat("_seq"), allCmpSeq, Sequence.IUPAC_DNA);
         newCmpDef.addSequence(newSequence);*/
@@ -249,6 +236,45 @@ public class TemplateTransformer {
         }
 
         parent.removeComponent(oldComponent);
+    }
+
+    protected void addSequenceAnnotationsToParent(ComponentDefinition parent) throws SBOLValidationException {
+        Set<SequenceConstraint> flatSCs = parent.getSequenceConstraints();
+        int length = 0;
+        int start = 1;
+
+        List<Component> flatCmps = parent.getSortedComponents();
+
+        for (Component cmp : flatCmps) {
+            length = 0;
+            System.out.println(cmp.getDisplayId());
+
+            ComponentDefinition cmpDef = cmp.getDefinition();
+            Set<Sequence> cmpDefSeqs = cmpDef.getSequences();
+
+            for (Sequence seq : cmpDefSeqs) {
+                length += seq.getElements().length();
+            }
+
+            Set<SequenceAnnotation> seqAnns = cmpDef.getSequenceAnnotations();
+            for (SequenceAnnotation seqAnn : seqAnns) {
+                /*System.out.println("Sorted Cmp Def: "+cmpDef.getDisplayId());
+                System.out.println("Seq Ann Cmp Def: "+seqAnn.getComponent().getDisplayId());*/
+                Set<Location> seqAnnLocs = seqAnn.getLocations();
+
+                /*for (Location seqAnnLoc : seqAnnLocs) {
+
+                }*/
+                SequenceAnnotation newSA = parent.createSequenceAnnotation(seqAnn.getDisplayId(), seqAnn.getDisplayId(), start, start+length);
+
+                if (newSA.getComponent() == null) {
+                    // Throws org.sbolstandard.core2.SBOLValidationException: sbol-10522:  Strong Validation Error: 
+                    // The sequenceAnnotations property of a ComponentDefinition MUST NOT contain two or more SequenceAnnotation objects that refer to the same Component.
+                    //newSA.setComponent(cmp.getIdentity());
+                }
+            }
+            start += length;
+        }
     }
 
     /**
@@ -323,6 +349,7 @@ public class TemplateTransformer {
                 }
             }
 
+            //rebuildSequences(curr, doc, newSequenceAnns);
             count++;
         }
         if (!newSeq.isBlank()) {
