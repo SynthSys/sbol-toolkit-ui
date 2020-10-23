@@ -232,6 +232,24 @@ public class TemplateTransformerTest {
 
         //write teest if the sequences constraints have been replaced with new one
         //that points to newComp instead to the replaced
+        Set<SequenceConstraint> parentSCs = parent.getSequenceConstraints();
+        Set<SequenceConstraint> npSCs = newDef.getSequenceConstraints();
+
+        for (SequenceConstraint sc : npSCs) {
+            ComponentDefinition objectCD = sc.getObjectDefinition();
+            ComponentDefinition subjectCD = sc.getSubjectDefinition();
+
+            if(objectCD == replacedDef || subjectCD == replacedDef) {
+                System.out.println("Old SequenceConstraint detected!");
+                assertTrue(Boolean.FALSE);
+            } else {
+                if(objectCD == newDef) {
+                    assertEquals(newComp, objectCD.getComponent(newDisplayId));
+                } else if(subjectCD == newDef) {
+                    assertEquals(newComp, subjectCD.getComponent(newDisplayId));
+                }
+            }
+        }
     }
 
     /**
