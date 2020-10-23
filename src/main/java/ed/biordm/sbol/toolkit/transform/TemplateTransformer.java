@@ -110,7 +110,7 @@ public class TemplateTransformer {
         link.setName(cleanName);
 
         // Create SequenceAnnotation for new component definition and link to instance
-        SequenceAnnotation seqAnn = newCmpDef.createSequenceAnnotation(cleanName + "_sa", cleanName + "_sa", 1, newSequence.length());
+        // SequenceAnnotation seqAnn = newCmpDef.createSequenceAnnotation(cleanName + "_sa", cleanName + "_sa", 1, newSequence.length());
         //seqAnn.setComponent(link.getDisplayId());
 
         replaceComponent(parent, cmp, link);
@@ -157,43 +157,40 @@ public class TemplateTransformer {
         newCmpDef.addWasDerivedFrom(template.getIdentity());
 
         Set<SequenceAnnotation> flatSAs = new HashSet<>();
+        addChildSequenceAnnotations(newCmpDef, doc, flatSAs);
+
         rebuildSequences(newCmpDef, doc, flatSAs);
 
+        for (SequenceAnnotation sa : flatSAs) {
+            if(!newCmpDef.getSequenceAnnotations().contains(sa)) {
+                if (sa.getComponent() == null) {
+                    System.out.println("here1");
+
+                    if (sa.getComponentDefinition() == null) {
+                        System.out.println("No component or component definition?!");
+                    }
+                   //System.out.println(sa.getComponentDefinition().getIdentity());
+                } else {
+                    System.out.println(sa.getComponent().getDisplayId());
+                }
+                //System.out.println(sa.getDisplayId());
+
+                Set<Location> saLocs = sa.getLocations();
+
+                for (Location saLoc : saLocs) {
+                    System.out.println(saLoc.getSequence());
+                }
+                //newCmpDef.createSequenceAnnotation(sa.getDisplayId(), cleanName);
+            }
+            //System.out.println(((Location)sa.getLocations().toArray()[0]).getSequence().getElements());
+        }
+
+        //rebuildSequences(newCmpDef, doc, flatSAs);
+
         // this sort of works
-        addSequenceAnnotationsToParent(newCmpDef);
+        //addSequenceAnnotationsToParent(newCmpDef);
 
         //addChildSequenceAnnotations(newCmpDef, doc, flatSAs);
-
-        /*for (SequenceConstraint sc : flatSCs) {
-            Component scObject = sc.getObject();
-            Component scSubject = sc.getSubject();
-
-            for (SequenceAnnotation sa : flatSAs) {
-                // newCmpDef.createSequenceAnnotation(sa.getDisplayId(), cleanName);
-                System.out.println(sa.getDisplayId());
-                Component saCmp = sa.getComponent();
-
-                length = 0;
-
-                if (newCmpDef.getSequenceAnnotation(saCmp) == null) {
-                    if (saCmp == scObject) {
-                        System.out.println("It's the object!");
-                    } else if (saCmp == scSubject) {
-                        Set<Sequence> saCmpDefSeqs = saCmp.getDefinition().getSequences();
-
-                        for (Sequence seq : saCmpDefSeqs) {
-                            length += seq.getElements().length();
-                        }
-                        SequenceAnnotation newSA = newCmpDef.createSequenceAnnotation(sa.getDisplayId(), sa.getDisplayId(), start, length);
-                        newSA.setComponent(newName);
-                        start += length;
-                    }
-                }
-            }
-        }*/
-        /*String allCmpSeq = newCmpDef.getImpliedNucleicAcidSequence();
-        Sequence newSequence = doc.createSequence(cleanName.concat("_seq"), allCmpSeq, Sequence.IUPAC_DNA);
-        newCmpDef.addSequence(newSequence);*/
 
         return newCmpDef;
     }
@@ -212,11 +209,26 @@ public class TemplateTransformer {
 
     protected void addChildSequenceAnnotations(ComponentDefinition comp, SBOLDocument doc, Set<SequenceAnnotation> childSequenceAnns) throws SBOLValidationException {
         Set<SequenceAnnotation> oldSequenceAnn = comp.getSequenceAnnotations();
+        int saCount = 1;
 
         for(Component child : comp.getComponents()) {
             ComponentDefinition cmpDef = child.getDefinition();
+
+            if (cmpDef.getSequenceAnnotations().size() > 0) {
             for(SequenceAnnotation seqAn : cmpDef.getSequenceAnnotations()) {
                 childSequenceAnns.add(seqAn);
+            }
+            } else {
+                for (Sequence seq : cmpDef.getSequences()) {
+                    String newSAName = "ann".concat(String.valueOf(saCount));
+                    SequenceAnnotation newSA = comp.createSequenceAnnotation(newSAName, newSAName, 1, seq.getElements().length());
+                    newSA.setComponent(child.getIdentity());
+
+                    saCount += 1;
+
+                    childSequenceAnns.add(newSA);
+                }
+
             }
 
             addChildSequenceAnnotations(cmpDef, doc, childSequenceAnns);

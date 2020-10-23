@@ -35,7 +35,7 @@ public class TemplateTransformerTest {
 
     TemplateTransformer templateTransformer = new TemplateTransformer();
     SBOLDocument doc;
-    static String seqenceOntoPref = "http://identifiers.org/so/";
+    static String SEQUENCE_ONTO_PREF = "http://identifiers.org/so/";
 
     @Before
     public void generateSBOLDocument() throws IOException, SBOLValidationException, SBOLConversionException {
@@ -591,7 +591,7 @@ public class TemplateTransformerTest {
 
         // Add the flattened sequences to the parent component's SequenceAnnotation components
         ComponentDefinition newPlasmidFlat = templateTransformer.flattenSequences(newPlasmid, newName.concat("_flat"), doc);
-        newPlasmidFlat.addRole(new URI(seqenceOntoPref+"SO:0000637"));
+        newPlasmidFlat.addRole(new URI(SEQUENCE_ONTO_PREF+"SO:0000637"));
 
         // Check component instances match
         for (Component cmp : sll00199PlasmidFlat.getSortedComponents()) {
