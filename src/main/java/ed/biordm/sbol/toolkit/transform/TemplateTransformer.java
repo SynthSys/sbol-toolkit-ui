@@ -392,31 +392,27 @@ public class TemplateTransformer {
         }
     }
 
+    /**
+     * Replace the sub-string between the startIdx and endIdx positions in the
+     * provided oldSeq String parameter, with the content of the barcodeSeq
+     * String value. If the length of the barcodeSeq String parameter is shorter
+     * or longer than the section of the oldSeq defined by the index values,
+     * the resulting sub-string is truncated or padded accordingly.
+     *
+     * @param oldSeq
+     * @param barcodeSeq
+     * @param startIdx
+     * @param endIdx
+     * @return
+     */
     public String updateBarcodeSequence(String oldSeq, String barcodeSeq, int startIdx, int endIdx) {
 
-        String startSubstr = oldSeq.substring(0, startIdx);
-        String endSubstr = oldSeq.substring(endIdx, oldSeq.length());
+        String startSubStr = oldSeq.substring(0, startIdx);
+        String endSubStr = oldSeq.substring(endIdx, oldSeq.length());
 
-        StringBuffer oldSeqBuff = new StringBuffer(oldSeq);  
+        String newSeq = startSubStr.concat(barcodeSeq).concat(endSubStr);
 
-        // verify that index values can accommodate new barcode string
-        if(barcodeSeq.length() > (endIdx - startIdx)) {
-            int diff = barcodeSeq.length() - (endIdx - startIdx);
-            // add padding to the original sequence to accommodate new barcode
-
-            char[] strPadding = new char[diff];
-            Arrays.fill(strPadding, 'N');
-            oldSeqBuff.insert(endIdx, new String(strPadding));
-
-            endIdx = startIdx + barcodeSeq.length();
-
-            oldSeq = oldSeqBuff.toString();
-        }
-
-        // get substring that needs to be replaced
-        String target = oldSeq.substring(startIdx, endIdx);
-
-        return oldSeq.replace(target, barcodeSeq);
+        return newSeq;
     }
 
     /**
