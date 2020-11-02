@@ -5,8 +5,8 @@
  */
 package ed.biordm.sbol.toolkit.transform;
 
-import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -390,6 +390,33 @@ public class TemplateTransformer {
                 comp.getSequences().iterator().next().setElements(newSeq);
             }
         }
+    }
+
+    public String updateBarcodeSequence(String oldSeq, String barcodeSeq, int startIdx, int endIdx) {
+
+        String startSubstr = oldSeq.substring(0, startIdx);
+        String endSubstr = oldSeq.substring(endIdx, oldSeq.length());
+
+        StringBuffer oldSeqBuff = new StringBuffer(oldSeq);  
+
+        // verify that index values can accommodate new barcode string
+        if(barcodeSeq.length() > (endIdx - startIdx)) {
+            int diff = barcodeSeq.length() - (endIdx - startIdx);
+            // add padding to the original sequence to accommodate new barcode
+
+            char[] strPadding = new char[diff];
+            Arrays.fill(strPadding, 'N');
+            oldSeqBuff.insert(endIdx, new String(strPadding));
+
+            endIdx = startIdx + barcodeSeq.length();
+
+            oldSeq = oldSeqBuff.toString();
+        }
+
+        // get substring that needs to be replaced
+        String target = oldSeq.substring(startIdx, endIdx);
+
+        return oldSeq.replace(target, barcodeSeq);
     }
 
     /**
