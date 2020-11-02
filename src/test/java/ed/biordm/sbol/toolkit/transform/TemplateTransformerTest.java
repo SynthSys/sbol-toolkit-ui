@@ -625,6 +625,15 @@ public class TemplateTransformerTest {
         ComponentDefinition newPlasmidFlat = templateTransformer.flattenSequences(newPlasmid, newName.concat("_flat"), doc);
         newPlasmidFlat.addRole(new URI(SEQUENCE_ONTO_PREF+"SO:0000637"));
 
+        // Add arbitrary(?) SequenceAnnotations. What are the rules for these annotations?
+        Component seqCmp = newPlasmid.getComponent("ampR");
+        SequenceAnnotation an = newPlasmid.createSequenceAnnotation("ann1", "ann1", 1, 2073);
+        an.setComponent(seqCmp.getIdentity());
+
+        seqCmp = newPlasmid.getComponent("test_left");
+        an = newPlasmid.createSequenceAnnotation("ann2", "ann2", 2074, 2074+newLtSeqEls.length());
+        an.setComponent(seqCmp.getIdentity());
+
         // Check component instances match
         for (Component cmp : sll00199PlasmidFlat.getSortedComponents()) {
             System.out.println(cmp.getDisplayId());

@@ -69,7 +69,7 @@ public class CyanoTemplates {
         }
 
         try {
-            SBOLWriter.write(doc, "E:/Temp/" + fName + ".xml");
+            SBOLWriter.write(doc, "D:/Temp/sbol/" + fName + ".xml");
         } catch (IOException e) {
             e.printStackTrace();
             throw e;
