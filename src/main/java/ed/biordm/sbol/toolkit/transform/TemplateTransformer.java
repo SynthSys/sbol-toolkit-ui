@@ -5,6 +5,7 @@
  */
 package ed.biordm.sbol.toolkit.transform;
 
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashSet;
 import java.util.List;
@@ -291,6 +292,7 @@ public class TemplateTransformer {
                 Set<Location> seqAnnLocs = seqAnn.getLocations();
 
                 SequenceAnnotation newSA = parent.createSequenceAnnotation(seqAnn.getDisplayId(), seqAnn.getDisplayId(), start, start+length);
+                newSA.setRoles(seqAnn.getRoles());
 
                 if (newSA.getComponent() == null) {
                     // Throws org.sbolstandard.core2.SBOLValidationException: sbol-10522:  Strong Validation Error: 
@@ -370,6 +372,7 @@ public class TemplateTransformer {
                                 start += length;
                             }
                             seqAnn.setComponent(c.getIdentity());
+                            seqAnn.setRoles(sa.getRoles());
                         }
 
                         newSequenceAnns.add(seqAnn);
