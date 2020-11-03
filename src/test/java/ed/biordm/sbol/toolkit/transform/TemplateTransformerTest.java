@@ -85,6 +85,59 @@ public class TemplateTransformerTest {
         assertEquals(region.getRoles(), newCmp.getRoles());
     }
 
+    /**
+     * Test if the sub-components from the AmpR component definition are properly
+     * copied to the new parent plasmid.
+     */
+    @Test
+    public void testAmprSubComponents() throws Exception {
+        String ampRDispId = "ampr_origin";
+        String version = "1.0.0";
+
+        ComponentDefinition ampR = doc.getComponentDefinition(ampRDispId, version);
+        assertNotNull(ampR);
+
+        for (Component cmp : ampR.getComponents()) {
+            //System.out.println(cmp.getDisplayId());
+        }
+
+        for (SequenceAnnotation seqAnn : ampR.getSequenceAnnotations()) {
+            //System.out.println(seqAnn.getDisplayId());
+        }
+
+        String templateDispId = "cyano_codA_Km";
+        String newName = "johnny_cyano_codA_Km";
+        String desc = "test plasmid from template";
+
+        ComponentDefinition templatePlasmid = doc.getComponentDefinition(templateDispId, version);
+        ComponentDefinition newCmp = templateTransformer.instantiateFromTemplate(templatePlasmid,
+                newName, version, desc, doc);
+
+        String ampRCmpDispId = "ampR";
+        ComponentDefinition newAmpR = newCmp.getComponent(ampRCmpDispId).getDefinition();
+
+        for (Component cmp : newAmpR.getComponents()) {
+            //System.out.println(cmp.getDisplayId());
+            assertTrue(ampR.getComponents().contains(cmp));
+        }
+
+        for (SequenceAnnotation seqAnn : newAmpR.getSequenceAnnotations()) {
+            //System.out.println(seqAnn.getDisplayId());
+            assertTrue(ampR.getSequenceAnnotations().contains(seqAnn));
+        }
+
+        for (Component cmp : newCmp.getSortedComponents()) {
+            System.out.println(cmp.getDisplayId());
+
+            ComponentDefinition curCmpDef = cmp.getDefinition();
+            System.out.println(curCmpDef.getDisplayId());
+
+            for (SequenceAnnotation seqAnn : curCmpDef.getSequenceAnnotations()) {
+                System.out.println(seqAnn.getDisplayId());
+            }
+        }
+    }
+
     @Test
     public void instantiateFromTemplateCreatesNewDefinitionWithGivenAttributesPreservingExistingFeatures() throws Exception {
 
@@ -656,11 +709,11 @@ public class TemplateTransformerTest {
         // Add arbitrary(?) SequenceAnnotations. What are the rules for these annotations?
         Component seqCmp = newPlasmidFlat.getComponent("ampR");
         SequenceAnnotation an = newPlasmidFlat.createSequenceAnnotation("ann1", "ann1", 1, 2073);
-        an.setComponent(seqCmp.getIdentity());
+        //an.setComponent(seqCmp.getIdentity());
 
         seqCmp = newPlasmidFlat.getComponent("test_left");
         an = newPlasmidFlat.createSequenceAnnotation("ann2", "ann2", 2074, 2074+newLtSeqEls.length());
-        an.setComponent(seqCmp.getIdentity());
+        //an.setComponent(seqCmp.getIdentity());
 
         // Check component instances match
         for (Component cmp : sll00199PlasmidFlat.getSortedComponents()) {
