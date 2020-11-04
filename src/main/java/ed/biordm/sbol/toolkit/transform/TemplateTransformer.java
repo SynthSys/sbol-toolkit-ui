@@ -6,7 +6,6 @@
 package ed.biordm.sbol.toolkit.transform;
 
 import java.net.URISyntaxException;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -15,6 +14,7 @@ import org.sbolstandard.core2.Component;
 import org.sbolstandard.core2.ComponentDefinition;
 import org.sbolstandard.core2.Location;
 import org.sbolstandard.core2.OrientationType;
+import org.sbolstandard.core2.Range;
 import org.sbolstandard.core2.SBOLDocument;
 import org.sbolstandard.core2.SBOLValidationException;
 import org.sbolstandard.core2.Sequence;
@@ -182,11 +182,11 @@ public class TemplateTransformer {
             //System.out.println(((Location)sa.getLocations().toArray()[0]).getSequence().getElements());
         }
 
-        rebuildSequences(newCmpDef, doc, flatSAs);
+        rebuildSequences(newCmpDef, newCmpDef, doc, flatSAs);
         //rebuildSequencesOrig(newCmpDef, doc);
 
         // this sort of works
-        addSequenceAnnotationsToParent(newCmpDef);
+        //addSequenceAnnotationsToParent(newCmpDef);
 
         //addChildSequenceAnnotations(newCmpDef, doc, flatSAs);
 
@@ -280,24 +280,26 @@ public class TemplateTransformer {
             length = 0;
 
             ComponentDefinition cmpDef = cmp.getDefinition();
-            Set<Sequence> cmpDefSeqs = cmpDef.getSequences();
-
-            for (Sequence seq : cmpDefSeqs) {
-                length += seq.getElements().length();
-            }
 
             Set<SequenceAnnotation> seqAnns = cmpDef.getSequenceAnnotations();
             for (SequenceAnnotation seqAnn : seqAnns) {
 
                 Set<Location> seqAnnLocs = seqAnn.getLocations();
 
-                SequenceAnnotation newSA = parent.createSequenceAnnotation(seqAnn.getDisplayId(), seqAnn.getDisplayId(), start, start+length);
-                newSA.setRoles(seqAnn.getRoles());
+                for (Location loc : seqAnnLocs) {
+                    Range locRange = (Range) loc;
 
-                if (newSA.getComponent() == null) {
-                    // Throws org.sbolstandard.core2.SBOLValidationException: sbol-10522:  Strong Validation Error: 
-                    // The sequenceAnnotations property of a ComponentDefinition MUST NOT contain two or more SequenceAnnotation objects that refer to the same Component.
-                    //newSA.setComponent(cmp.getIdentity());
+                    int seqAnnStart = locRange.getStart();
+                    int seqAnnEnd = locRange.getEnd();
+
+                    SequenceAnnotation newSA = parent.createSequenceAnnotation(seqAnn.getDisplayId(), seqAnn.getDisplayId(), start + seqAnnStart - 1, start +  + seqAnnEnd - 1);
+                    newSA.setRoles(seqAnn.getRoles());
+
+                    if (newSA.getComponent() == null) {
+                        // Throws org.sbolstandard.core2.SBOLValidationException: sbol-10522:  Strong Validation Error: 
+                        // The sequenceAnnotations property of a ComponentDefinition MUST NOT contain two or more SequenceAnnotation objects that refer to the same Component.
+                        //newSA.setComponent(cmp.getIdentity());
+                    }
                 }
             }
             start += length;
@@ -315,8 +317,8 @@ public class TemplateTransformer {
      * @param newSequenceAnns The set of SequenceAnnotation objects to recursively collect from sub-components
      * @throws SBOLValidationException
      */
-    protected void rebuildSequences(ComponentDefinition comp, SBOLDocument doc, Set<SequenceAnnotation> newSequenceAnns) throws SBOLValidationException {
-        Set<SequenceAnnotation> oldSequenceAnns = comp.getSequenceAnnotations();
+    protected void rebuildSequences(ComponentDefinition parent, ComponentDefinition subCmp, SBOLDocument doc, Set<SequenceAnnotation> newSequenceAnns) throws SBOLValidationException {
+        Set<SequenceAnnotation> oldSequenceAnns = parent.getSequenceAnnotations();
 
         //comp.clearSequenceAnnotations();
         Set<Sequence> currSequences = new HashSet<Sequence>();
@@ -326,12 +328,35 @@ public class TemplateTransformer {
         int count = 0;
         String newSeq = "";
         ComponentDefinition curr;
-        for (org.sbolstandard.core2.Component c : comp.getSortedComponents()) {
+        for (org.sbolstandard.core2.Component c : subCmp.getSortedComponents()) {
             curr = c.getDefinition();
             if (!curr.getComponents().isEmpty()) {
-                rebuildSequences(curr, doc, newSequenceAnns);
+                rebuildSequences(parent, curr, doc, newSequenceAnns);
             }
             length = 0;
+
+            Set<SequenceAnnotation> seqAnns = curr.getSequenceAnnotations();
+            for (SequenceAnnotation seqAnn : seqAnns) {
+
+                Set<Location> seqAnnLocs = seqAnn.getLocations();
+
+                for (Location loc : seqAnnLocs) {
+                    Range locRange = (Range) loc;
+
+                    int seqAnnStart = locRange.getStart();
+                    int seqAnnEnd = locRange.getEnd();
+
+                    SequenceAnnotation newSA = parent.createSequenceAnnotation(seqAnn.getDisplayId(), seqAnn.getDisplayId(), start + seqAnnStart - 1, start +  + seqAnnEnd - 1);
+                    newSA.setRoles(seqAnn.getRoles());
+
+                    if (newSA.getComponent() == null) {
+                        // Throws org.sbolstandard.core2.SBOLValidationException: sbol-10522:  Strong Validation Error: 
+                        // The sequenceAnnotations property of a ComponentDefinition MUST NOT contain two or more SequenceAnnotation objects that refer to the same Component.
+                        //newSA.setComponent(cmp.getIdentity());
+                    }
+                }
+            }
+
             //Append sequences to build newly constructed sequence
             for (Sequence s : curr.getSequences()) {
                 currSequences.add(s);
@@ -342,8 +367,8 @@ public class TemplateTransformer {
             newSeq = newSeq.concat(currSeq);
             length += currSeq.length();*/
 
-            OrientationType o = OrientationType.INLINE;
-            for(SequenceAnnotation seqAnn : curr.getSequenceAnnotations()) {
+            start += length;
+            /*for(SequenceAnnotation seqAnn : curr.getSequenceAnnotations()) {
                 if(seqAnn == null) {
                     if (length == 0) {
                         seqAnn = comp.createSequenceAnnotation(seqAnn.getDisplayId(), "GenericLocation", o);
@@ -378,16 +403,16 @@ public class TemplateTransformer {
                         newSequenceAnns.add(seqAnn);
                     }
                 }
-            }
+            }*/
 
             count++;
         }
         if (!newSeq.isBlank()) {
-            if (comp.getSequences().isEmpty()) {
-                String uniqueId = comp.getDisplayId().concat("_seq");
-                comp.addSequence(doc.createSequence(uniqueId, comp.getVersion(), newSeq, Sequence.IUPAC_DNA));
+            if (parent.getSequences().isEmpty()) {
+                String uniqueId = parent.getDisplayId().concat("_seq");
+                parent.addSequence(doc.createSequence(uniqueId, parent.getVersion(), newSeq, Sequence.IUPAC_DNA));
             } else {
-                comp.getSequences().iterator().next().setElements(newSeq);
+                parent.getSequences().iterator().next().setElements(newSeq);
             }
         }
     }
