@@ -150,13 +150,24 @@ public class TemplateTransformerTest {
                     //String seqAnnDispId = newCmp
 
                     SequenceAnnotation seqAnn2 = newCmp.createSequenceAnnotation(seqAnn.getDisplayId(), seqAnn.getDisplayId(), start + range.getStart() - 1, start + range.getEnd() - 1, OrientationType.INLINE);
+                    //seqAnn2.setComponent(cmp.getIdentity());
                 }
             }
         }
 
+        String[] saDisplayIdsArr = new String[]{"ori", "AmpR_prom", "AmpR",};
+        Set<String> saDisplayIds = new HashSet<>( Arrays.asList(saDisplayIdsArr) );
+
         for (SequenceAnnotation seqAnn : newCmp.getSequenceAnnotations()) {
+            System.out.println("New sequence annotation:");
             System.out.println(seqAnn.getDisplayId());
-            assertTrue(newCmpFlat.getSequenceAnnotations().contains(seqAnn));
+            assertTrue(saDisplayIds.contains(seqAnn.getDisplayId()));
+        }
+
+        for (SequenceAnnotation seqAnn : newCmpFlat.getSequenceAnnotations()) {
+            System.out.println("New sequence annotation:");
+            System.out.println(seqAnn.getDisplayId());
+            assertTrue(saDisplayIds.contains(seqAnn.getDisplayId()));
         }
     }
 
@@ -508,14 +519,26 @@ public class TemplateTransformerTest {
             assertTrue(saDisplayIds.contains(seqAnn.getDisplayId()));
         }
 
+        Integer[] startsArr = new Integer[]{92, 1228, 197};
+        Set<Integer> starts = new HashSet<>( Arrays.asList(startsArr) );
+
+        Integer[] endsArr = new Integer[]{196, 1816, 1057};
+        Set<Integer> ends = new HashSet<>( Arrays.asList(endsArr) );
+
         // template.getSequenceAnnotations().addAll(childSeqAnns);
         //template.createSequenceAnnotation(displayId, locationId, 0, 0, OrientationType.INLINE)
-        for (SequenceAnnotation seqAnn : template.getSequenceAnnotations()) {
+        for (SequenceAnnotation seqAnn : template.getSortedSequenceAnnotations()) {
             //System.out.println(seqAnn.getComponentDefinition().getDisplayId());
             //System.out.println(seqAnn.getComponent().getDisplayId());
             //template.createSequenceAnnotation(seqAnn.getDisplayId(), seqAnn.getLocation(displayId), seqAnn.);
             List<Location> locations = seqAnn.getSortedLocations();
-            locations.get(0).getSequence().getElements();
+
+            for(Location loc : locations) {
+                Range range = (Range) loc;
+                System.out.println(range.getStart());
+                assertTrue(starts.contains((Integer)range.getStart()));
+                assertTrue(ends.contains((Integer)range.getEnd()));
+            }
             assertTrue(saDisplayIds.contains(seqAnn.getDisplayId()));
         }
     }
