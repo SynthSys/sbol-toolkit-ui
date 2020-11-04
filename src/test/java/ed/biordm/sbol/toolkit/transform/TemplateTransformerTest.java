@@ -20,6 +20,8 @@ import org.sbolstandard.core2.AccessType;
 import org.sbolstandard.core2.Component;
 import org.sbolstandard.core2.ComponentDefinition;
 import org.sbolstandard.core2.Location;
+import org.sbolstandard.core2.OrientationType;
+import org.sbolstandard.core2.Range;
 import org.sbolstandard.core2.SBOLConversionException;
 import org.sbolstandard.core2.SBOLDocument;
 import org.sbolstandard.core2.SBOLReader;
@@ -126,6 +128,11 @@ public class TemplateTransformerTest {
             assertTrue(ampR.getSequenceAnnotations().contains(seqAnn));
         }
 
+        // Test flattened sequence annotations
+        ComponentDefinition newCmpFlat = templateTransformer.flattenSequences(newCmp, "johnny_cyano_codA_Km_flat", doc);
+
+        int start = 1;
+        int seqAnnCount = 1;
         for (Component cmp : newCmp.getSortedComponents()) {
             System.out.println(cmp.getDisplayId());
 
@@ -134,7 +141,22 @@ public class TemplateTransformerTest {
 
             for (SequenceAnnotation seqAnn : curCmpDef.getSequenceAnnotations()) {
                 System.out.println(seqAnn.getDisplayId());
+
+                for (Location loc : seqAnn.getLocations()) {
+                    Range range = (Range) loc;
+                    System.out.println(range.getStart());
+                    System.out.println(range.getEnd());
+
+                    //String seqAnnDispId = newCmp
+
+                    SequenceAnnotation seqAnn2 = newCmp.createSequenceAnnotation(seqAnn.getDisplayId(), seqAnn.getDisplayId(), start + range.getStart() - 1, start + range.getEnd() - 1, OrientationType.INLINE);
+                }
             }
+        }
+
+        for (SequenceAnnotation seqAnn : newCmp.getSequenceAnnotations()) {
+            System.out.println(seqAnn.getDisplayId());
+            assertTrue(newCmpFlat.getSequenceAnnotations().contains(seqAnn));
         }
     }
 
@@ -461,7 +483,7 @@ public class TemplateTransformerTest {
         assertNotNull(template);
 
         Set<SequenceAnnotation> childSeqAnns = new HashSet<>();
-        templateTransformer.rebuildSequences(template, doc, childSeqAnns);
+        templateTransformer.rebuildSequences(template, template, doc, childSeqAnns);
 
         String[] saDisplayIdsArr = new String[]{"ori", "ori_instance", "AmpR_prom", "null", "ann1", "gap", "AmpR", "ann2", "insert"};
         Set<String> saDisplayIds = new HashSet<>( Arrays.asList(saDisplayIdsArr) );
