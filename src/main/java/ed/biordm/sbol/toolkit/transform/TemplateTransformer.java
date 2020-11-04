@@ -154,39 +154,8 @@ public class TemplateTransformer {
         newCmpDef.setName(cleanName);
         newCmpDef.addWasDerivedFrom(template.getIdentity());
 
-        Set<SequenceAnnotation> flatSAs = new HashSet<>();
-        //addChildSequenceAnnotations(newCmpDef, doc, flatSAs);
+        rebuildSequences(newCmpDef, newCmpDef, doc);
 
-        for (SequenceAnnotation sa : flatSAs) {
-            if (!newCmpDef.getSequenceAnnotations().contains(sa)) {
-                if (sa.getComponent() == null) {
-                    System.out.println("here1");
-
-                    if (sa.getComponentDefinition() == null) {
-                        System.out.println("No component or component definition?!");
-                    }
-                    //System.out.println(sa.getComponentDefinition().getIdentity());
-                } else {
-                    System.out.println(sa.getComponent().getDisplayId());
-                }
-                //System.out.println(sa.getDisplayId());
-
-                Set<Location> saLocs = sa.getLocations();
-
-                for (Location saLoc : saLocs) {
-                    System.out.println(saLoc.getSequence());
-                }
-                //newCmpDef.createSequenceAnnotation(sa.getDisplayId(), cleanName);
-            }
-            //System.out.println(((Location)sa.getLocations().toArray()[0]).getSequence().getElements());
-        }
-
-        rebuildSequences(newCmpDef, newCmpDef, doc, flatSAs);
-        //rebuildSequencesOrig(newCmpDef, doc);
-
-        // this sort of works
-        //addSequenceAnnotationsToParent(newCmpDef);
-        //addChildSequenceAnnotations(newCmpDef, doc, flatSAs);
         return newCmpDef;
     }
 
@@ -317,13 +286,7 @@ public class TemplateTransformer {
      * @throws SBOLValidationException
      */
     protected void rebuildSequences(ComponentDefinition parent,
-            ComponentDefinition subCmp, SBOLDocument doc,
-            Set<SequenceAnnotation> newSequenceAnns) throws SBOLValidationException {
-        Set<SequenceAnnotation> oldSequenceAnns = parent.getSequenceAnnotations();
-
-        //comp.clearSequenceAnnotations();
-        Set<Sequence> currSequences = new HashSet<Sequence>();
-
+            ComponentDefinition subCmp, SBOLDocument doc) throws SBOLValidationException {
         int start = 1;
         int length;
         int count = 0;
@@ -332,7 +295,7 @@ public class TemplateTransformer {
         for (org.sbolstandard.core2.Component c : subCmp.getSortedComponents()) {
             curr = c.getDefinition();
             if (!curr.getComponents().isEmpty()) {
-                rebuildSequences(parent, curr, doc, newSequenceAnns);
+                rebuildSequences(parent, curr, doc);
             }
             length = 0;
 
@@ -340,7 +303,6 @@ public class TemplateTransformer {
 
             //Append sequences to build newly constructed sequence
             for (Sequence s : curr.getSequences()) {
-                currSequences.add(s);
                 newSeq = newSeq.concat(s.getElements());
                 length += s.getElements().length();
             }

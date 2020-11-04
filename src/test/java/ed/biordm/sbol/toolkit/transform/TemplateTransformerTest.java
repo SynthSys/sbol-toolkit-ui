@@ -493,19 +493,18 @@ public class TemplateTransformerTest {
         //ComponentDefinition template = doc.getComponentDefinition("cyano_codA_Km", "1.0.0");
         assertNotNull(template);
 
-        Set<SequenceAnnotation> childSeqAnns = new HashSet<>();
-        templateTransformer.rebuildSequences(template, template, doc, childSeqAnns);
+        templateTransformer.rebuildSequences(template, template, doc);
 
         String[] saDisplayIdsArr = new String[]{"ori", "ori_instance", "AmpR_prom", "null", "ann1", "gap", "AmpR", "ann2", "insert"};
         Set<String> saDisplayIds = new HashSet<>( Arrays.asList(saDisplayIdsArr) );
 
-        for (SequenceAnnotation seqAnn : childSeqAnns) {
+        /*for (SequenceAnnotation seqAnn : childSeqAnns) {
             //System.out.println(seqAnn.getComponentDefinition().getDisplayId());
             //System.out.println(seqAnn.getComponent().getDisplayId());
             System.out.println(seqAnn.getIdentity());
             System.out.println(seqAnn.getComponentIdentity());
             assertTrue(saDisplayIds.contains(seqAnn.getDisplayId()));
-        }
+        }*/
 
         ComponentDefinition templateFlat = doc.getComponentDefinition("sll00199_codA_Km_flat", "1.0.0");
         //ComponentDefinition template = doc.getComponentDefinition("cyano_codA_Km", "1.0.0");
