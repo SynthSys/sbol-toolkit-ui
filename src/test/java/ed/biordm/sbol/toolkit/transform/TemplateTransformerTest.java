@@ -527,8 +527,19 @@ public class TemplateTransformerTest {
         ComponentDefinition sll00199Plasmid = doc.getComponentDefinition("sll00199_codA_Km", "1.0.0");
         assertNotNull(sll00199Plasmid);
 
-        templateTransformer.addSequenceAnnotationsToParent(sll00199Plasmid);
+        ComponentDefinition rightFlank = sll00199Plasmid.getComponent("right").getDefinition();
+        assertNotNull(rightFlank);
+
+        // Check that no SequenceAnnotation objects are added when the passed child has none
+        templateTransformer.addSequenceAnnotationsToParent(sll00199Plasmid, rightFlank, 1);
         Set<SequenceAnnotation> sll00199PlasmidSAs = sll00199Plasmid.getSequenceAnnotations();
+
+        assertEquals(0, sll00199PlasmidSAs.size());
+
+        // add the SequenceAnnotations from the child 'ampR' component
+        ComponentDefinition childCmp = sll00199Plasmid.getComponent("ampR").getDefinition();
+        templateTransformer.addSequenceAnnotationsToParent(sll00199Plasmid, childCmp, 1);
+        sll00199PlasmidSAs = sll00199Plasmid.getSequenceAnnotations();
 
         Set<Component> children = sll00199Plasmid.getComponents();
         int childSeqAnnCount = 0;
