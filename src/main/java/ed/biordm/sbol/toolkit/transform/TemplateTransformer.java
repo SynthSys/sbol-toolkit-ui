@@ -97,7 +97,24 @@ public class TemplateTransformer {
         newCmpDef.setName(cleanName);
         newCmpDef.addWasDerivedFrom(prevCmpDef.getIdentity());
 
-        // Assume we are adding a new sequence to the component
+        // Find the sequence annotation for the previous component definition
+        for (SequenceAnnotation seqAnn : parent.getSequenceAnnotations()) {
+            if (seqAnn.getComponent() == cmp) {
+
+                for (Location loc : seqAnn.getLocations()) {
+                    Range range = (Range) loc;
+                    int seqStart = range.getStart();
+                    int seqEnd = range.getEnd();
+
+                    // Update the barcode sequence in the parent sequence
+                    for (Sequence seq : parent.getSequences()) {
+                        String newParentSeq = this.updateBarcodeSequence(seq.getElements(), newSequence, seqStart, seqEnd);
+                        seq.setElements(newParentSeq);
+                    }
+                }
+            }
+        }
+        // Create a new sequence for the component
         String version = "1.0.0"; // should this be the version of the component definition?
         Sequence seq = doc.createSequence(cleanName + "_seq", version,
                 newSequence, Sequence.IUPAC_DNA);
@@ -108,9 +125,7 @@ public class TemplateTransformer {
         link.addWasDerivedFrom(cmp.getIdentity());
         link.setName(cleanName);
 
-        // Create SequenceAnnotation for new component definition and link to instance
-        // SequenceAnnotation seqAnn = newCmpDef.createSequenceAnnotation(cleanName + "_sa", cleanName + "_sa", 1, newSequence.length());
-        //seqAnn.setComponent(link.getDisplayId());
+        // Replace component and update sequence constraints
         replaceComponent(parent, cmp, link);
 
         return newCmpDef;
