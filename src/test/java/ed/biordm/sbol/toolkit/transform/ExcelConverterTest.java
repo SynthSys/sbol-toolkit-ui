@@ -160,7 +160,12 @@ public class ExcelConverterTest {
 
                 seqCmp = newCyanoCDFlat.getComponent(leftFlankName);
                 an = newCyanoCDFlat.createSequenceAnnotation("ann2", "ann2", 2074, 2074+leftFlankSequence.length());
-                an.setComponent(seqCmp.getIdentity());
+
+                if (seqCmp != null) {
+                    if (seqCmp.getIdentity() != null) {
+                        an.setComponent(seqCmp.getIdentity());
+                    }
+                }
             } catch (SBOLValidationException ex) {
                 ex.printStackTrace();
             } catch (URISyntaxException ex) {
