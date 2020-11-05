@@ -21,8 +21,11 @@ spring:
     # template-resolver-order:
     # view-names:
 
-#logging:
+logging:
+  file:
+    name: myapplication.log
 #  level:
+#    root:
 #      - ".=info"
 #      - "com.memorynotfound=debug"
 #      - "org.springframework=info"

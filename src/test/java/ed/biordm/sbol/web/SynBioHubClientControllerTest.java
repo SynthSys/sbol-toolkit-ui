@@ -23,17 +23,17 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  */
 @SpringBootTest
 @AutoConfigureMockMvc
-//@WebMvcTest(HomeController.class)
-public class HomeControllerTest {
+//@WebMvcTest(SynBioHubClientController.class)
+public class SynBioHubClientControllerTest {
 
     @Autowired
     private MockMvc mvc;
 
     @Test
-    public void getHome() throws Exception {
-        mvc.perform(MockMvcRequestBuilders.get("/").accept(MediaType.TEXT_HTML))
+    public void postSubmit() throws Exception {
+        mvc.perform(MockMvcRequestBuilders.post("/submit").accept(MediaType.TEXT_HTML))
                 .andExpect(status().isOk())
-                .andExpect(view().name("home"))
+                .andExpect(view().name("submit-result"))
                 .andExpect(model().attribute("message", "Greetings from Spring Boot!"));
     }
 }
