@@ -6,6 +6,12 @@ server:
 messages:
   home: Hello, Memorynotfound!
 
+synbiohub:
+  client:
+    user: test
+    email: test@test.com
+    pass: testpass
+
 spring:
   thymeleaf:
     cache: false
