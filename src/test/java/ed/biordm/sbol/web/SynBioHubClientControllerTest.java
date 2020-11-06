@@ -105,8 +105,8 @@ public class SynBioHubClientControllerTest {
         System.out.println(responseEntity.getHeaders());*/
         
         Map<String, String> params = new HashMap<>();
-        params.put("email", "j.hay@epcc.ed.ac.uk");
-        params.put("password", "admin");
+        params.put("email", synBioHubEmail);
+        params.put("password", synBioHubPass);
 
         // final ResponseEntity<String> responseEntity = restTemplate.execute(LOGIN_URL, HttpMethod.GET, null, null, params);
         final ResponseEntity<String> responseEntity = restTemplate.exchange(LOGIN_URL, HttpMethod.GET, requestEntity, String.class, params);
@@ -123,12 +123,12 @@ public class SynBioHubClientControllerTest {
 
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
 
-        params.add("email", "j.hay@epcc.ed.ac.uk");
-        params.add("password", "admin");
+        params.add("email", synBioHubEmail);
+        params.add("password", synBioHubPass);
 
         HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(params, headers);
         ResponseEntity<String> response = restTemplate.postForEntity(LOGIN_URL, request, String.class);
-        System.out.println(response.getBody());
+        System.out.println("SynBioHub Auth Token: ".concat(response.getBody()));
         System.out.println(response);//<200,[Content-Length:"0", Date:"Fri, 31 May 2019 09:26:24 GMT"]>
     }
 
@@ -138,7 +138,7 @@ public class SynBioHubClientControllerTest {
         headers.setContentType(MediaType.MULTIPART_FORM_DATA);
         headers.setAccept(Arrays.asList(new MediaType[]{MediaType.TEXT_PLAIN}));
         // run the login test above to retrieve the token used here:
-        headers.add("X-authorization", "394d9e21-49ce-433d-acbc-20effb81cef7");
+        headers.add("X-authorization", "02d60ce2-268f-4953-ac8f-d1306561862a");
 
         MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
         params.add("id", "test_id");
