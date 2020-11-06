@@ -6,11 +6,10 @@
 package ed.biordm.sbol.web;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import java.io.File;
 import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import org.json.JSONObject;
@@ -19,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -59,7 +59,7 @@ public class SynBioHubClientControllerTest {
 
     private final String LOGIN_URL = "http://localhost:7777/login";
     private final String USER_API = "http://localhost:7777/users";
-    private final String SUBMIT_API = "http://localhost:7777/submit";
+    private final String SUBMIT_URL = "http://localhost:7777/submit";
     
     HttpHeaders createHeaders(String username, String password) {
         return new HttpHeaders() {{
@@ -130,5 +130,31 @@ public class SynBioHubClientControllerTest {
         ResponseEntity<String> response = restTemplate.postForEntity(LOGIN_URL, request, String.class);
         System.out.println(response.getBody());
         System.out.println(response);//<200,[Content-Length:"0", Date:"Fri, 31 May 2019 09:26:24 GMT"]>
+    }
+
+    @Test
+    public void testSynBioHubSubmit() throws JsonProcessingException, UnsupportedEncodingException {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+        headers.setAccept(Arrays.asList(new MediaType[]{MediaType.TEXT_PLAIN}));
+        // run the login test above to retrieve the token used here:
+        headers.add("X-authorization", "394d9e21-49ce-433d-acbc-20effb81cef7");
+
+        MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
+        params.add("id", "test_id");
+        params.add("version", "1.0.0");
+        params.add("name", "test_name");
+        params.add("description", "test_description");
+        params.add("overwrite_merge", "0");
+
+        // Prepare SBOL file resource for upload
+        File sbolFile = new File("D:/Temp/sbol/cyano_full_template.xml");
+        params.add("file", new FileSystemResource(sbolFile));
+
+        HttpEntity<MultiValueMap<String, Object>> request = new HttpEntity<>(params, headers);
+        ResponseEntity<String> response = restTemplate.postForEntity(SUBMIT_URL, request, String.class);
+        System.out.println(response.getBody());
+        //<200,Successfully uploaded,[X-Powered-By:"Express", Content-Type:"text/plain; charset=utf-8", Content-Length:"21", ETag:"W/"15-7awNgShFQs1A/x/gRTR2xR8k+YA"", Date:"Fri, 06 Nov 2020 12:33:44 GMT", Connection:"keep-alive"]>
+        System.out.println(response);
     }
 }
