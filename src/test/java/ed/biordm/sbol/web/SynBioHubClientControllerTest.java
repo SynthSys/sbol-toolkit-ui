@@ -60,6 +60,7 @@ public class SynBioHubClientControllerTest {
     private final String LOGIN_URL = "http://localhost:7777/login";
     private final String USER_API = "http://localhost:7777/users";
     private final String SUBMIT_URL = "http://localhost:7777/submit";
+    private final String UPDATE_URL = "http://localhost:7777/edit/";
     
     HttpHeaders createHeaders(String username, String password) {
         return new HttpHeaders() {{
@@ -121,6 +122,7 @@ public class SynBioHubClientControllerTest {
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
         headers.setAccept(Arrays.asList(new MediaType[]{MediaType.TEXT_PLAIN}));
 
+        // https://synbiohub.github.io/api-docs/?plaintext#login
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
 
         params.add("email", synBioHubEmail);
@@ -140,12 +142,40 @@ public class SynBioHubClientControllerTest {
         // run the login test above to retrieve the token used here:
         headers.add("X-authorization", "02d60ce2-268f-4953-ac8f-d1306561862a");
 
+        // https://synbiohub.github.io/api-docs/?plaintext#submission-endpoints
         MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
         params.add("id", "test_id");
         params.add("version", "1.0.0");
         params.add("name", "test_name");
         params.add("description", "test_description");
         params.add("overwrite_merge", "0");
+
+        // Prepare SBOL file resource for upload
+        File sbolFile = new File("D:/Temp/sbol/cyano_full_template.xml");
+        params.add("file", new FileSystemResource(sbolFile));
+
+        HttpEntity<MultiValueMap<String, Object>> request = new HttpEntity<>(params, headers);
+        ResponseEntity<String> response = restTemplate.postForEntity(SUBMIT_URL, request, String.class);
+        System.out.println(response.getBody());
+        //<200,Successfully uploaded,[X-Powered-By:"Express", Content-Type:"text/plain; charset=utf-8", Content-Length:"21", ETag:"W/"15-7awNgShFQs1A/x/gRTR2xR8k+YA"", Date:"Fri, 06 Nov 2020 12:33:44 GMT", Connection:"keep-alive"]>
+        System.out.println(response);
+    }
+
+    @Test
+    public void testSynBioHubUpdate() throws JsonProcessingException, UnsupportedEncodingException {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+        headers.setAccept(Arrays.asList(new MediaType[]{MediaType.TEXT_PLAIN}));
+        // run the login test above to retrieve the token used here:
+        headers.add("X-authorization", "02d60ce2-268f-4953-ac8f-d1306561862a");
+
+        String updateUrl = UPDATE_URL.concat("sll00199_left_seq");
+        // https://synbiohub.github.io/api-docs/?plaintext#edit-citations
+        // title, description, role, wasDerivedFrom, type, annotation
+        MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
+        params.add("previous", "test_id"); // The previous value of the field.
+        params.add("object", "1.0.0");     // The new value of the field.
+        params.add("pred", "test_name");   // A predicate for an annotation.
 
         // Prepare SBOL file resource for upload
         File sbolFile = new File("D:/Temp/sbol/cyano_full_template.xml");
