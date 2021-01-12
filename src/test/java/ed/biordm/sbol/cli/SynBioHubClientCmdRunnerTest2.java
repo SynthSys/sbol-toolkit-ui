@@ -56,8 +56,8 @@ public class SynBioHubClientCmdRunnerTest2 {
     public void testRun() throws Exception {
         System.out.println("run");
         String[] arg0 = null;
-        SynBioHubClientCmdRunner instance = new SynBioHubClientCmdRunner();
-        instance.run(arg0);
+        /*SynBioHubClientCmdRunner instance = new SynBioHubClientCmdRunner();
+        instance.run(arg0);*/
         // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");
     }
