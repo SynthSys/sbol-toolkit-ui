@@ -5,6 +5,8 @@
  */
 package ed.biordm.sbol.cli;
 
+import ed.biordm.sbol.service.SynBioHubClientService;
+import ed.biordm.sbol.service.SynBioHubClientServiceImpl;
 import java.util.Arrays;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,6 +15,9 @@ import org.springframework.boot.ExitCodeGenerator;
 import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import picocli.CommandLine;
 import picocli.CommandLine.IFactory;
 
@@ -23,11 +28,14 @@ import picocli.CommandLine.IFactory;
  * @author jhay
  */
 @SpringBootApplication
+// @ComponentScan({ "ed.biordm.sbol.cli", "ed.biordm.sbol.service", "ed.biordm.sbol.web" })
+@ComponentScan({ "ed.biordm.sbol.cli", "ed.biordm.sbol.service" })
+// @ComponentScan({ "ed.biordm.sbol.cli"})
 public class SynBioHubClientCmdRunner implements CommandLineRunner, ExitCodeGenerator {
 
     private static final Logger logger = LoggerFactory.getLogger(SynBioHubClientCmdRunner.class);
 
-    private IFactory factory;        
+    private IFactory factory;
     private SynBioHubCmd synBioHubCmd; 
     private int exitCode;
 
@@ -72,5 +80,20 @@ public class SynBioHubClientCmdRunner implements CommandLineRunner, ExitCodeGene
     @Override
     public int getExitCode() {
         return exitCode;
+    }
+
+    /*@Bean
+    public RestTemplate restTemplate(RestTemplateBuilder builder) {
+        return builder.build();
+    }*/
+
+    @Bean
+    public RestTemplateBuilder restTemplateBuilder() {
+        return new RestTemplateBuilder();
+    }
+
+    @Bean
+    public SynBioHubClientService synBioHubClientService() {
+        return new SynBioHubClientServiceImpl(new RestTemplateBuilder());
     }
 }

@@ -11,6 +11,7 @@ synbiohub:
     user: test
     email: test@test.com
     pass: testpass
+    baseUrl: http://localhost:7777/
 
 spring:
   thymeleaf:
