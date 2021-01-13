@@ -12,6 +12,9 @@ synbiohub:
     email: test@test.com
     pass: testpass
     baseUrl: http://localhost:7777/
+  cmd:
+    # relative to src/main/java/ed/biordm/sbol/cli
+    properties: ../resources/cli/default.properties
 
 spring:
   thymeleaf:

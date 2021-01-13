@@ -7,9 +7,14 @@ package ed.biordm.sbol.cli;
 
 import ed.biordm.sbol.service.SynBioHubClientService;
 import ed.biordm.sbol.service.SynBioHubClientServiceImpl;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Arrays;
+import java.util.Properties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.ExitCodeGenerator;
 import org.springframework.boot.WebApplicationType;
@@ -20,6 +25,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import picocli.CommandLine;
 import picocli.CommandLine.IFactory;
+
 
 /**
  * See https://picocli.info/, https://picocli.info/#_spring_boot_example and
@@ -35,14 +41,22 @@ public class SynBioHubClientCmdRunner implements CommandLineRunner, ExitCodeGene
 
     private static final Logger logger = LoggerFactory.getLogger(SynBioHubClientCmdRunner.class);
 
-    private IFactory factory;
-    private SynBioHubCmd synBioHubCmd; 
+    private final IFactory factory;
+    private final SynBioHubCmd synBioHubCmd; 
+    private final CommandLine cmd;
     private int exitCode;
+
+    @Value("${synbiohub.cmd.properties}")
+    private String propertiesFilename;
 
     // constructor injection
     SynBioHubClientCmdRunner(IFactory factory, SynBioHubCmd synBioHubCmd) {
         this.factory = factory;
         this.synBioHubCmd = synBioHubCmd;
+        this.cmd = new CommandLine(this.synBioHubCmd, this.factory);
+
+        Properties defaults = getProperties(propertiesFilename);
+        this.cmd.setDefaultValueProvider(new SynBioHubCmdDefaultProvider(defaults));
     }
 
     public static void main(String[] args) {
@@ -55,7 +69,7 @@ public class SynBioHubClientCmdRunner implements CommandLineRunner, ExitCodeGene
         System.out.println("Run");
         System.out.println(Arrays.toString(args));
         // let picocli parse command line args and run the business logic
-        exitCode = new CommandLine(synBioHubCmd, factory).execute(args);
+        exitCode = cmd.execute(args);
 
         // From Apache Commons CLI...
         /*Option help = Option.builder("h").required(false).hasArg(false).longOpt("help").build();
@@ -80,6 +94,20 @@ public class SynBioHubClientCmdRunner implements CommandLineRunner, ExitCodeGene
     @Override
     public int getExitCode() {
         return exitCode;
+    }
+
+    protected static Properties getProperties(String propertiesFilename) {
+        Properties prop = new Properties();
+ 
+        try (InputStream stream = ClassLoader.getSystemResourceAsStream(propertiesFilename)) {
+            if (stream == null) {
+                throw new FileNotFoundException();
+            }
+            prop.load(stream);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return prop;
     }
 
     /*@Bean
