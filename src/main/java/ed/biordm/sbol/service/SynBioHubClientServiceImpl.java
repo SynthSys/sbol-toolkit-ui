@@ -23,7 +23,7 @@ import org.springframework.web.client.RestTemplate;
  *
  * @author jhay
  */
-// @Service("synBioHubClientService")
+@Service("synBioHubClientService")
 public class SynBioHubClientServiceImpl implements SynBioHubClientService {
     private static final Logger LOGGER = LoggerFactory.getLogger(SynBioHubClientServiceImpl.class);
 
@@ -43,28 +43,37 @@ public class SynBioHubClientServiceImpl implements SynBioHubClientService {
     @Value("${synbiohub.client.pass}")
     private String synBioHubPass;
 
-    @Value("${synbiohub.client.baseUrl}")
+    // @Value("${synbiohub.client.baseUrl}")
     private String synBioHubBaseUrl;
 
     /*private final String LOGIN_URL = "https://synbiohub.org/login";
     private final String USER_API = "https://synbiohub.org/users";
     private final String SUBMIT_API = "https://synbiohub.org/submit";*/
 
-    private final String LOGIN_URL = synBioHubBaseUrl.concat("login");
+    /*private final String LOGIN_URL = synBioHubBaseUrl.concat("login");
     private final String USER_API = synBioHubBaseUrl.concat("users");
-    private final String SUBMIT_API = synBioHubBaseUrl.concat("submit");
+    private final String SUBMIT_API = synBioHubBaseUrl.concat("submit");*/
+
+    private final String LOGIN_URL;
+    private final String USER_API;
+    private final String SUBMIT_API;
 
     HttpHeaders headers = new HttpHeaders();
 
     @Autowired
-    public SynBioHubClientServiceImpl(RestTemplateBuilder restTemplateBuilder) {
+    public SynBioHubClientServiceImpl(RestTemplateBuilder restTemplateBuilder,
+            @Value("${synbiohub.client.baseUrl}") String synBioHubBaseUrl) {
         restTemplate = restTemplateBuilder.build();
+
+        LOGIN_URL = synBioHubBaseUrl.concat("login");
+        USER_API = synBioHubBaseUrl.concat("users");
+        SUBMIT_API = synBioHubBaseUrl.concat("submit");
     }
 
-    @PostConstruct
+    /*@PostConstruct
     public void init() {
         this.restTemplate = this.restTemplateBuilder.build();
-    }
+    }*/
 
     HttpHeaders createHeaders(String username, String password) {
         return new HttpHeaders() {{

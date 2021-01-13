@@ -12,11 +12,14 @@ import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import javax.annotation.PostConstruct;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.HttpEntity;
@@ -24,6 +27,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
@@ -39,7 +43,8 @@ import org.springframework.web.client.RestTemplate;
  */
 @SpringBootTest
 @AutoConfigureMockMvc
-//@WebMvcTest(SynBioHubClientController.class)
+// @WebMvcTest(SynBioHubClientController.class)
+//@ExtendWith(SpringExtension.class)
 public class SynBioHubClientControllerTest {
 
     @Autowired
@@ -57,11 +62,41 @@ public class SynBioHubClientControllerTest {
     @Value("${synbiohub.client.pass}")
     private String synBioHubPass;
 
-    private final String LOGIN_URL = "http://localhost:7777/login";
+    // @Value("${synbiohub.client.baseUrl}")
+    private String synBioHubBaseUrl;
+
+    /*private final String LOGIN_URL = "http://localhost:7777/login";
     private final String USER_API = "http://localhost:7777/users";
     private final String SUBMIT_URL = "http://localhost:7777/submit";
-    private final String UPDATE_URL = "http://localhost:7777/edit/";
-    
+    private final String UPDATE_URL = "http://localhost:7777/edit/";*/
+
+    /* private final String LOGIN_URL = synBioHubBaseUrl.concat("login");
+    private final String USER_API = synBioHubBaseUrl.concat("users");
+    private final String SUBMIT_URL = synBioHubBaseUrl.concat("submit");
+    private final String UPDATE_URL = synBioHubBaseUrl.concat("edit"); */
+
+    private final String LOGIN_URL;
+    private final String USER_API;
+    private final String SUBMIT_URL;
+    private final String UPDATE_URL;
+
+    @Autowired
+    public SynBioHubClientControllerTest(@Value("${synbiohub.client.baseUrl}") String synBioHubBaseUrl) {
+        this.synBioHubBaseUrl = synBioHubBaseUrl;
+        LOGIN_URL = synBioHubBaseUrl.concat("login");
+        USER_API = synBioHubBaseUrl.concat("users");
+        SUBMIT_URL = synBioHubBaseUrl.concat("submit");
+        UPDATE_URL = synBioHubBaseUrl.concat("edit");
+    }
+
+    /*@PostConstruct
+    public void init() {
+        LOGIN_URL = synBioHubBaseUrl.concat("login");
+        USER_API = synBioHubBaseUrl.concat("users");
+        SUBMIT_URL = synBioHubBaseUrl.concat("submit");
+        UPDATE_URL = synBioHubBaseUrl.concat("edit");
+    }*/
+
     HttpHeaders createHeaders(String username, String password) {
         return new HttpHeaders() {{
             final String basicAuth = HttpHeaders.encodeBasicAuth(username, password, StandardCharsets.UTF_8);

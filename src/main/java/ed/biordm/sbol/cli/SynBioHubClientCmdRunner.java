@@ -92,8 +92,8 @@ public class SynBioHubClientCmdRunner implements CommandLineRunner, ExitCodeGene
         return new RestTemplateBuilder();
     }
 
-    @Bean
+    /*@Bean
     public SynBioHubClientService synBioHubClientService() {
         return new SynBioHubClientServiceImpl(new RestTemplateBuilder());
-    }
+    }*/
 }
