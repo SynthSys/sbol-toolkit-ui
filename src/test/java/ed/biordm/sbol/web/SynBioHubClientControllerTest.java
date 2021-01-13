@@ -62,18 +62,7 @@ public class SynBioHubClientControllerTest {
     @Value("${synbiohub.client.pass}")
     private String synBioHubPass;
 
-    // @Value("${synbiohub.client.baseUrl}")
-    private String synBioHubBaseUrl;
-
-    /*private final String LOGIN_URL = "http://localhost:7777/login";
-    private final String USER_API = "http://localhost:7777/users";
-    private final String SUBMIT_URL = "http://localhost:7777/submit";
-    private final String UPDATE_URL = "http://localhost:7777/edit/";*/
-
-    /* private final String LOGIN_URL = synBioHubBaseUrl.concat("login");
-    private final String USER_API = synBioHubBaseUrl.concat("users");
-    private final String SUBMIT_URL = synBioHubBaseUrl.concat("submit");
-    private final String UPDATE_URL = synBioHubBaseUrl.concat("edit"); */
+    private final String synBioHubBaseUrl;
 
     private final String LOGIN_URL;
     private final String USER_API;
@@ -88,14 +77,6 @@ public class SynBioHubClientControllerTest {
         SUBMIT_URL = synBioHubBaseUrl.concat("submit");
         UPDATE_URL = synBioHubBaseUrl.concat("edit");
     }
-
-    /*@PostConstruct
-    public void init() {
-        LOGIN_URL = synBioHubBaseUrl.concat("login");
-        USER_API = synBioHubBaseUrl.concat("users");
-        SUBMIT_URL = synBioHubBaseUrl.concat("submit");
-        UPDATE_URL = synBioHubBaseUrl.concat("edit");
-    }*/
 
     HttpHeaders createHeaders(String username, String password) {
         return new HttpHeaders() {{
@@ -114,8 +95,6 @@ public class SynBioHubClientControllerTest {
 
     @Test
     public void postLogin() throws Exception {
-        System.out.println("WTTTTFFFFFF!!!!!!!!");
-
         /*final ResponseEntity<String> responseEntity = restTemplate
                 .exchange(LOGIN_URL, HttpMethod.POST, new HttpEntity<Void>(createHeaders(synBioHubEmail, synBioHubPass)), String.class);*/
         

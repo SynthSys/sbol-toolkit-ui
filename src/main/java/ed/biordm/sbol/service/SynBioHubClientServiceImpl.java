@@ -28,10 +28,8 @@ public class SynBioHubClientServiceImpl implements SynBioHubClientService {
     private static final Logger LOGGER = LoggerFactory.getLogger(SynBioHubClientServiceImpl.class);
 
     // @Autowired
-    // private final RestTemplate restTemplate;
     private final RestTemplate restTemplate;
 
-    // @Autowired
     private final RestTemplateBuilder restTemplateBuilder;
 
     @Value("${synbiohub.client.user}")
@@ -43,16 +41,7 @@ public class SynBioHubClientServiceImpl implements SynBioHubClientService {
     @Value("${synbiohub.client.pass}")
     private String synBioHubPass;
 
-    // @Value("${synbiohub.client.baseUrl}")
-    private String synBioHubBaseUrl;
-
-    /*private final String LOGIN_URL = "https://synbiohub.org/login";
-    private final String USER_API = "https://synbiohub.org/users";
-    private final String SUBMIT_API = "https://synbiohub.org/submit";*/
-
-    /*private final String LOGIN_URL = synBioHubBaseUrl.concat("login");
-    private final String USER_API = synBioHubBaseUrl.concat("users");
-    private final String SUBMIT_API = synBioHubBaseUrl.concat("submit");*/
+    private final String synBioHubBaseUrl;
 
     private final String LOGIN_URL;
     private final String USER_API;
@@ -64,17 +53,13 @@ public class SynBioHubClientServiceImpl implements SynBioHubClientService {
     public SynBioHubClientServiceImpl(RestTemplateBuilder restTemplateBuilder,
             @Value("${synbiohub.client.baseUrl}") String synBioHubBaseUrl) {
         this.restTemplateBuilder = restTemplateBuilder;
-        restTemplate = restTemplateBuilder.build();
+        this.restTemplate = this.restTemplateBuilder.build();
 
+        this.synBioHubBaseUrl = synBioHubBaseUrl;
         LOGIN_URL = synBioHubBaseUrl.concat("login");
         USER_API = synBioHubBaseUrl.concat("users");
         SUBMIT_API = synBioHubBaseUrl.concat("submit");
     }
-
-    /*@PostConstruct
-    public void init() {
-        this.restTemplate = this.restTemplateBuilder.build();
-    }*/
 
     HttpHeaders createHeaders(String username, String password) {
         return new HttpHeaders() {{
@@ -108,8 +93,6 @@ public class SynBioHubClientServiceImpl implements SynBioHubClientService {
         if(!headers.containsKey("Authorization")) {
             doLogin();
         }
-
-        LOGGER.debug("WTTTTFFFFFF?!");
 
         HttpEntity<String> request = new HttpEntity<String>(headers);
 

@@ -38,7 +38,6 @@ public class SynBioHubCmd implements Callable<Integer> {
     char[] password;
 
     public Integer call() throws Exception {
-        // mailService.sendMessage(to, subject, String.join(" ", body)); 
         System.out.printf("synBioHubCmd was called with --username=%s", username);
         
         byte[] bytes = new byte[password.length];
