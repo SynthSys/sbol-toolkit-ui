@@ -24,8 +24,8 @@ import org.springframework.web.client.RestTemplate;
 @AutoConfigureMockMvc
 public class SynBioHubClientCmdRunnerTest {
 
-    @Autowired
-    private RestTemplate restTemplate;
+    /*@Autowired
+    private RestTemplate restTemplate;*/
 
     @BeforeEach
     public void setUp() throws Exception {

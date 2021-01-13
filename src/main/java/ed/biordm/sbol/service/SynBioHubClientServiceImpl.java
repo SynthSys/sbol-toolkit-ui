@@ -29,10 +29,10 @@ public class SynBioHubClientServiceImpl implements SynBioHubClientService {
 
     // @Autowired
     // private final RestTemplate restTemplate;
-    private RestTemplate restTemplate;
+    private final RestTemplate restTemplate;
 
-    @Autowired
-    private RestTemplateBuilder restTemplateBuilder;
+    // @Autowired
+    private final RestTemplateBuilder restTemplateBuilder;
 
     @Value("${synbiohub.client.user}")
     private String synBioHubUser;
@@ -63,6 +63,7 @@ public class SynBioHubClientServiceImpl implements SynBioHubClientService {
     @Autowired
     public SynBioHubClientServiceImpl(RestTemplateBuilder restTemplateBuilder,
             @Value("${synbiohub.client.baseUrl}") String synBioHubBaseUrl) {
+        this.restTemplateBuilder = restTemplateBuilder;
         restTemplate = restTemplateBuilder.build();
 
         LOGIN_URL = synBioHubBaseUrl.concat("login");

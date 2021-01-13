@@ -47,18 +47,36 @@ public class SynBioHubClientController {
     @Value("${synbiohub.client.pass}")
     private String synBioHubPass;
 
-    /*private final String LOGIN_URL = "https://synbiohub.org/login";
-    private final String USER_API = "https://synbiohub.org/users";
-    private final String SUBMIT_API = "https://synbiohub.org/submit";*/
+    // @Value("${synbiohub.client.baseUrl}")
+    private String synBioHubBaseUrl;
 
-    private final String LOGIN_URL = "http://localhost:7777/login";
+    /*private final String LOGIN_URL = "http://localhost:7777/login";
     private final String USER_API = "http://localhost:7777/users";
-    private final String SUBMIT_API = "http://localhost:7777/submit";
+    private final String SUBMIT_URL = "http://localhost:7777/submit";
+    private final String UPDATE_URL = "http://localhost:7777/edit/";*/
+
+    /* private final String LOGIN_URL = synBioHubBaseUrl.concat("login");
+    private final String USER_API = synBioHubBaseUrl.concat("users");
+    private final String SUBMIT_URL = synBioHubBaseUrl.concat("submit");
+    private final String UPDATE_URL = synBioHubBaseUrl.concat("edit"); */
+
+    private final String LOGIN_URL;
+    private final String USER_API;
+    private final String SUBMIT_URL;
+    private final String UPDATE_URL;
 
     HttpHeaders headers = new HttpHeaders();
 
-    public SynBioHubClientController(RestTemplateBuilder restTemplateBuilder) {
+    @Autowired
+    public SynBioHubClientController(RestTemplateBuilder restTemplateBuilder,
+            @Value("${synbiohub.client.baseUrl}") String synBioHubBaseUrl) {
         restTemplate = restTemplateBuilder.build();
+        
+        this.synBioHubBaseUrl = synBioHubBaseUrl;
+        LOGIN_URL = synBioHubBaseUrl.concat("login");
+        USER_API = synBioHubBaseUrl.concat("users");
+        SUBMIT_URL = synBioHubBaseUrl.concat("submit");
+        UPDATE_URL = synBioHubBaseUrl.concat("edit");
     }
 
     HttpHeaders createHeaders(String username, String password) {
@@ -103,7 +121,7 @@ public class SynBioHubClientController {
         HttpEntity<String> request = new HttpEntity<String>(headers);
 
         final ResponseEntity<String> responseEntity = restTemplate
-                .exchange(SUBMIT_API, HttpMethod.POST, new HttpEntity<Void>(createHeaders(synBioHubUser, synBioHubPass)), String.class);
+                .exchange(SUBMIT_URL, HttpMethod.POST, new HttpEntity<Void>(createHeaders(synBioHubUser, synBioHubPass)), String.class);
         System.out.println(responseEntity.getBody());
         mav.setViewName("submit-result");
 

@@ -35,20 +35,11 @@ public class SynBioHubCmd implements Callable<Integer> {
     char[] username;
 
     @Option(names = {"-p", "--password"}, description = "Passphrase", interactive = true, required = true)
-    char[] password;  
-
-    @Option(names = "--subject", description = "Subject")
-    String subject;
-
-    @Option(names = "--to", description = "email(s) of recipient(s)", required = true)
-    List<String> to;
-
-    @Parameters(description = "Message to be sent")
-    String[] body = {};
+    char[] password;
 
     public Integer call() throws Exception {
         // mailService.sendMessage(to, subject, String.join(" ", body)); 
-        System.out.printf("synBioHubCmd was called with --to=%s and subject: %s%n", to, subject);
+        System.out.printf("synBioHubCmd was called with --username=%s", username);
         
         byte[] bytes = new byte[password.length];
         for (int i = 0; i < bytes.length; i++) { bytes[i] = (byte) password[i]; }
