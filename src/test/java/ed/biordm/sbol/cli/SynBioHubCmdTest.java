@@ -11,7 +11,6 @@ import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.stream.Stream;
-import org.junit.After;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import org.junit.Before;
@@ -61,10 +60,13 @@ public class SynBioHubCmdTest {
     private SynBioHubClientService synBioHubClientService;*/
 
     @Before
-    public void setUpStreams() {
+    public void init() {
         MockitoAnnotations.initMocks(this);
         cmd = new CommandLine(app);
+    }
 
+    /*@Before
+    public void setUpStreams() {     
         out.reset();
         err.reset();
         System.setOut(new PrintStream(out));
@@ -75,10 +77,10 @@ public class SynBioHubCmdTest {
     public void restoreStreams() {
         System.setOut(originalOut);
         System.setErr(originalErr);
-    }
+    }*/
 
     @Test
-    public void test() {
+    public void testMinimalArgs() {
         StringWriter sw = new StringWriter();
         cmd.setOut(new PrintWriter(sw));
 
@@ -90,6 +92,27 @@ public class SynBioHubCmdTest {
 
         cmd.execute(allArgs);
         assertEquals("", sw.toString());
+    }
+
+    @Test
+    public void testAllArgs() {
+        StringWriter sw = new StringWriter();
+        cmd.setOut(new PrintWriter(sw));
+
+        System.out.println(synBioHubClientService == null);
+        String[] userArgs = { "--username", "johnnyH" };
+        String[] passwordArgs = { "--password", "mysupersecurepassword" };
+        String[] collectionIdArgs = { "--collection-id", "1" };
+        String[] serverUrlArgs = { "--server-url", "http://localhost:7777/" };
+        String[] dirPathArgs = { "--dir-path", "D://Temp//sbol/" };
+        String[] fileExtFilterArgs = { "--file-ext-filter", "sbol" };
+        String[] overwriteArgs = { "--overwrite", "true" };
+
+        String[] allArgs = Stream.of(userArgs,
+                passwordArgs, collectionIdArgs, serverUrlArgs,
+                dirPathArgs, fileExtFilterArgs, overwriteArgs).flatMap(Stream::of).toArray(String[]::new);
+
+        cmd.execute(allArgs);
         assertEquals("", sw.toString());
     }
 
