@@ -5,6 +5,7 @@
  */
 package ed.biordm.sbol.cli;
 
+import ed.biordm.sbol.service.SynBioHubClientService;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.io.PrintWriter;
@@ -17,6 +18,13 @@ import org.junit.Test;
 import org.junit.contrib.java.lang.system.ExpectedSystemExit;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.mockito.runners.MockitoJUnitRunner;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Configuration;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 
@@ -25,6 +33,11 @@ import picocli.CommandLine.Command;
  * 
  * @author jhay
  */
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE)
+@Configuration
+// @Profile("test")
+@RunWith(MockitoJUnitRunner.class)
+// @RunWith(SpringRunner.class)
 public class SynBioHubCmdTest {   
     final PrintStream originalOut = System.out;
     final PrintStream originalErr = System.err;
@@ -33,11 +46,25 @@ public class SynBioHubCmdTest {
 
     @Rule public final ExpectedSystemExit exit = ExpectedSystemExit.none();
 
-    SynBioHubCmd app = new SynBioHubCmd();
-    CommandLine cmd = new CommandLine(app);
+    @Mock
+    private SynBioHubClientService synBioHubClientService;
+
+    @InjectMocks
+    private SynBioHubCmd app;
+
+    // SynBioHubCmd app = new SynBioHubCmd();
+    // CommandLine cmd = new CommandLine(app);
+    private CommandLine cmd;
+
+    //@MockBean
+    /*@Autowired
+    private SynBioHubClientService synBioHubClientService;*/
 
     @BeforeEach
     public void setUpStreams() {
+        MockitoAnnotations.initMocks(this);
+        cmd = new CommandLine(app);
+
         out.reset();
         err.reset();
         System.setOut(new PrintStream(out));
@@ -55,9 +82,11 @@ public class SynBioHubCmdTest {
         StringWriter sw = new StringWriter();
         cmd.setOut(new PrintWriter(sw));
 
+        System.out.println(synBioHubClientService == null);
         String[] userArgs = { "--username", "johnnyH" };
         String[] passwordArgs = { "--password", "mysupersecurepassword" };
-        String[] allArgs = Stream.of(userArgs, passwordArgs).flatMap(Stream::of).toArray(String[]::new);
+        String[] collectionIdArgs = { "--collection-id", "1" };
+        String[] allArgs = Stream.of(userArgs, passwordArgs, collectionIdArgs).flatMap(Stream::of).toArray(String[]::new);
 
         cmd.execute(allArgs);
         assertEquals("", sw.toString());

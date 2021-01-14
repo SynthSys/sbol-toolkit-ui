@@ -9,7 +9,7 @@ import java.util.stream.Stream;
 import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 import org.junit.jupiter.api.BeforeEach;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.SpringApplication;
 import org.springframework.boot.test.context.SpringBootTest;
 
 /**
@@ -20,10 +20,12 @@ import org.springframework.boot.test.context.SpringBootTest;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE)
 // @SpringBootTest
 // @AutoConfigureMockMvc
+// @RunWith(SpringRunner.class)
 public class SynBioHubClientCmdRunnerTest {
     @BeforeEach
     public void setUp() throws Exception {
-        
+        // Reflection was only requires if the property was autowired with @value...
+        // ReflectionTestUtils.setField(SynBioHubClientCmdRunner.class, "propertiesFilename", "blah");
         System.setProperty("file.encoding", "UTF-8");
     }
 
@@ -31,8 +33,11 @@ public class SynBioHubClientCmdRunnerTest {
     public void test() throws Exception {
         String[] userArgs = { "--username", "johnnyH" };
         String[] passwordArgs = { "--password", "mysupersecurepassword" };
-        String[] allArgs = Stream.of(userArgs, passwordArgs).flatMap(Stream::of).toArray(String[]::new);
-        SynBioHubClientCmdRunner.main(allArgs);
+        String[] collectionIdArgs = { "--collection-id", "1" };
+        String[] allArgs = Stream.of(userArgs, passwordArgs, collectionIdArgs).flatMap(Stream::of).toArray(String[]::new);
+        // SynBioHubClientCmdRunner.main(allArgs);
+        // PowerMockito.mockStatic(SpringApplication.class);
+        SpringApplication.run(SynBioHubClientCmdRunner.class, allArgs);
     }
 
     @Test

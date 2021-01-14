@@ -5,8 +5,6 @@
  */
 package ed.biordm.sbol.cli;
 
-import ed.biordm.sbol.service.SynBioHubClientService;
-import ed.biordm.sbol.service.SynBioHubClientServiceImpl;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -20,8 +18,6 @@ import org.springframework.boot.ExitCodeGenerator;
 import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
-import org.springframework.boot.web.client.RestTemplateBuilder;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import picocli.CommandLine;
 import picocli.CommandLine.IFactory;
@@ -46,16 +42,17 @@ public class SynBioHubClientCmdRunner implements CommandLineRunner, ExitCodeGene
     private final CommandLine cmd;
     private int exitCode;
 
-    @Value("${synbiohub.cmd.properties}")
     private String propertiesFilename;
 
     // constructor injection
-    SynBioHubClientCmdRunner(IFactory factory, SynBioHubCmd synBioHubCmd) {
+    SynBioHubClientCmdRunner(IFactory factory, SynBioHubCmd synBioHubCmd,
+            @Value("${synbiohub.cmd.properties}") String propertiesFilename) {
         this.factory = factory;
         this.synBioHubCmd = synBioHubCmd;
         this.cmd = new CommandLine(this.synBioHubCmd, this.factory);
+        this.propertiesFilename = propertiesFilename;
 
-        Properties defaults = getProperties(propertiesFilename);
+        Properties defaults = getProperties(this.propertiesFilename);
         this.cmd.setDefaultValueProvider(new SynBioHubCmdDefaultProvider(defaults));
     }
 
@@ -98,6 +95,7 @@ public class SynBioHubClientCmdRunner implements CommandLineRunner, ExitCodeGene
 
     protected static Properties getProperties(String propertiesFilename) {
         Properties prop = new Properties();
+        System.out.println(propertiesFilename);
  
         try (InputStream stream = ClassLoader.getSystemResourceAsStream(propertiesFilename)) {
             if (stream == null) {

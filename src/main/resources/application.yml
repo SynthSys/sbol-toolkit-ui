@@ -14,7 +14,7 @@ synbiohub:
     baseUrl: http://localhost:7777/
   cmd:
     # relative to src/main/java/ed/biordm/sbol/cli
-    properties: ../resources/cli/default.properties
+    properties: cli/default.properties
 
 spring:
   thymeleaf:

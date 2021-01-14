@@ -6,7 +6,6 @@
 package ed.biordm.sbol.service;
 
 import java.nio.charset.StandardCharsets;
-import javax.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,6 +51,8 @@ public class SynBioHubClientServiceImpl implements SynBioHubClientService {
     @Autowired
     public SynBioHubClientServiceImpl(RestTemplateBuilder restTemplateBuilder,
             @Value("${synbiohub.client.baseUrl}") String synBioHubBaseUrl) {
+        System.out.println("Service is init'd!");
+        System.out.println(synBioHubBaseUrl);
         this.restTemplateBuilder = restTemplateBuilder;
         this.restTemplate = this.restTemplateBuilder.build();
 
