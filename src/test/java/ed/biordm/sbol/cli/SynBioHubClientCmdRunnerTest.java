@@ -30,11 +30,29 @@ public class SynBioHubClientCmdRunnerTest {
     }
 
     @Test
-    public void test() throws Exception {
+    public void testMandatoryArgs() throws Exception {
         String[] userArgs = { "--username", "johnnyH" };
         String[] passwordArgs = { "--password", "mysupersecurepassword" };
         String[] collectionIdArgs = { "--collection-id", "1" };
         String[] allArgs = Stream.of(userArgs, passwordArgs, collectionIdArgs).flatMap(Stream::of).toArray(String[]::new);
+        // SynBioHubClientCmdRunner.main(allArgs);
+        // PowerMockito.mockStatic(SpringApplication.class);
+        SpringApplication.run(SynBioHubClientCmdRunner.class, allArgs);
+    }
+
+    @Test
+    public void testAllArgs() throws Exception {
+        String[] userArgs = { "--username", "johnnyH" };
+        String[] passwordArgs = { "--password", "mysupersecurepassword" };
+        String[] collectionIdArgs = { "--collection-id", "1" };
+        String[] serverUrlArgs = { "--server-url", "http://localhost:7777/" };
+        String[] dirPathArgs = { "--dir-path", "D://Temp//sbol/" };
+        String[] fileExtFilterArgs = { "--file-ext-filter", "sbol" };
+        String[] overwriteArgs = { "--overwrite", "true" };
+
+        String[] allArgs = Stream.of(userArgs,
+                passwordArgs, collectionIdArgs, serverUrlArgs,
+                dirPathArgs, fileExtFilterArgs, overwriteArgs).flatMap(Stream::of).toArray(String[]::new);
         // SynBioHubClientCmdRunner.main(allArgs);
         // PowerMockito.mockStatic(SpringApplication.class);
         SpringApplication.run(SynBioHubClientCmdRunner.class, allArgs);
