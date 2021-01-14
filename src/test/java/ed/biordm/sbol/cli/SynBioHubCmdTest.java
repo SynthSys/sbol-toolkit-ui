@@ -11,13 +11,13 @@ import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.stream.Stream;
+import org.junit.After;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.contrib.java.lang.system.ExpectedSystemExit;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -60,7 +60,7 @@ public class SynBioHubCmdTest {
     /*@Autowired
     private SynBioHubClientService synBioHubClientService;*/
 
-    @BeforeEach
+    @Before
     public void setUpStreams() {
         MockitoAnnotations.initMocks(this);
         cmd = new CommandLine(app);
@@ -71,7 +71,7 @@ public class SynBioHubCmdTest {
         System.setErr(new PrintStream(err));
     }
 
-    @AfterEach
+    @After
     public void restoreStreams() {
         System.setOut(originalOut);
         System.setErr(originalErr);
