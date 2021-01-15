@@ -24,6 +24,7 @@ import org.springframework.web.client.RestTemplate;
  */
 @Service("synBioHubClientService")
 public class SynBioHubClientServiceImpl implements SynBioHubClientService {
+    // private static final ch.qos.logback.classic.Logger LOGGER = (ch.qos.logback.classic.Logger) LoggerFactory.getLogger(SynBioHubClientServiceImpl.class);
     private static final Logger LOGGER = LoggerFactory.getLogger(SynBioHubClientServiceImpl.class);
 
     // @Autowired

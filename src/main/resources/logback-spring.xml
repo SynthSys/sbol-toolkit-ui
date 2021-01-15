@@ -32,11 +32,6 @@
         </rollingPolicy>
     </appender>
 
-    <root level="debug">
-        <appender-ref ref="RollingFile" />
-        <appender-ref ref="Console" />
-    </root>
-
     <!-- LOG everything at INFO level -->
     <root level="info">
         <appender-ref ref="RollingFile" />
