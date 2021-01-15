@@ -49,12 +49,45 @@ public class SynBioHubClientServiceImpl implements SynBioHubClientService {
 
     HttpHeaders headers = new HttpHeaders();
 
+    @Override
+    public String getServerUrl() {
+        return this.synBioHubBaseUrl;
+    }
+
+    /* @Override
+    public RestTemplate getRestTemplate() {
+        return this.restTemplate;
+    }*/
+
+    @Override
+    public RestTemplateBuilder getRestTemplateBuilder() {
+        return this.restTemplateBuilder;
+    }
+
+    /*@Override
+    public void setServerUrl(String synBioHubBaseUrl) {
+        this.synBioHubBaseUrl = synBioHubBaseUrl;
+    }*/
+
     @Autowired
     public SynBioHubClientServiceImpl(RestTemplateBuilder restTemplateBuilder,
             @Value("${synbiohub.client.baseUrl}") String synBioHubBaseUrl) {
         System.out.println("Service is init'd!");
         System.out.println(synBioHubBaseUrl);
         this.restTemplateBuilder = restTemplateBuilder;
+        this.restTemplate = this.restTemplateBuilder.build();
+
+        this.synBioHubBaseUrl = synBioHubBaseUrl;
+        LOGIN_URL = synBioHubBaseUrl.concat("login");
+        USER_API = synBioHubBaseUrl.concat("users");
+        SUBMIT_API = synBioHubBaseUrl.concat("submit");
+    }
+
+    // Overloaded constructor to allow a new service impl to be instantiated
+    // if the specified server URL is different than the autowired default
+    public SynBioHubClientServiceImpl(SynBioHubClientService synBioHubClientService,
+            String synBioHubBaseUrl) {
+        this.restTemplateBuilder = synBioHubClientService.getRestTemplateBuilder();
         this.restTemplate = this.restTemplateBuilder.build();
 
         this.synBioHubBaseUrl = synBioHubBaseUrl;
@@ -71,14 +104,14 @@ public class SynBioHubClientServiceImpl implements SynBioHubClientService {
     }
 
     @Override
-    public void doLogin() {
+    public void doLogin(String username, String password) {
         /*String credentials = synBioHubUser+":"+synBioHubPass;
         byte[] credentialBytes = credentials .getBytes();
         byte[] base64CredentialBytes = Base64.encodeBase64(credentialBytes);
         String base64Credentials = new String(base64CredentialBytes);
         headers.add("Authorization", "Basic " + base64Credentials );*/
         final ResponseEntity<String> responseEntity = restTemplate
-                .exchange(LOGIN_URL, HttpMethod.POST, new HttpEntity<Void>(createHeaders(synBioHubEmail, synBioHubPass)), String.class);
+                .exchange(LOGIN_URL, HttpMethod.POST, new HttpEntity<Void>(createHeaders(username, password)), String.class);
         System.out.println(responseEntity.getBody());
     }
 
@@ -93,7 +126,7 @@ public class SynBioHubClientServiceImpl implements SynBioHubClientService {
         LOGGER.debug("Overwrite is: {}", isOverwrite);
 
         if(!headers.containsKey("Authorization")) {
-            doLogin();
+            doLogin(username, password);
         }
 
         HttpEntity<String> request = new HttpEntity<String>(headers);

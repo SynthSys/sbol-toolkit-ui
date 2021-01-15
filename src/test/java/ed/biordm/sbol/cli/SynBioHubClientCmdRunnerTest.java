@@ -45,7 +45,7 @@ public class SynBioHubClientCmdRunnerTest {
         String[] userArgs = { "--username", "johnnyH" };
         String[] passwordArgs = { "--password", "mysupersecurepassword" };
         String[] collectionIdArgs = { "--collection-id", "1" };
-        String[] serverUrlArgs = { "--server-url", "http://localhost:7777/" };
+        String[] serverUrlArgs = { "--server-url", "http://localhost:7890/" };
         String[] dirPathArgs = { "--dir-path", "D://Temp//sbol/" };
         String[] fileExtFilterArgs = { "--file-ext-filter", "sbol" };
         String[] overwriteArgs = { "--overwrite", "true" };

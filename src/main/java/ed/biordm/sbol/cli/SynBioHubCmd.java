@@ -12,6 +12,7 @@ import java.util.concurrent.Callable;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 import ed.biordm.sbol.service.SynBioHubClientService;
+import ed.biordm.sbol.service.SynBioHubClientServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -69,6 +70,14 @@ public class SynBioHubCmd implements Callable<Integer> {
         LOGGER.info("Hi {}, your password is hashed to {}.", username, Base64.getEncoder().encodeToString(md.digest()));
 
         LOGGER.debug("SynBioHubClientService failed to initialise: {}", synBioHubClientService == null);
+
+        LOGGER.debug("Specified server URL: {}", serverUrl);
+        if(!serverUrl.equals(synBioHubClientService.getServerUrl())) {
+            LOGGER.debug("Setting new server URL");
+            // synBioHubClientService.setServerUrl(serverUrl);
+            synBioHubClientService = new SynBioHubClientServiceImpl(synBioHubClientService, serverUrl);
+        }
+
         synBioHubClientService.submitSBOLFiles(username, new String(password),
                 String.valueOf(collectionId), dirPath, fileExtFilter, overwrite);
 
