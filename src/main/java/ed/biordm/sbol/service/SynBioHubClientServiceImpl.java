@@ -5,13 +5,20 @@
  */
 package ed.biordm.sbol.service;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Arrays;
+import static java.util.Arrays.asList;
 import java.util.List;
 import java.util.function.Predicate;
+import java.util.logging.Level;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.slf4j.Logger;
@@ -19,11 +26,16 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 /**
@@ -104,7 +116,7 @@ public class SynBioHubClientServiceImpl implements SynBioHubClientService {
         SUBMIT_API = synBioHubBaseUrl.concat("submit");
     }
 
-    HttpHeaders createHeaders(String username, String password) {
+    protected HttpHeaders createHeaders(String username, String password) {
         return new HttpHeaders() {{
             final String basicAuth = HttpHeaders.encodeBasicAuth(username, password, StandardCharsets.UTF_8);
             setBasicAuth(basicAuth);
@@ -124,7 +136,7 @@ public class SynBioHubClientServiceImpl implements SynBioHubClientService {
     }
 
     @Override
-    public void submitSBOLFiles(String username, String password, String collectionId,
+    public void submitSBOLFiles(String username, String password, long collectionId,
             String dirPath, String fileExtFilter, boolean isOverwrite) throws Exception {
         LOGGER.debug("Username is: {}", username);
         LOGGER.debug("Password is: {}", password);
@@ -133,17 +145,19 @@ public class SynBioHubClientServiceImpl implements SynBioHubClientService {
         LOGGER.debug("File extension filter is: {}", fileExtFilter);
         LOGGER.debug("Overwrite is: {}", isOverwrite);
 
+ 
         if(!headers.containsKey("Authorization")) {
             doLogin(username, password);
         }
 
-        HttpEntity<String> request = new HttpEntity<String>(headers);
+        // SynBioHubClientUploader uploader = new SynBioHubClientUploader();
+        List<String> fileNamesList = retrieveFiles(dirPath, fileExtFilter);
 
-        final ResponseEntity<String> responseEntity = restTemplate
-                .exchange(SUBMIT_API, HttpMethod.POST, new HttpEntity<Void>(createHeaders(synBioHubUser, synBioHubPass)), String.class);
-        System.out.println(responseEntity.getBody());       
-        
+        for (String filename: fileNamesList) {
+            LOGGER.debug("Current file for upload: {}", filename);
 
+            uploadFile(createHeaders(synBioHubUser, synBioHubPass), filename, collectionId);
+        }
         /*SimpleMailMessage message = new SimpleMailMessage(); // create message
         message.setFrom(NOREPLY_ADDRESS);                    // compose message
         for (String recipient : to) { message.setTo(recipient); }
@@ -154,33 +168,124 @@ public class SynBioHubClientServiceImpl implements SynBioHubClientService {
         //LOGGER.info("Mail to {} sent! Subject: {}, Body: {}", to, subject, text); 
     }
 
-    protected void doFileUploads(String dirPath, String fileExtFilter) {
+    /**
+     * 
+     * @param dirPath
+     * @param fileExtFilter 
+     * @return  
+     */
+    protected List<String> retrieveFiles(String dirPath, String fileExtFilter) {
         // File directory = new File(dirPath);
+        List<String> fileNamesList = new ArrayList<>();
 
-        Predicate<String> fileExtCondition = new Predicate<String>() 
-        {
-            @Override
-            public boolean test(String filename) {
-                if (filename.toLowerCase().endsWith(".".concat(fileExtFilter))) {
-                    return true;
-                }
-                return false;
+        Predicate<String> fileExtCondition = (String filename) -> {
+            if (filename.toLowerCase().endsWith(".".concat(fileExtFilter))) {
+                return true;
             }
+            return false;
         };
 
         // Reading the folder and getting Stream.
         try (Stream<Path> walk = Files.walk(Paths.get(dirPath))) {
 
             // Filtering the paths by a regular file and adding into a list.
-            List<String> fileNamesList = walk.filter(Files::isRegularFile)
+            fileNamesList = walk.filter(Files::isRegularFile)
                     .map(x -> x.toString()).filter(fileExtCondition)
                     .collect(Collectors.toList());
 
             // printing the file nams
-            fileNamesList.forEach(System.out::println);
-
+            //fileNamesList.forEach(System.out::println);
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.error("Error locating files for upload", e);
         }
+
+        return fileNamesList;
+    }
+
+    /**
+     * 
+     * @param filename
+     * @param collectionId
+     * @param username
+     * @param password
+     * @return 
+     */
+    /*protected boolean uploadFile(String filename, long collectionId, String username,
+            String password) {
+        if(!headers.containsKey("Authorization")) {
+            doLogin(username, password);
+        }
+
+        HttpEntity<String> request = new HttpEntity<String>(headers);
+
+        final ResponseEntity<String> responseEntity = restTemplate
+                .exchange(SUBMIT_API, HttpMethod.POST, new HttpEntity<Void>(createHeaders(synBioHubUser, synBioHubPass)), String.class);
+        System.out.println(responseEntity.getBody());
+
+        return false;
+    }*/
+
+    /**
+     * 
+     * @param headers
+     * @param filename
+     * @param collectionId
+     * @return 
+     */
+    protected boolean uploadFile(HttpHeaders headers, String filename, long collectionId) {
+        boolean success = false;
+        HttpEntity<String> request = new HttpEntity(headers);
+
+        File file = new File(filename);
+        byte[] fileContent = getFileContent(file);
+
+        HttpHeaders parts = new HttpHeaders();
+        parts.setContentType(MediaType.APPLICATION_XML);
+        final ByteArrayResource byteArrayResource = new ByteArrayResource(fileContent) {
+            @Override
+            public String getFilename() {
+                return filename;
+            }
+        };
+
+        final HttpEntity<ByteArrayResource> partsEntity = new HttpEntity<>(byteArrayResource, parts);
+
+        headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+        headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+
+        MultiValueMap<String, Object> requestMap = new LinkedMultiValueMap<>();
+        requestMap.add("user-file", partsEntity);
+
+        final ParameterizedTypeReference<String> typeReference = new ParameterizedTypeReference() {};
+
+        final ResponseEntity<String> responseEntity = restTemplate.exchange(SUBMIT_API, HttpMethod.POST, new HttpEntity<>(requestMap, headers), typeReference);
+        if(responseEntity.getStatusCode().is2xxSuccessful()) {
+            // System.out.println("File uploaded = " + responseEntity.getBody().isSuccess());
+            success = true;
+        }
+        /*final ResponseEntity<String> responseEntity = restTemplate
+                .exchange(SUBMIT_API, HttpMethod.POST, new HttpEntity<Void>(headers), String.class);
+        System.out.println(responseEntity.getBody());*/
+
+        return success;
+    }
+
+    /**
+     * 
+     * @param file
+     * @return 
+     */
+    protected byte[] getFileContent(File file) {
+        byte[] fileBytes = new byte[(int) file.length()];
+        try {
+            FileInputStream fileInputStream = new FileInputStream(file);
+            fileInputStream.read(fileBytes);
+        } catch (FileNotFoundException e) {
+            LOGGER.error("Unable to find file: {}", file.getAbsolutePath(), e);
+        } catch (IOException e) {
+            LOGGER.error("Unable to read file: {}", file.getAbsolutePath(), e);
+        }
+        
+        return fileBytes;
     }
 }

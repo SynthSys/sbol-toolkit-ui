@@ -79,7 +79,7 @@ public class SynBioHubCmd implements Callable<Integer> {
         }
 
         synBioHubClientService.submitSBOLFiles(username, new String(password),
-                String.valueOf(collectionId), dirPath, fileExtFilter, overwrite);
+                collectionId, dirPath, fileExtFilter, overwrite);
 
         // null out the arrays when done
         Arrays.fill(bytes, (byte) 0);

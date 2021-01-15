@@ -24,6 +24,6 @@ public interface SynBioHubClientService {
 
     void doLogin(String username, String password);
 
-    void submitSBOLFiles(String username, String password, String collectionId,
+    void submitSBOLFiles(String username, String password, long collectionId,
             String dirPath, String fileExtFilter, boolean isOverwrite) throws Exception;
 }
