@@ -35,7 +35,7 @@ import picocli.CommandLine.IFactory;
 // @ComponentScan({ "ed.biordm.sbol.cli"})
 public class SynBioHubClientCmdRunner implements CommandLineRunner, ExitCodeGenerator {
 
-    private static final Logger logger = LoggerFactory.getLogger(SynBioHubClientCmdRunner.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SynBioHubClientCmdRunner.class);
 
     private final IFactory factory;
     private final SynBioHubCmd synBioHubCmd; 
@@ -63,8 +63,8 @@ public class SynBioHubClientCmdRunner implements CommandLineRunner, ExitCodeGene
 
     @Override
     public void run(String... args) throws Exception {
-        System.out.println("Run");
-        System.out.println(Arrays.toString(args));
+        LOGGER.debug("Running with args:");
+        LOGGER.debug(Arrays.toString(args));
         // let picocli parse command line args and run the business logic
         exitCode = cmd.execute(args);
 
