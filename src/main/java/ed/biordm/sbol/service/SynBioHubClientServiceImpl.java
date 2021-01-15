@@ -5,7 +5,15 @@
  */
 package ed.biordm.sbol.service;
 
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.List;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -144,5 +152,35 @@ public class SynBioHubClientServiceImpl implements SynBioHubClientService {
         emailSender.send(message);                           // send message
         */
         //LOGGER.info("Mail to {} sent! Subject: {}, Body: {}", to, subject, text); 
+    }
+
+    protected void doFileUploads(String dirPath, String fileExtFilter) {
+        // File directory = new File(dirPath);
+
+        Predicate<String> fileExtCondition = new Predicate<String>() 
+        {
+            @Override
+            public boolean test(String filename) {
+                if (filename.toLowerCase().endsWith(".".concat(fileExtFilter))) {
+                    return true;
+                }
+                return false;
+            }
+        };
+
+        // Reading the folder and getting Stream.
+        try (Stream<Path> walk = Files.walk(Paths.get(dirPath))) {
+
+            // Filtering the paths by a regular file and adding into a list.
+            List<String> fileNamesList = walk.filter(Files::isRegularFile)
+                    .map(x -> x.toString()).filter(fileExtCondition)
+                    .collect(Collectors.toList());
+
+            // printing the file nams
+            fileNamesList.forEach(System.out::println);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
