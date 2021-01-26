@@ -16,9 +16,11 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import static java.util.Arrays.asList;
+import java.util.Collections;
 import java.util.List;
 import java.util.function.Predicate;
 import java.util.logging.Level;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.slf4j.Logger;
@@ -31,12 +33,14 @@ import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.server.ResponseStatusException;
 
 /**
  *
@@ -52,14 +56,14 @@ public class SynBioHubClientServiceImpl implements SynBioHubClientService {
 
     private final RestTemplateBuilder restTemplateBuilder;
 
-    @Value("${synbiohub.client.user}")
+    /*@Value("${synbiohub.client.user}")
     private String synBioHubUser;
 
     @Value("${synbiohub.client.email}")
     private String synBioHubEmail;
 
     @Value("${synbiohub.client.pass}")
-    private String synBioHubPass;
+    private String synBioHubPass;*/
 
     private final String synBioHubBaseUrl;
 
@@ -68,6 +72,8 @@ public class SynBioHubClientServiceImpl implements SynBioHubClientService {
     private final String SUBMIT_API;
 
     HttpHeaders headers = new HttpHeaders();
+
+    private static final Pattern AUTH_TOKEN_PATTERN = Pattern.compile("[\\w]{8}-[\\w]{4}-[\\w]{4}-[\\w]{4}-[\\w]{12}");
 
     @Override
     public String getServerUrl() {
@@ -123,22 +129,64 @@ public class SynBioHubClientServiceImpl implements SynBioHubClientService {
         }};
     }
 
-    @Override
-    public void doLogin(String username, String password) {
-        /*String credentials = synBioHubUser+":"+synBioHubPass;
-        byte[] credentialBytes = credentials .getBytes();
-        byte[] base64CredentialBytes = Base64.encodeBase64(credentialBytes);
-        String base64Credentials = new String(base64CredentialBytes);
-        headers.add("Authorization", "Basic " + base64Credentials );*/
-        final ResponseEntity<String> responseEntity = restTemplate
-                .exchange(LOGIN_URL, HttpMethod.POST, new HttpEntity<Void>(createHeaders(username, password)), String.class);
-        System.out.println(responseEntity.getBody());
+    protected HttpHeaders createLoginHeaders() {
+        return new HttpHeaders() {{
+            this.setAccept(Collections.singletonList(MediaType.TEXT_PLAIN));
+            this.setAcceptCharset(Collections.singletonList(StandardCharsets.UTF_8));
+        }};
+    }
+
+    protected HttpHeaders createAuthHeaders(ResponseEntity<?> responseEntity) {
+        HttpHeaders authHeaders = new HttpHeaders();
+        authHeaders.setAccept(Collections.singletonList(MediaType.TEXT_PLAIN));
+        authHeaders.setAcceptCharset(Collections.singletonList(StandardCharsets.UTF_8));
+
+        HttpStatus resStatus = responseEntity.getStatusCode();
+        LOGGER.info("Response status for login request: {}", responseEntity.getStatusCodeValue());
+        LOGGER.info("Received response for login request: {}", responseEntity.getBody());
+
+        if (resStatus.is2xxSuccessful()) {
+            Object resBody = responseEntity.getBody();
+            if (resBody != null && resBody.getClass().equals(String.class)) {
+                //422b6bbf-9a1a-4003-ad20-81f7bf32d1cf
+                String authToken = resBody.toString();
+                LOGGER.debug("Auth Token: {}", authToken);
+                if (AUTH_TOKEN_PATTERN.matcher(authToken).matches()) {
+                    //authHeaders.setBearerAuth(authToken);
+                    authHeaders.set("X-authorization", authToken);
+                    //authHeaders.setBasicAuth(authToken);
+                }
+            }
+        } else {
+            throw new ResponseStatusException(resStatus, resStatus.getReasonPhrase());
+        }
+
+        return authHeaders;
     }
 
     @Override
-    public void submitSBOLFiles(String username, String password, long collectionId,
+    public HttpHeaders doLogin(String email, String password) {
+        LOGGER.debug("Attempting login with user email: {}", email);
+
+        MultiValueMap<String, Object> requestMap = new LinkedMultiValueMap<>();
+        requestMap.add("email", email);
+        requestMap.add("password", password);
+
+        HttpHeaders headers = createLoginHeaders();
+        final ParameterizedTypeReference<String> typeReference = new ParameterizedTypeReference<String>() {};
+        HttpEntity<MultiValueMap<String, Object>> entity = new HttpEntity<>(requestMap, headers);
+
+        final ResponseEntity<String> responseEntity = restTemplate.exchange(LOGIN_URL, HttpMethod.POST, entity, typeReference);
+        LOGGER.info("Response status for login request: {}", responseEntity.getStatusCodeValue());
+        LOGGER.info("Received response for login request: {}", responseEntity.getBody());
+
+        return createAuthHeaders(responseEntity);
+    }
+
+    @Override
+    public void submitSBOLFiles(String email, String password, long collectionId,
             String dirPath, String fileExtFilter, boolean isOverwrite) throws Exception {
-        LOGGER.debug("Username is: {}", username);
+        LOGGER.debug("Email is: {}", email);
         LOGGER.debug("Password is: {}", password);
         LOGGER.debug("Collection ID is: {}", collectionId);
         LOGGER.debug("Directory path is: {}", dirPath);
@@ -146,9 +194,10 @@ public class SynBioHubClientServiceImpl implements SynBioHubClientService {
         LOGGER.debug("Overwrite is: {}", isOverwrite);
 
  
-        if(!headers.containsKey("Authorization")) {
+        /*if(!headers.containsKey("Authorization")) {
             doLogin(username, password);
-        }
+        }*/
+        HttpHeaders authHeaders = doLogin(email, password);
 
         // SynBioHubClientUploader uploader = new SynBioHubClientUploader();
         List<String> fileNamesList = retrieveFiles(dirPath, fileExtFilter);
@@ -156,7 +205,7 @@ public class SynBioHubClientServiceImpl implements SynBioHubClientService {
         for (String filename: fileNamesList) {
             LOGGER.debug("Current file for upload: {}", filename);
 
-            uploadFile(createHeaders(synBioHubUser, synBioHubPass), filename, collectionId);
+            uploadFile(authHeaders, filename, collectionId);
         }
         /*SimpleMailMessage message = new SimpleMailMessage(); // create message
         message.setFrom(NOREPLY_ADDRESS);                    // compose message
