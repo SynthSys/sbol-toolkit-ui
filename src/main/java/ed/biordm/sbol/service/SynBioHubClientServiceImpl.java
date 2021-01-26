@@ -69,10 +69,11 @@ public class SynBioHubClientServiceImpl implements SynBioHubClientService {
 
     private final String LOGIN_URL;
     private final String USER_API;
-    private final String SUBMIT_API;
+    private final String SUBMIT_URL;
 
     HttpHeaders headers = new HttpHeaders();
 
+    // typical format: 422b6bbf-9a1a-4003-ad20-81f7bf32d1cf
     private static final Pattern AUTH_TOKEN_PATTERN = Pattern.compile("[\\w]{8}-[\\w]{4}-[\\w]{4}-[\\w]{4}-[\\w]{12}");
 
     @Override
@@ -106,7 +107,7 @@ public class SynBioHubClientServiceImpl implements SynBioHubClientService {
         this.synBioHubBaseUrl = synBioHubBaseUrl;
         LOGIN_URL = synBioHubBaseUrl.concat("login");
         USER_API = synBioHubBaseUrl.concat("users");
-        SUBMIT_API = synBioHubBaseUrl.concat("submit");
+        SUBMIT_URL = synBioHubBaseUrl.concat("submit");
     }
 
     // Overloaded constructor to allow a new service impl to be instantiated
@@ -119,7 +120,7 @@ public class SynBioHubClientServiceImpl implements SynBioHubClientService {
         this.synBioHubBaseUrl = synBioHubBaseUrl;
         LOGIN_URL = synBioHubBaseUrl.concat("login");
         USER_API = synBioHubBaseUrl.concat("users");
-        SUBMIT_API = synBioHubBaseUrl.concat("submit");
+        SUBMIT_URL = synBioHubBaseUrl.concat("submit");
     }
 
     protected HttpHeaders createHeaders(String username, String password) {
@@ -148,7 +149,6 @@ public class SynBioHubClientServiceImpl implements SynBioHubClientService {
         if (resStatus.is2xxSuccessful()) {
             Object resBody = responseEntity.getBody();
             if (resBody != null && resBody.getClass().equals(String.class)) {
-                //422b6bbf-9a1a-4003-ad20-81f7bf32d1cf
                 String authToken = resBody.toString();
                 LOGGER.debug("Auth Token: {}", authToken);
                 if (AUTH_TOKEN_PATTERN.matcher(authToken).matches()) {
@@ -177,10 +177,21 @@ public class SynBioHubClientServiceImpl implements SynBioHubClientService {
         HttpEntity<MultiValueMap<String, Object>> entity = new HttpEntity<>(requestMap, headers);
 
         final ResponseEntity<String> responseEntity = restTemplate.exchange(LOGIN_URL, HttpMethod.POST, entity, typeReference);
-        LOGGER.info("Response status for login request: {}", responseEntity.getStatusCodeValue());
+
+        HttpStatus resStatus = responseEntity.getStatusCode();
+        int resStatusVal = responseEntity.getStatusCodeValue();
+        LOGGER.info("Response status for login request: {}", resStatusVal);
         LOGGER.info("Received response for login request: {}", responseEntity.getBody());
 
-        return createAuthHeaders(responseEntity);
+        HttpHeaders authHeaders = new HttpHeaders();
+
+        if (resStatus.is2xxSuccessful()) {
+            authHeaders = createAuthHeaders(responseEntity);
+        } else {
+            throw new ResponseStatusException(resStatus, resStatus.getReasonPhrase());
+        }
+
+        return authHeaders;
     }
 
     @Override
@@ -303,11 +314,12 @@ public class SynBioHubClientServiceImpl implements SynBioHubClientService {
         headers.setContentType(MediaType.MULTIPART_FORM_DATA);
 
         MultiValueMap<String, Object> requestMap = new LinkedMultiValueMap<>();
-        requestMap.add("user-file", partsEntity);
+        requestMap.add("file", partsEntity);
 
-        final ParameterizedTypeReference<String> typeReference = new ParameterizedTypeReference() {};
+        final ParameterizedTypeReference<String> typeReference = new ParameterizedTypeReference<String>() {};
+        final HttpEntity<MultiValueMap<String, Object>> reqEntity = new HttpEntity<>(requestMap, headers);
 
-        final ResponseEntity<String> responseEntity = restTemplate.exchange(SUBMIT_API, HttpMethod.POST, new HttpEntity<>(requestMap, headers), typeReference);
+        final ResponseEntity<String> responseEntity = restTemplate.exchange(SUBMIT_URL, HttpMethod.POST, reqEntity, typeReference);
         if(responseEntity.getStatusCode().is2xxSuccessful()) {
             // System.out.println("File uploaded = " + responseEntity.getBody().isSuccess());
             success = true;
