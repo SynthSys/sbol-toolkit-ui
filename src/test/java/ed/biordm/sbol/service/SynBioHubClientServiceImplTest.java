@@ -64,9 +64,10 @@ public class SynBioHubClientServiceImplTest {
         String fileExtFilter = "xml";
         String username = "JohnnyH";
         String password = "mysupersecretpassword";
-        long collId = 2;
+        String collUrl = "http://localhost:7777/user/Johnny/a_random_id/a_random_id_collection/1";
         boolean isOverwrite = Boolean.TRUE;
 
-        synBioHubClientService.submitSBOLFiles(username, password, collId, dirPath, fileExtFilter, isOverwrite);
+        synBioHubClientService.submitSBOLFiles(username, password, collUrl,
+                dirPath, fileExtFilter, isOverwrite);
     }
 }
