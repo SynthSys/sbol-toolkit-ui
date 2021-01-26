@@ -5,6 +5,7 @@
  */
 package ed.biordm.sbol.service;
 
+import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,40 +35,43 @@ public class SynBioHubClientServiceImplTest {
     @Autowired
     private SynBioHubClientService synBioHubClientService;
 
-    // @InjectMocks
-    /*SynBioHubClientServiceImpl synBioHubClientService;
-
-    @Value("${synbiohub.client.baseUrl}")
-    private String synBioHubBaseUrl;
-
-    @Value("${synbiohub.client.username}")
-    private String username;
-
-    @Value("${synbiohub.client.password}")
-    private String password;
-
-    @Before
-    public void init() {
-        // MockitoAnnotations.initMocks(this);
-        System.out.println(synBioHubBaseUrl);
-        synBioHubClientService = new SynBioHubClientServiceImpl(restTemplateBuilder, synBioHubBaseUrl);
-    }*/
-
-    /*@BeforeEach
-    void init(@Mock RestTemplateBuilder restTemplateBuilder) {
-        synBioHubClientService = new SynBioHubClientServiceImpl(restTemplateBuilder, synBioHubBaseUrl);
-    }*/
+    String dirPath = "D://temp//sbol";
+    String fileExtFilter = "xml";
+    String email = "j.hay@epcc.ed.ac.uk";
+    String password = "mysupersecretpassword";
+    String collUrl = "http://localhost:7777/user/Johnny/a_random_id/a_random_id_collection/1";
+    String collId = "a_random_id";
+    long version = 1;
+    String collName = "A Random Name";
+    boolean isOverwrite = Boolean.TRUE;
 
     @Test
     public void testSubmitFiles() throws Exception {
-        String dirPath = "D://temp//sbol";
-        String fileExtFilter = "xml";
-        String username = "JohnnyH";
-        String password = "mysupersecretpassword";
-        String collUrl = "http://localhost:7777/user/Johnny/a_random_id/a_random_id_collection/1";
-        boolean isOverwrite = Boolean.TRUE;
+        String pass = "admin";
 
-        synBioHubClientService.submitSBOLFiles(username, password, collUrl,
+        synBioHubClientService.submitSBOLFiles(email, pass, collUrl,
                 dirPath, fileExtFilter, isOverwrite);
+    }
+
+    @Test
+    public void testSubmitFilesBadEmail() throws Exception {
+        String pass = "admin";
+        String badEmail = "johnnyH";
+        try {
+            synBioHubClientService.submitSBOLFiles(badEmail, password, collUrl,
+                dirPath, fileExtFilter, isOverwrite);
+        } catch (Exception e) {
+            assertEquals("401 Unauthorized: [Your e-mail address was not recognized.]", e.getMessage());
+        }
+    }
+
+    @Test
+    public void testSubmitFilesBadPassword() throws Exception {
+        try {
+            synBioHubClientService.submitSBOLFiles(email, password, collUrl,
+                    dirPath, fileExtFilter, isOverwrite);
+        } catch (Exception e) {
+            assertEquals("401 Unauthorized: [Your password was not recognized.]", e.getMessage());
+        }
     }
 }

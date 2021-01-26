@@ -215,9 +215,9 @@ public class SynBioHubClientServiceImpl implements SynBioHubClientService {
 
         int overwriteMerge = Integer.MAX_VALUE;
         if (isOverwrite) {
-            overwriteMerge = 1;
+            overwriteMerge = 3;
         } else {
-            overwriteMerge = 0;
+            overwriteMerge = 4;
         }
 
         for (String filename: fileNamesList) {
@@ -367,7 +367,7 @@ public class SynBioHubClientServiceImpl implements SynBioHubClientService {
 
         final HttpEntity<ByteArrayResource> partsEntity = new HttpEntity<>(byteArrayResource, parts);
 
-        headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+        headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON, MediaType.TEXT_PLAIN));
         headers.setContentType(MediaType.MULTIPART_FORM_DATA);
 
         requestMap.add("file", partsEntity);

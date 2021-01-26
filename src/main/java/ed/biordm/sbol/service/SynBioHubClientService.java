@@ -24,6 +24,6 @@ public interface SynBioHubClientService {
 
     HttpHeaders doLogin(String email, String password);
 
-    void submitSBOLFiles(String username, String password, String collectionUrl,
+    void submitSBOLFiles(String email, String password, String collectionUrl,
             String dirPath, String fileExtFilter, boolean isOverwrite) throws Exception;
 }
