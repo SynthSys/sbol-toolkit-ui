@@ -5,40 +5,37 @@
  */
 package ed.biordm.sbol.service;
 
-import ed.biordm.sbol.web.SynBioHubClientTestConfiguration;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.SpringBootConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.web.client.RestTemplateBuilder;
-import org.springframework.context.annotation.Import;
-import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.context.annotation.Bean;
+import org.springframework.test.context.junit4.SpringRunner;
 
 /**
  *
  * @author jhay
  */
-@Import(SynBioHubClientTestConfiguration.class)
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE)
-@SpringBootConfiguration
-@RunWith(SpringJUnit4ClassRunner.class)
-@TestPropertySource(properties = {
-    "synbiohub.client.baseUrl=http://localhost:7777/",
-    "synbiohub.client.username=johnnyH",
-    "synbiohub.client.password=mysupersecretpassword"
-})
+@RunWith(SpringRunner.class)
 public class SynBioHubClientServiceImplTest {
 
-    // @InjectMocks
-    SynBioHubClientServiceImpl synBioHubClientService;
+    @TestConfiguration
+    static class SynBioHubClientServiceImplTestContextConfiguration {
+ 
+        @Bean
+        public SynBioHubClientServiceImpl synBioHubClientService() {
+            RestTemplateBuilder restTemplateBuilder = new RestTemplateBuilder();
+            String url = "http://localhost:7777";
+            return new SynBioHubClientServiceImpl(restTemplateBuilder, url);
+        }
+    }
 
-    // @Mock
     @Autowired
-    RestTemplateBuilder restTemplateBuilder;
+    private SynBioHubClientService synBioHubClientService;
+
+    // @InjectMocks
+    /*SynBioHubClientServiceImpl synBioHubClientService;
 
     @Value("${synbiohub.client.baseUrl}")
     private String synBioHubBaseUrl;
@@ -54,7 +51,7 @@ public class SynBioHubClientServiceImplTest {
         // MockitoAnnotations.initMocks(this);
         System.out.println(synBioHubBaseUrl);
         synBioHubClientService = new SynBioHubClientServiceImpl(restTemplateBuilder, synBioHubBaseUrl);
-    }
+    }*/
 
     /*@BeforeEach
     void init(@Mock RestTemplateBuilder restTemplateBuilder) {
@@ -65,7 +62,11 @@ public class SynBioHubClientServiceImplTest {
     public void testSubmitFiles() throws Exception {
         String dirPath = "D://temp//sbol";
         String fileExtFilter = "xml";
+        String username = "JohnnyH";
+        String password = "mysupersecretpassword";
+        long collId = 2;
+        boolean isOverwrite = Boolean.TRUE;
 
-        synBioHubClientService.submitSBOLFiles(username, password, 2, dirPath, fileExtFilter, true);
+        synBioHubClientService.submitSBOLFiles(username, password, collId, dirPath, fileExtFilter, isOverwrite);
     }
 }
