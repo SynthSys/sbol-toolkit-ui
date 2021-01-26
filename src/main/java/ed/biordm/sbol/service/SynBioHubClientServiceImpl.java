@@ -195,11 +195,11 @@ public class SynBioHubClientServiceImpl implements SynBioHubClientService {
     }
 
     @Override
-    public void submitSBOLFiles(String email, String password, long collectionId,
+    public void submitSBOLFiles(String email, String password, String collectionUrl,
             String dirPath, String fileExtFilter, boolean isOverwrite) throws Exception {
         LOGGER.debug("Email is: {}", email);
         LOGGER.debug("Password is: {}", password);
-        LOGGER.debug("Collection ID is: {}", collectionId);
+        LOGGER.debug("Collection URL is: {}", collectionUrl);
         LOGGER.debug("Directory path is: {}", dirPath);
         LOGGER.debug("File extension filter is: {}", fileExtFilter);
         LOGGER.debug("Overwrite is: {}", isOverwrite);
@@ -213,10 +213,18 @@ public class SynBioHubClientServiceImpl implements SynBioHubClientService {
         // SynBioHubClientUploader uploader = new SynBioHubClientUploader();
         List<String> fileNamesList = retrieveFiles(dirPath, fileExtFilter);
 
+        int overwriteMerge = Integer.MAX_VALUE;
+        if (isOverwrite) {
+            overwriteMerge = 1;
+        } else {
+            overwriteMerge = 0;
+        }
+
         for (String filename: fileNamesList) {
             LOGGER.debug("Current file for upload: {}", filename);
 
-            uploadFile(authHeaders, filename, collectionId);
+            uploadFileToExistingCollection(authHeaders, filename, overwriteMerge,
+                    collectionUrl);
         }
         /*SimpleMailMessage message = new SimpleMailMessage(); // create message
         message.setFrom(NOREPLY_ADDRESS);                    // compose message
@@ -286,13 +294,62 @@ public class SynBioHubClientServiceImpl implements SynBioHubClientService {
     }*/
 
     /**
-     * 
+     *
      * @param headers
      * @param filename
-     * @param collectionId
-     * @return 
+     * @param id
+     * @param version
+     * @param name
+     * @param description
+     * @param citations
+     * @param overwriteMerge
+     * @return
      */
-    protected boolean uploadFile(HttpHeaders headers, String filename, long collectionId) {
+    protected boolean uploadFileToNewCollection(HttpHeaders headers, String filename, String id,
+            long version, String name, String description, String citations,
+            int overwriteMerge) {
+        boolean success = false;
+
+        MultiValueMap<String, Object> requestMap = new LinkedMultiValueMap<>();
+        requestMap.add("id", id);
+        requestMap.add("version", version);
+        requestMap.add("name", name);
+        requestMap.add("description", description);
+        requestMap.add("citations", citations);
+        requestMap.add("overwrite_merge", overwriteMerge);
+
+        return uploadFile(headers, filename, requestMap);
+    }
+
+    /**
+     *
+     * @param headers
+     * @param filename
+     * @param overwriteMerge
+     * @param collectionUrl
+     * @return
+     */
+    protected boolean uploadFileToExistingCollection(HttpHeaders headers,
+            String filename, int overwriteMerge, String collectionUrl) {
+        boolean success = false;
+
+        MultiValueMap<String, Object> requestMap = new LinkedMultiValueMap<>();
+        // requestMap.add("user-file", partsEntity);
+        requestMap.add("overwrite_merge", overwriteMerge);
+        requestMap.add("rootCollections", collectionUrl);
+
+        return uploadFile(headers, filename, requestMap);
+    }
+
+    /**
+     *
+     * @param headers
+     * @param filename
+     * @param requestMap
+     * @return
+     */
+    protected boolean uploadFile(HttpHeaders headers, String filename,
+            MultiValueMap<String, Object> requestMap) {
         boolean success = false;
         HttpEntity<String> request = new HttpEntity(headers);
 
@@ -313,7 +370,6 @@ public class SynBioHubClientServiceImpl implements SynBioHubClientService {
         headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
         headers.setContentType(MediaType.MULTIPART_FORM_DATA);
 
-        MultiValueMap<String, Object> requestMap = new LinkedMultiValueMap<>();
         requestMap.add("file", partsEntity);
 
         final ParameterizedTypeReference<String> typeReference = new ParameterizedTypeReference<String>() {};
