@@ -87,7 +87,7 @@ public class SynBioHubCmdTest {
         System.out.println(synBioHubClientService == null);
         String[] userArgs = { "--username", "johnnyH" };
         String[] passwordArgs = { "--password", "mysupersecurepassword" };
-        String[] collectionIdArgs = { "--collection-id", "1" };
+        String[] collectionIdArgs = { "--collection-url", "http://localhost:7777/user/Johnny/a_random_id/a_random_id_collection/1" };
         String[] allArgs = Stream.of(userArgs, passwordArgs, collectionIdArgs).flatMap(Stream::of).toArray(String[]::new);
 
         cmd.execute(allArgs);
@@ -102,7 +102,7 @@ public class SynBioHubCmdTest {
         System.out.println(synBioHubClientService == null);
         String[] userArgs = { "--username", "johnnyH" };
         String[] passwordArgs = { "--password", "mysupersecurepassword" };
-        String[] collectionIdArgs = { "--collection-id", "1" };
+        String[] collectionIdArgs = { "--collection-url", "http://localhost:7777/user/Johnny/a_random_id/a_random_id_collection/1" };
         String[] serverUrlArgs = { "--server-url", "http://localhost:7777/" };
         String[] dirPathArgs = { "--dir-path", "D://Temp//sbol/" };
         String[] fileExtFilterArgs = { "--file-ext-filter", "sbol" };

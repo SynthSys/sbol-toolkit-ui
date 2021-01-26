@@ -38,8 +38,8 @@ public class SynBioHubCmd implements Callable<Integer> {
     @Option(names = {"-p", "--password"}, description = "Passphrase", interactive = true, arity = "0..1", required = true)
     char[] password;
 
-    @Option(names = {"-c", "--collection-id"}, description = "Collection ID to deposit into", interactive = true, arity = "0..1", required = true)
-    long collectionId;
+    @Option(names = {"-c", "--collection-url"}, description = "Collection URL to deposit into", interactive = true, arity = "0..1", required = true)
+    String collectionUrl;
 
     @Option(names = {"-s", "--server-url"}, description = "Base URL of SynBioHub API target. Default value is ${DEFAULT-VALUE}", descriptionKey="serverUrl", interactive = true, arity = "0..1", required = false)
     String serverUrl;
@@ -79,7 +79,7 @@ public class SynBioHubCmd implements Callable<Integer> {
         }
 
         synBioHubClientService.submitSBOLFiles(username, new String(password),
-                collectionId, dirPath, fileExtFilter, overwrite);
+                collectionUrl, dirPath, fileExtFilter, overwrite);
 
         // null out the arrays when done
         Arrays.fill(bytes, (byte) 0);

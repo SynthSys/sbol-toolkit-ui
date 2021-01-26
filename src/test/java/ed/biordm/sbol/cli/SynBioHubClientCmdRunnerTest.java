@@ -33,7 +33,7 @@ public class SynBioHubClientCmdRunnerTest {
     public void testMandatoryArgs() throws Exception {
         String[] userArgs = { "--username", "johnnyH" };
         String[] passwordArgs = { "--password", "mysupersecurepassword" };
-        String[] collectionIdArgs = { "--collection-id", "1" };
+        String[] collectionIdArgs = { "--collection-url", "http://localhost:7777/user/Johnny/a_random_id/a_random_id_collection/1" };
         String[] allArgs = Stream.of(userArgs, passwordArgs, collectionIdArgs).flatMap(Stream::of).toArray(String[]::new);
         // SynBioHubClientCmdRunner.main(allArgs);
         // PowerMockito.mockStatic(SpringApplication.class);
@@ -44,7 +44,7 @@ public class SynBioHubClientCmdRunnerTest {
     public void testAllArgs() throws Exception {
         String[] userArgs = { "--username", "johnnyH" };
         String[] passwordArgs = { "--password", "mysupersecurepassword" };
-        String[] collectionIdArgs = { "--collection-id", "1" };
+        String[] collectionIdArgs = { "--collection-url", "http://localhost:7777/user/Johnny/a_random_id/a_random_id_collection/1" };
         String[] serverUrlArgs = { "--server-url", "http://localhost:7890/" };
         String[] dirPathArgs = { "--dir-path", "D://Temp//sbol/" };
         String[] fileExtFilterArgs = { "--file-ext-filter", "sbol" };
