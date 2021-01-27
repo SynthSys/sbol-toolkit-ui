@@ -30,6 +30,7 @@
             <id>cli</id>
             <properties>
                 <spring.boot.mainclass>ed.biordm.sbol.cli.SynBioHubClientCmdRunner</spring.boot.mainclass>
+                <maven.test.skip>true</maven.test.skip>
             </properties>
             <activation>
                 <activeByDefault>true</activeByDefault>
@@ -48,6 +49,10 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <executable>true</executable>
+                    <mainClass>${spring.boot.mainclass}</mainClass>
+                </configuration>
                 <executions>
                     <execution>
                         <goals>
