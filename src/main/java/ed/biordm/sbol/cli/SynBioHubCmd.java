@@ -117,7 +117,6 @@ public class SynBioHubCmd implements Callable<Integer> {
                 synBioHubClientService.setServerUrl(exclusiveURLArgs.serverUrl);
                 synBioHubClientService.setRestTemplateBuilder(restTemplateBuilder);
                 RestTemplate restTemplate = restTemplateBuilder.build();
-                synBioHubClientService.setRestTemplateBuilder(restTemplateBuilder);
                 synBioHubClientService.setRestTemplate(restTemplate);
             }
 
@@ -143,7 +142,6 @@ public class SynBioHubCmd implements Callable<Integer> {
                 synBioHubClientService.setServerUrl(collServerUrl);
                 synBioHubClientService.setRestTemplateBuilder(restTemplateBuilder);
                 RestTemplate restTemplate = restTemplateBuilder.build();
-                synBioHubClientService.setRestTemplateBuilder(restTemplateBuilder);
                 synBioHubClientService.setRestTemplate(restTemplate);
             }
 
