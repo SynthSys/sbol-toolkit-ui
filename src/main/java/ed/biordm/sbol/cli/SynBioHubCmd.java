@@ -25,7 +25,7 @@ import picocli.CommandLine.ArgGroup;
 @Command(name = "synBioHubCmd", mixinStandardHelpOptions = true, version = "1.0")
 public class SynBioHubCmd implements Callable<Integer> {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(SynBioHubClientCmdRunner.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SynBioHubCmd.class);
 
     @Autowired
     private SynBioHubClientService synBioHubClientService;
