@@ -67,9 +67,9 @@ public class SynBioHubClientServiceImpl implements SynBioHubClientService {
 
     private final String synBioHubBaseUrl;
 
-    private final String LOGIN_URL;
-    private final String USER_API;
-    private final String SUBMIT_URL;
+    private final String LOGIN_URL = "/login";
+    private final String USER_API = "/user";
+    private final String SUBMIT_URL = "/submit";
 
     HttpHeaders headers = new HttpHeaders();
 
@@ -105,23 +105,17 @@ public class SynBioHubClientServiceImpl implements SynBioHubClientService {
         this.restTemplate = this.restTemplateBuilder.build();
 
         this.synBioHubBaseUrl = synBioHubBaseUrl;
-        LOGIN_URL = synBioHubBaseUrl.concat("login");
-        USER_API = synBioHubBaseUrl.concat("users");
-        SUBMIT_URL = synBioHubBaseUrl.concat("submit");
     }
 
     // Overloaded constructor to allow a new service impl to be instantiated
     // if the specified server URL is different than the autowired default
-    public SynBioHubClientServiceImpl(SynBioHubClientService synBioHubClientService,
+    /*public SynBioHubClientServiceImpl(SynBioHubClientService synBioHubClientService,
             String synBioHubBaseUrl) {
         this.restTemplateBuilder = synBioHubClientService.getRestTemplateBuilder();
         this.restTemplate = this.restTemplateBuilder.build();
 
         this.synBioHubBaseUrl = synBioHubBaseUrl;
-        LOGIN_URL = synBioHubBaseUrl.concat("login");
-        USER_API = synBioHubBaseUrl.concat("users");
-        SUBMIT_URL = synBioHubBaseUrl.concat("submit");
-    }
+    }*/
 
     protected HttpHeaders createHeaders(String username, String password) {
         return new HttpHeaders() {{

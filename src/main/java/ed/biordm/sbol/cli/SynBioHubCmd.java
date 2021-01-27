@@ -16,6 +16,7 @@ import ed.biordm.sbol.service.SynBioHubClientServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -74,8 +75,11 @@ public class SynBioHubCmd implements Callable<Integer> {
         LOGGER.debug("Specified server URL: {}", serverUrl);
         if(!serverUrl.equals(synBioHubClientService.getServerUrl())) {
             LOGGER.debug("Setting new server URL");
+
+            RestTemplateBuilder restTemplateBuilder = new RestTemplateBuilder();
+            restTemplateBuilder = restTemplateBuilder.rootUri(serverUrl);
             // synBioHubClientService.setServerUrl(serverUrl);
-            synBioHubClientService = new SynBioHubClientServiceImpl(synBioHubClientService, serverUrl);
+            synBioHubClientService = new SynBioHubClientServiceImpl(restTemplateBuilder, serverUrl);
         }
 
         synBioHubClientService.submitSBOLFiles(username, new String(password),

@@ -18,6 +18,8 @@ import org.springframework.boot.ExitCodeGenerator;
 import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import picocli.CommandLine;
 import picocli.CommandLine.IFactory;
@@ -113,10 +115,13 @@ public class SynBioHubClientCmdRunner implements CommandLineRunner, ExitCodeGene
         return builder.build();
     }*/
 
-    /* @Bean
+    @Bean
     public RestTemplateBuilder restTemplateBuilder() {
-        return new RestTemplateBuilder();
-    } */
+        RestTemplateBuilder restTemplateBuilder = new RestTemplateBuilder();
+        // RestTemplateBuilder restTemplateBuilder = RestTemplateBuilder.rootUri("http://localhost:7777");
+        restTemplateBuilder = restTemplateBuilder.rootUri("http://localhost:7777");
+        return restTemplateBuilder;
+    }
 
     /*@Bean
     public SynBioHubClientService synBioHubClientService() {
