@@ -35,7 +35,8 @@ public class SynBioHubClientServiceImplTest {
     @Autowired
     private SynBioHubClientService synBioHubClientService;
 
-    String dirPath = "D://temp//sbol";
+    // String dirPath = "D://temp//sbol";
+    String dirPath = "D://temp//sbol//codA_Km_0081_slr1130.xml";
     String fileExtFilter = "xml";
     String email = "j.hay@epcc.ed.ac.uk";
     String password = "mysupersecretpassword";

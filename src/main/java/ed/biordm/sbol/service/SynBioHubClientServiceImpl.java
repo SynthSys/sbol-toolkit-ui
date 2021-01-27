@@ -243,28 +243,33 @@ public class SynBioHubClientServiceImpl implements SynBioHubClientService {
      * @return  
      */
     protected List<String> retrieveFiles(String dirPath, String fileExtFilter) {
-        // File directory = new File(dirPath);
+        File directory = new File(dirPath);
+
         List<String> fileNamesList = new ArrayList<>();
 
-        Predicate<String> fileExtCondition = (String filename) -> {
-            if (filename.toLowerCase().endsWith(".".concat(fileExtFilter))) {
-                return true;
+        if (directory.isFile()) {
+            fileNamesList.add(dirPath);
+        } else {
+            Predicate<String> fileExtCondition = (String filename) -> {
+                if (filename.toLowerCase().endsWith(".".concat(fileExtFilter))) {
+                    return true;
+                }
+                return false;
+            };
+
+            // Reading the folder and getting Stream.
+            try (Stream<Path> walk = Files.walk(Paths.get(dirPath))) {
+
+                // Filtering the paths by a regular file and adding into a list.
+                fileNamesList = walk.filter(Files::isRegularFile)
+                        .map(x -> x.toString()).filter(fileExtCondition)
+                        .collect(Collectors.toList());
+
+                // printing the file nams
+                //fileNamesList.forEach(System.out::println);
+            } catch (IOException e) {
+                LOGGER.error("Error locating files for upload", e);
             }
-            return false;
-        };
-
-        // Reading the folder and getting Stream.
-        try (Stream<Path> walk = Files.walk(Paths.get(dirPath))) {
-
-            // Filtering the paths by a regular file and adding into a list.
-            fileNamesList = walk.filter(Files::isRegularFile)
-                    .map(x -> x.toString()).filter(fileExtCondition)
-                    .collect(Collectors.toList());
-
-            // printing the file nams
-            //fileNamesList.forEach(System.out::println);
-        } catch (IOException e) {
-            LOGGER.error("Error locating files for upload", e);
         }
 
         return fileNamesList;
