@@ -19,9 +19,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestTemplate;
 import picocli.CommandLine.ArgGroup;
 
-@Component
+// @Component
 @Command(name = "synBioHubCmd", mixinStandardHelpOptions = true, version = "1.0")
 public class SynBioHubCmd implements Callable<Integer> {
 
@@ -29,6 +30,14 @@ public class SynBioHubCmd implements Callable<Integer> {
 
     @Autowired
     private SynBioHubClientService synBioHubClientService;
+
+    public void setSynBioHubClientService(SynBioHubClientService synBioHubClientService) {
+        this.synBioHubClientService = synBioHubClientService;
+    }
+
+    public SynBioHubClientService getSynBioHubClientService() {
+        return synBioHubClientService;
+    }
 
     private static final String CWD = System.getProperty("user.dir");
 
@@ -104,7 +113,12 @@ public class SynBioHubCmd implements Callable<Integer> {
                 RestTemplateBuilder restTemplateBuilder = new RestTemplateBuilder();
                 restTemplateBuilder = restTemplateBuilder.rootUri(exclusiveURLArgs.serverUrl);
                 // synBioHubClientService.setServerUrl(serverUrl);
-                synBioHubClientService = new SynBioHubClientServiceImpl(restTemplateBuilder, exclusiveURLArgs.serverUrl);
+                synBioHubClientService = new SynBioHubClientServiceImpl();
+                synBioHubClientService.setServerUrl(exclusiveURLArgs.serverUrl);
+                synBioHubClientService.setRestTemplateBuilder(restTemplateBuilder);
+                RestTemplate restTemplate = restTemplateBuilder.build();
+                synBioHubClientService.setRestTemplateBuilder(restTemplateBuilder);
+                synBioHubClientService.setRestTemplate(restTemplate);
             }
 
             synBioHubClientService.submitSBOLFiles(username, new String(password),
@@ -125,7 +139,12 @@ public class SynBioHubCmd implements Callable<Integer> {
                 RestTemplateBuilder restTemplateBuilder = new RestTemplateBuilder();
                 restTemplateBuilder = restTemplateBuilder.rootUri(collServerUrl);
                 // synBioHubClientService.setServerUrl(serverUrl);
-                synBioHubClientService = new SynBioHubClientServiceImpl(restTemplateBuilder, collServerUrl);
+                synBioHubClientService = new SynBioHubClientServiceImpl();
+                synBioHubClientService.setServerUrl(collServerUrl);
+                synBioHubClientService.setRestTemplateBuilder(restTemplateBuilder);
+                RestTemplate restTemplate = restTemplateBuilder.build();
+                synBioHubClientService.setRestTemplateBuilder(restTemplateBuilder);
+                synBioHubClientService.setRestTemplate(restTemplate);
             }
 
             synBioHubClientService.submitSBOLFiles(username, new String(password),

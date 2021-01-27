@@ -5,6 +5,8 @@
  */
 package ed.biordm.sbol.cli;
 
+import ed.biordm.sbol.service.SynBioHubClientService;
+import ed.biordm.sbol.service.SynBioHubClientServiceImpl;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -12,7 +14,7 @@ import java.util.Arrays;
 import java.util.Properties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.ExitCodeGenerator;
 import org.springframework.boot.WebApplicationType;
@@ -21,6 +23,7 @@ import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.web.client.RestTemplate;
 import picocli.CommandLine;
 import picocli.CommandLine.IFactory;
 
@@ -33,21 +36,31 @@ import picocli.CommandLine.IFactory;
  */
 @SpringBootApplication
 // @ComponentScan({ "ed.biordm.sbol.cli", "ed.biordm.sbol.service", "ed.biordm.sbol.web" })
-@ComponentScan({ "ed.biordm.sbol.cli", "ed.biordm.sbol.service" })
+//@ComponentScan(basePackages={ "ed.biordm.sbol.cli", "ed.biordm.sbol.service" })
 // @ComponentScan({ "ed.biordm.sbol.cli"})
+// @ComponentScan({ "ed.biordm.sbol.service" })
 public class SynBioHubClientCmdRunner implements CommandLineRunner, ExitCodeGenerator {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SynBioHubClientCmdRunner.class);
 
-    private final IFactory factory;
+    @Autowired
+    private IFactory factory;
+
+    @Autowired
+    private SynBioHubClientService synBioHubClientService;
+
+    @Autowired
+    private CommandLine cmd;
+
+    /*private final IFactory factory;
     private final SynBioHubCmd synBioHubCmd; 
-    private final CommandLine cmd;
+    private final CommandLine cmd;*/
     private int exitCode;
 
     private String propertiesFilename;
 
     // constructor injection
-    SynBioHubClientCmdRunner(IFactory factory, SynBioHubCmd synBioHubCmd,
+    /*SynBioHubClientCmdRunner(IFactory factory, SynBioHubCmd synBioHubCmd,
             @Value("${synbiohub.cmd.properties}") String propertiesFilename) {
         this.factory = factory;
         this.synBioHubCmd = synBioHubCmd;
@@ -56,7 +69,7 @@ public class SynBioHubClientCmdRunner implements CommandLineRunner, ExitCodeGene
 
         Properties defaults = getProperties(this.propertiesFilename);
         this.cmd.setDefaultValueProvider(new SynBioHubCmdDefaultProvider(defaults));
-    }
+    }*/
 
     public static void main(String[] args) {
         System.out.println(Arrays.toString(args));
@@ -121,6 +134,27 @@ public class SynBioHubClientCmdRunner implements CommandLineRunner, ExitCodeGene
         // RestTemplateBuilder restTemplateBuilder = RestTemplateBuilder.rootUri("http://localhost:7777");
         restTemplateBuilder = restTemplateBuilder.rootUri("http://localhost:7777");
         return restTemplateBuilder;
+    }
+
+    @Bean
+    public RestTemplate restTemplate() {
+        RestTemplateBuilder restTemplateBuilder = new RestTemplateBuilder();
+        // RestTemplateBuilder restTemplateBuilder = RestTemplateBuilder.rootUri("http://localhost:7777");
+        restTemplateBuilder = restTemplateBuilder.rootUri("http://localhost:7777");
+        return restTemplateBuilder.build();
+    }
+
+    @Bean
+    public SynBioHubClientService synBioHubClientService() {
+        return new SynBioHubClientServiceImpl();
+    }
+
+    @Bean
+    public CommandLine cmd() {
+        SynBioHubCmd synBioHubCmd = new SynBioHubCmd();
+        synBioHubCmd.setSynBioHubClientService(synBioHubClientService);
+        cmd = new CommandLine(synBioHubCmd, this.factory);
+        return cmd;
     }
 
     /*@Bean

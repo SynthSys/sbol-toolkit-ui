@@ -8,6 +8,7 @@ package ed.biordm.sbol.service;
 import java.net.URI;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.HttpHeaders;
+import org.springframework.web.client.RestTemplate;
 
 /**
  *
@@ -17,11 +18,18 @@ public interface SynBioHubClientService {
 
     String getServerUrl();
 
+    void setServerUrl(String synBioHubBaseUrl);
+
+    RestTemplateBuilder getRestTemplateBuilder();
+
+    void setRestTemplateBuilder(RestTemplateBuilder restTemplateBuilder);
+
+    RestTemplate getRestTemplate();
+
+    void setRestTemplate(RestTemplate restTemplate);
     /*void setServerUrl(String synBioHubBaseUrl);
 
     RestTemplate getRestTemplate();*/
-
-    RestTemplateBuilder getRestTemplateBuilder();
 
     HttpHeaders doLogin(String email, String password);
 

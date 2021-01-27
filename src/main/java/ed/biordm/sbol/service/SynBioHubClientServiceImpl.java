@@ -46,15 +46,17 @@ import org.springframework.web.server.ResponseStatusException;
  *
  * @author jhay
  */
-@Service("synBioHubClientService")
+//@Service("synBioHubClientService")
+// @Service
 public class SynBioHubClientServiceImpl implements SynBioHubClientService {
     // private static final ch.qos.logback.classic.Logger LOGGER = (ch.qos.logback.classic.Logger) LoggerFactory.getLogger(SynBioHubClientServiceImpl.class);
     private static final Logger LOGGER = LoggerFactory.getLogger(SynBioHubClientServiceImpl.class);
 
-    // @Autowired
-    private final RestTemplate restTemplate;
+    @Autowired
+    private RestTemplate restTemplate;
 
-    private final RestTemplateBuilder restTemplateBuilder;
+    @Autowired
+    private RestTemplateBuilder restTemplateBuilder;
 
     /*@Value("${synbiohub.client.user}")
     private String synBioHubUser;
@@ -65,7 +67,7 @@ public class SynBioHubClientServiceImpl implements SynBioHubClientService {
     @Value("${synbiohub.client.pass}")
     private String synBioHubPass;*/
 
-    private final String synBioHubBaseUrl;
+    private String synBioHubBaseUrl;
 
     private final String LOGIN_URL = "/login";
     private final String USER_API = "/user";
@@ -79,6 +81,11 @@ public class SynBioHubClientServiceImpl implements SynBioHubClientService {
     @Override
     public String getServerUrl() {
         return this.synBioHubBaseUrl;
+    }
+
+    @Override
+    public void setServerUrl(String synBioHubBaseUrl) {
+        this.synBioHubBaseUrl = synBioHubBaseUrl;
     }
 
     /* @Override
@@ -96,16 +103,16 @@ public class SynBioHubClientServiceImpl implements SynBioHubClientService {
         this.synBioHubBaseUrl = synBioHubBaseUrl;
     }*/
 
-    @Autowired
-    public SynBioHubClientServiceImpl(RestTemplateBuilder restTemplateBuilder,
-            @Value("${synbiohub.client.baseUrl}") String synBioHubBaseUrl) {
+    // @Autowired
+    /*public SynBioHubClientServiceImpl(RestTemplateBuilder restTemplateBuilder) {
+        // , @Value("${synbiohub.client.baseUrl}") String synBioHubBaseUrl) {
         System.out.println("Service is init'd!");
-        System.out.println(synBioHubBaseUrl);
+        // System.out.println(synBioHubBaseUrl);
         this.restTemplateBuilder = restTemplateBuilder;
         this.restTemplate = this.restTemplateBuilder.build();
 
-        this.synBioHubBaseUrl = synBioHubBaseUrl;
-    }
+        // this.synBioHubBaseUrl = synBioHubBaseUrl;
+    }*/
 
     // Overloaded constructor to allow a new service impl to be instantiated
     // if the specified server URL is different than the autowired default
@@ -446,5 +453,20 @@ public class SynBioHubClientServiceImpl implements SynBioHubClientService {
         }
         
         return fileBytes;
+    }
+
+    @Override
+    public void setRestTemplateBuilder(RestTemplateBuilder restTemplateBuilder) {
+        this.restTemplateBuilder = restTemplateBuilder;
+    }
+
+    @Override
+    public RestTemplate getRestTemplate() {
+        return this.restTemplate;
+    }
+
+    @Override
+    public void setRestTemplate(RestTemplate restTemplate) {
+        this.restTemplate = restTemplate;
     }
 }
