@@ -32,11 +32,13 @@ public class SynBioHubClientServiceImplTest {
     static class SynBioHubClientServiceImplTestContextConfiguration {
  
         @Bean
-        public SynBioHubClientServiceImpl synBioHubClientService() {
+        public SynBioHubClientService synBioHubClientService() {
             RestTemplateBuilder restTemplateBuilder = new RestTemplateBuilder();
             String url = "http://localhost:7777";
             restTemplateBuilder = restTemplateBuilder.rootUri(url);
-            return new SynBioHubClientServiceImpl(restTemplateBuilder, url);
+            SynBioHubClientService synBioHubClientService = new SynBioHubClientServiceImpl();
+            synBioHubClientService.setServerUrl(url);
+            return synBioHubClientService;
         }
     }
 

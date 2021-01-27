@@ -35,9 +35,11 @@ public class SynBioHubClientServiceImplIT {
         RestTemplateBuilder restTemplateBuilder = new RestTemplateBuilder();
 
         @Bean
-        public SynBioHubClientServiceImpl synBioHubClientService() {           
+        public SynBioHubClientService synBioHubClientService() {           
             String url = "http://localhost:7777";
-            return new SynBioHubClientServiceImpl(restTemplateBuilder, url);
+            SynBioHubClientService synBioHubClientService = new SynBioHubClientServiceImpl();
+            synBioHubClientService.setServerUrl(url);
+            return synBioHubClientService;
         }
 
         @Bean
