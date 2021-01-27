@@ -116,6 +116,52 @@ public class SynBioHubCmdTest {
         assertEquals("", sw.toString());
     }
 
+    @Test
+    public void testExistingCollectionArgs() {
+        StringWriter sw = new StringWriter();
+        cmd.setOut(new PrintWriter(sw));
+
+        System.out.println(synBioHubClientService == null);
+        // String[] userArgs = { "--username", "johnnyH" };
+        String[] userArgs = { "--username", "j.hay@epcc.ed.ac.uk" };
+        // String[] passwordArgs = { "--password", "mysupersecurepassword" };
+        String[] passwordArgs = { "--password", "admin" };
+        String[] collectionIdArgs = { "--collection-url", "http://localhost:7777/user/Johnny/a_random_id/a_random_id_collection/1" };
+        String[] dirPathArgs = { "--dir-path", "D://Temp//sbol//codA_Km_0081_slr1130.xml" };
+        String[] fileExtFilterArgs = { "--file-ext-filter", "xml" };
+        String[] overwriteArgs = { "--overwrite", "true" };
+
+        String[] allArgs = Stream.of(userArgs,
+                passwordArgs, collectionIdArgs, dirPathArgs, fileExtFilterArgs,
+                overwriteArgs).flatMap(Stream::of).toArray(String[]::new);
+
+        cmd.execute(allArgs);
+        assertEquals("", sw.toString());
+    }
+
+    @Test
+    public void testNewCollectionArgs() {
+        StringWriter sw = new StringWriter();
+        cmd.setOut(new PrintWriter(sw));
+
+        System.out.println(synBioHubClientService == null);
+        // String[] userArgs = { "--username", "johnnyH" };
+        String[] userArgs = { "--username", "j.hay@epcc.ed.ac.uk" };
+        // String[] passwordArgs = { "--password", "mysupersecurepassword" };
+        String[] passwordArgs = { "--password", "admin" };
+        String[] collectionIdArgs = { "--collection-name", "Johnny New Random Collection" };
+        String[] serverUrlArgs = { "--server-url", "http://localhost:7777" };
+        String[] dirPathArgs = { "--dir-path", "D://temp//sbol//codA_Km_0081_slr1130.xml" };
+        String[] fileExtFilterArgs = { "--file-ext-filter", "xml" };
+        String[] overwriteArgs = { "--overwrite", "true" };
+        String[] allArgs = Stream.of(userArgs, passwordArgs, collectionIdArgs,
+                serverUrlArgs, dirPathArgs, fileExtFilterArgs, overwriteArgs)
+                .flatMap(Stream::of).toArray(String[]::new);
+
+        cmd.execute(allArgs);
+        assertEquals("", sw.toString());
+    }
+
     /*@Test
     public void whiteBoxTest() {
 

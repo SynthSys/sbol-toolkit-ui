@@ -9,17 +9,17 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
-import static java.util.Arrays.asList;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Predicate;
-import java.util.logging.Level;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -189,7 +189,49 @@ public class SynBioHubClientServiceImpl implements SynBioHubClientService {
     }
 
     @Override
-    public void submitSBOLFiles(String email, String password, String collectionUrl,
+    public void submitSBOLFiles(String email, String password, String collectionName,
+            String dirPath, String fileExtFilter, boolean isOverwrite) throws Exception {
+        LOGGER.debug("Email is: {}", email);
+        LOGGER.debug("Password is: {}", password);
+        LOGGER.debug("Collection Name is: {}", collectionName);
+        LOGGER.debug("Directory path is: {}", dirPath);
+        LOGGER.debug("File extension filter is: {}", fileExtFilter);
+        LOGGER.debug("Overwrite is: {}", isOverwrite);
+
+ 
+        /*if(!headers.containsKey("Authorization")) {
+            doLogin(username, password);
+        }*/
+        HttpHeaders authHeaders = doLogin(email, password);
+
+        // SynBioHubClientUploader uploader = new SynBioHubClientUploader();
+        List<String> fileNamesList = retrieveFiles(dirPath, fileExtFilter);
+
+        int overwriteMerge = Integer.MAX_VALUE;
+        if (isOverwrite) {
+            overwriteMerge = 0;
+        } else {
+            overwriteMerge = 1;
+        }
+
+        for (String filename: fileNamesList) {
+            LOGGER.debug("Current file for upload: {}", filename);
+
+            uploadFileToNewCollection(authHeaders, filename, overwriteMerge,
+                    collectionName);
+        }
+        /*SimpleMailMessage message = new SimpleMailMessage(); // create message
+        message.setFrom(NOREPLY_ADDRESS);                    // compose message
+        for (String recipient : to) { message.setTo(recipient); }
+        message.setSubject(subject);
+        message.setText(text);
+        emailSender.send(message);                           // send message
+        */
+        //LOGGER.info("Mail to {} sent! Subject: {}, Body: {}", to, subject, text); 
+    }
+
+    @Override
+    public void submitSBOLFiles(String email, String password, URI collectionUrl,
             String dirPath, String fileExtFilter, boolean isOverwrite) throws Exception {
         LOGGER.debug("Email is: {}", email);
         LOGGER.debug("Password is: {}", password);
@@ -293,28 +335,29 @@ public class SynBioHubClientServiceImpl implements SynBioHubClientService {
     }*/
 
     /**
-     *
+     * 
      * @param headers
      * @param filename
-     * @param id
-     * @param version
-     * @param name
-     * @param description
-     * @param citations
+     * @param collectionName
      * @param overwriteMerge
-     * @return
+     * @return 
      */
-    protected boolean uploadFileToNewCollection(HttpHeaders headers, String filename, String id,
-            long version, String name, String description, String citations,
-            int overwriteMerge) {
+    protected boolean uploadFileToNewCollection(HttpHeaders headers,
+            String filename, int overwriteMerge, String collectionName) {
         boolean success = false;
 
+        String collId = collectionName.replace(" ", "");
+        String collVersion = "1.0";
+        String collDesc = "";   // is a required parameter
+        collDesc = collectionName;
+        String collCitations = "";
+
         MultiValueMap<String, Object> requestMap = new LinkedMultiValueMap<>();
-        requestMap.add("id", id);
-        requestMap.add("version", version);
-        requestMap.add("name", name);
-        requestMap.add("description", description);
-        requestMap.add("citations", citations);
+        requestMap.add("id", collId);
+        requestMap.add("version", collVersion);
+        requestMap.add("name", collectionName);
+        requestMap.add("description", collDesc);
+        requestMap.add("citations", collCitations);
         requestMap.add("overwrite_merge", overwriteMerge);
 
         return uploadFile(headers, filename, requestMap);
@@ -329,13 +372,13 @@ public class SynBioHubClientServiceImpl implements SynBioHubClientService {
      * @return
      */
     protected boolean uploadFileToExistingCollection(HttpHeaders headers,
-            String filename, int overwriteMerge, String collectionUrl) {
+            String filename, int overwriteMerge, URI collectionUrl) throws MalformedURLException {
         boolean success = false;
 
         MultiValueMap<String, Object> requestMap = new LinkedMultiValueMap<>();
         // requestMap.add("user-file", partsEntity);
         requestMap.add("overwrite_merge", overwriteMerge);
-        requestMap.add("rootCollections", collectionUrl);
+        requestMap.add("rootCollections", collectionUrl.toURL().toString());
 
         return uploadFile(headers, filename, requestMap);
     }

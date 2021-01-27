@@ -13,11 +13,13 @@ import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 import ed.biordm.sbol.service.SynBioHubClientService;
 import ed.biordm.sbol.service.SynBioHubClientServiceImpl;
+import java.net.URI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.stereotype.Component;
+import picocli.CommandLine.ArgGroup;
 
 @Component
 @Command(name = "synBioHubCmd", mixinStandardHelpOptions = true, version = "1.0")
@@ -39,11 +41,14 @@ public class SynBioHubCmd implements Callable<Integer> {
     @Option(names = {"-p", "--password"}, description = "Passphrase", interactive = true, arity = "0..1", required = true)
     char[] password;
 
-    @Option(names = {"-c", "--collection-url"}, description = "Collection URL to deposit into", interactive = true, arity = "0..1", required = true)
-    String collectionUrl;
+    @ArgGroup(exclusive = true, multiplicity = "1")
+    ExclusiveURLArgs exclusiveURLArgs;
 
-    @Option(names = {"-s", "--server-url"}, description = "Base URL of SynBioHub API target. Default value is ${DEFAULT-VALUE}", descriptionKey="serverUrl", interactive = true, arity = "0..1", required = false)
-    String serverUrl;
+    /* @ArgGroup(exclusive = false)
+    DependentURLArgs dependentURLArgs; */
+
+    @Option(names = {"-n", "--collection-name"}, description = "Name for the new collection", descriptionKey="collectionName", interactive = true, arity = "0..1", required = false)
+    String collectionName;
 
     @Option(names = {"-d", "--dir-path"}, description = "Directory path to the folder containing the SBOL files to submit. Default value is ${DEFAULT-VALUE}", descriptionKey="dirPath", interactive = true, arity = "0..1", required = false)
     String dirPath;
@@ -57,6 +62,22 @@ public class SynBioHubCmd implements Callable<Integer> {
     /*@Autowired
     public SynBioHubCmd(@Value("${synBioHubClientService}") SynBioHubClientService synBioHubClientService) {
         
+    }*/
+
+    static class ExclusiveURLArgs {
+        @Option(names = {"-c", "--collection-url"}, description = "Collection URL to deposit into", descriptionKey = "collectionUrl", interactive = true, arity = "0..1", required = true)
+        String collectionUrl;
+
+        @Option(names = {"-s", "--server-url"}, description = "Base URL of SynBioHub API target. Default value is ${DEFAULT-VALUE}", descriptionKey="serverUrl", interactive = true, arity = "0..1", required = true)
+        String serverUrl;
+    }
+
+    /*static class DependentURLArgs {
+        @Option(names = {"-s", "--server-url"}, description = "Base URL of SynBioHub API target. Default value is ${DEFAULT-VALUE}", descriptionKey="serverUrl", interactive = true, arity = "0..1", required = true)
+        String serverUrl;
+
+        @Option(names = {"-n", "--collection-name"}, description = "Name for the new collection", descriptionKey="collectionName", interactive = true, arity = "0..1", required = true)
+        String collectionName;
     }*/
     
     public Integer call() throws Exception {
@@ -72,18 +93,44 @@ public class SynBioHubCmd implements Callable<Integer> {
 
         LOGGER.debug("SynBioHubClientService failed to initialise: {}", synBioHubClientService == null);
 
-        LOGGER.debug("Specified server URL: {}", serverUrl);
-        if(!serverUrl.equals(synBioHubClientService.getServerUrl())) {
-            LOGGER.debug("Setting new server URL");
+        LOGGER.debug("Specified server URL: {}", exclusiveURLArgs.serverUrl);
+        LOGGER.debug("Specified collection URL: {}", exclusiveURLArgs.collectionUrl);
 
-            RestTemplateBuilder restTemplateBuilder = new RestTemplateBuilder();
-            restTemplateBuilder = restTemplateBuilder.rootUri(serverUrl);
-            // synBioHubClientService.setServerUrl(serverUrl);
-            synBioHubClientService = new SynBioHubClientServiceImpl(restTemplateBuilder, serverUrl);
+        if(exclusiveURLArgs.serverUrl != null) {
+            LOGGER.debug("Specified Collection Name: {}", collectionName);
+            if(!exclusiveURLArgs.serverUrl.equals(synBioHubClientService.getServerUrl())) {
+                LOGGER.debug("Setting new server URL");
+
+                RestTemplateBuilder restTemplateBuilder = new RestTemplateBuilder();
+                restTemplateBuilder = restTemplateBuilder.rootUri(exclusiveURLArgs.serverUrl);
+                // synBioHubClientService.setServerUrl(serverUrl);
+                synBioHubClientService = new SynBioHubClientServiceImpl(restTemplateBuilder, exclusiveURLArgs.serverUrl);
+            }
+
+            synBioHubClientService.submitSBOLFiles(username, new String(password),
+                collectionName, dirPath, fileExtFilter, overwrite);
+        } else if(exclusiveURLArgs.collectionUrl != null) {
+            URI collectionUri = new URI(exclusiveURLArgs.collectionUrl);
+            String scheme = collectionUri.getScheme();
+            String domain = collectionUri.getHost();
+            int port = collectionUri.getPort();
+            String collServerUrl = scheme.concat("://").concat(domain);
+
+            if (port > 0) {
+                collServerUrl = collServerUrl.concat(":").concat(String.valueOf(port));
+            }
+            if(!collServerUrl.equals(synBioHubClientService.getServerUrl())) {
+                LOGGER.debug("Setting new server URL");
+
+                RestTemplateBuilder restTemplateBuilder = new RestTemplateBuilder();
+                restTemplateBuilder = restTemplateBuilder.rootUri(collServerUrl);
+                // synBioHubClientService.setServerUrl(serverUrl);
+                synBioHubClientService = new SynBioHubClientServiceImpl(restTemplateBuilder, collServerUrl);
+            }
+
+            synBioHubClientService.submitSBOLFiles(username, new String(password),
+                collectionUri, dirPath, fileExtFilter, overwrite);
         }
-
-        synBioHubClientService.submitSBOLFiles(username, new String(password),
-                collectionUrl, dirPath, fileExtFilter, overwrite);
 
         // null out the arrays when done
         Arrays.fill(bytes, (byte) 0);

@@ -5,6 +5,7 @@
  */
 package ed.biordm.sbol.service;
 
+import java.net.URI;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.HttpHeaders;
 
@@ -24,6 +25,9 @@ public interface SynBioHubClientService {
 
     HttpHeaders doLogin(String email, String password);
 
-    void submitSBOLFiles(String email, String password, String collectionUrl,
+    void submitSBOLFiles(String email, String password, String collectionName,
+            String dirPath, String fileExtFilter, boolean isOverwrite) throws Exception;
+
+    void submitSBOLFiles(String email, String password, URI collectionUrl,
             String dirPath, String fileExtFilter, boolean isOverwrite) throws Exception;
 }
