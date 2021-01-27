@@ -18,3 +18,13 @@ docker run -d --name synbiohub --link my-virtuoso:virtuoso -p 7777:7777 --entryp
 2. In the setup form, change the Virtuoso config fields as follows (these correspond to the volumes we mounted in the Virtuoso Docker run command above):
   * virtuoso.ini = /data/virtuoso.ini
   * virtuoso data = /data
+
+## Building the CLI Application
+
+In NetBeans, right-click on the project in the Projects explorer window, and select 'Set Configuration' -> 'cli' from the context menu.
+
+## Launching the CLI Application
+
+```
+java -jar target/sbol-toolkit-web-1.0.0-SNAPSHOT.war --collection-url=http://localhost:7777/user/Johnny/a_random_id/a_random_id_collection/1 --username=<email> password=<password>
+```
