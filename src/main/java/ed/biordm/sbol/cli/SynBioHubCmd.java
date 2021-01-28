@@ -14,11 +14,11 @@ import picocli.CommandLine.Option;
 import ed.biordm.sbol.service.SynBioHubClientService;
 import ed.biordm.sbol.service.SynBioHubClientServiceImpl;
 import java.net.URI;
+import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.client.RestTemplateBuilder;
-import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 import picocli.CommandLine.ArgGroup;
 
@@ -40,18 +40,20 @@ public class SynBioHubCmd implements Callable<Integer> {
     }
 
     private static final String CWD = System.getProperty("user.dir");
+    
+    private static final Pattern Y_N_PATTERN = Pattern.compile("[Y|N]{1}");
 
     // @Option(names = {"-u", "--username"}, description = "Username", interactive = true, required = true)
     // char[] username;
 
-    @Option(names = {"-u", "--username"}, description = "Username", interactive = true, arity = "0..1", required = true)
+    @Option(names = {"-u", "--username"}, description = "Username", interactive = true, arity = "0..1"/*, required = true*/)
     String username;
 
-    @Option(names = {"-p", "--password"}, description = "Passphrase", interactive = true, arity = "0..1", required = true)
+    @Option(names = {"-p", "--password"}, description = "Passphrase", interactive = true, arity = "0..1"/*, required = true*/)
     char[] password;
 
-    @ArgGroup(exclusive = true, multiplicity = "1")
-    ExclusiveURLArgs exclusiveURLArgs;
+    @ArgGroup(exclusive = true/*, multiplicity = "1"*/)
+    ExclusiveURLArgs exclusiveUrlArgs;
 
     /* @ArgGroup(exclusive = false)
     DependentURLArgs dependentURLArgs; */
@@ -91,6 +93,8 @@ public class SynBioHubCmd implements Callable<Integer> {
     
     public Integer call() throws Exception {
         LOGGER.info("synBioHubCmd was called with --username={}", username);
+
+        verifyInput();
         
         byte[] bytes = new byte[password.length];
         for (int i = 0; i < bytes.length; i++) { bytes[i] = (byte) password[i]; }
@@ -102,19 +106,19 @@ public class SynBioHubCmd implements Callable<Integer> {
 
         LOGGER.debug("SynBioHubClientService failed to initialise: {}", synBioHubClientService == null);
 
-        LOGGER.debug("Specified server URL: {}", exclusiveURLArgs.serverUrl);
-        LOGGER.debug("Specified collection URL: {}", exclusiveURLArgs.collectionUrl);
+        LOGGER.debug("Specified server URL: {}", exclusiveUrlArgs.serverUrl);
+        LOGGER.debug("Specified collection URL: {}", exclusiveUrlArgs.collectionUrl);
 
-        if(exclusiveURLArgs.serverUrl != null) {
+        if(exclusiveUrlArgs.serverUrl != null) {
             LOGGER.debug("Specified Collection Name: {}", collectionName);
-            if(!exclusiveURLArgs.serverUrl.equals(synBioHubClientService.getServerUrl())) {
+            if(!exclusiveUrlArgs.serverUrl.equals(synBioHubClientService.getServerUrl())) {
                 LOGGER.debug("Setting new server URL");
 
                 RestTemplateBuilder restTemplateBuilder = new RestTemplateBuilder();
-                restTemplateBuilder = restTemplateBuilder.rootUri(exclusiveURLArgs.serverUrl);
+                restTemplateBuilder = restTemplateBuilder.rootUri(exclusiveUrlArgs.serverUrl);
                 // synBioHubClientService.setServerUrl(serverUrl);
                 synBioHubClientService = new SynBioHubClientServiceImpl();
-                synBioHubClientService.setServerUrl(exclusiveURLArgs.serverUrl);
+                synBioHubClientService.setServerUrl(exclusiveUrlArgs.serverUrl);
                 synBioHubClientService.setRestTemplateBuilder(restTemplateBuilder);
                 RestTemplate restTemplate = restTemplateBuilder.build();
                 synBioHubClientService.setRestTemplate(restTemplate);
@@ -122,8 +126,8 @@ public class SynBioHubCmd implements Callable<Integer> {
 
             synBioHubClientService.submitSBOLFiles(username, new String(password),
                 collectionName, dirPath, fileExtFilter, overwrite);
-        } else if(exclusiveURLArgs.collectionUrl != null) {
-            URI collectionUri = new URI(exclusiveURLArgs.collectionUrl);
+        } else if(exclusiveUrlArgs.collectionUrl != null) {
+            URI collectionUri = new URI(exclusiveUrlArgs.collectionUrl);
             String scheme = collectionUri.getScheme();
             String domain = collectionUri.getHost();
             int port = collectionUri.getPort();
@@ -154,5 +158,43 @@ public class SynBioHubCmd implements Callable<Integer> {
         Arrays.fill(password, ' ');
 
         return 0;
+    }
+
+    protected boolean verifyInput() {
+        if (username == null) {
+            username = new String(System.console().readLine("Please enter your SynBioHub username (email address): "));
+        }
+
+        if (password == null) {
+            password = System.console().readPassword("Please enter your SynBioHub password: ");
+        }
+
+        if (exclusiveUrlArgs == null) {
+            exclusiveUrlArgs = new ExclusiveURLArgs();
+        }
+
+        if (exclusiveUrlArgs.collectionUrl == null && exclusiveUrlArgs.serverUrl == null) {
+            String response = new String(System.console().readLine("Do you want to upload SBOL files to an existing collection [Y | N]: ")).trim();
+
+            while(!Y_N_PATTERN.matcher(response).matches()) {
+                response = new String(System.console().readLine("Do you want to upload SBOL files to an existing collection [Y | N]: ")).trim();
+            }
+
+            if(response.equals("Y")) {
+                exclusiveUrlArgs.collectionUrl = new String(System.console().readLine("Please enter the URL of the collection you wish to upload to: "));
+            } else {
+                exclusiveUrlArgs.serverUrl = new String(System.console().readLine("Please enter the URL of the SynBioHub server you wish to upload to: "));
+
+                if (collectionName == null) {
+                    collectionName = new String(System.console().readLine("Please enter a name for the new collection to create: "));
+                }
+            }
+        }
+
+        if (dirPath == null) {
+            dirPath = new String(System.console().readLine("Please enter the path to the directory or SBOL file you wish to upload: "));
+        }
+
+        return true;
     }
 }

@@ -10,11 +10,15 @@ import ed.biordm.sbol.service.SynBioHubClientServiceImpl;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.Arrays;
+import java.util.Enumeration;
 import java.util.Properties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.ExitCodeGenerator;
 import org.springframework.boot.WebApplicationType;
@@ -22,7 +26,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.web.client.RestTemplate;
 import picocli.CommandLine;
 import picocli.CommandLine.IFactory;
@@ -57,6 +60,7 @@ public class SynBioHubClientCmdRunner implements CommandLineRunner, ExitCodeGene
     private final CommandLine cmd;*/
     private int exitCode;
 
+    @Value("${synbiohub.cmd.properties}")
     private String propertiesFilename;
 
     // constructor injection
@@ -72,7 +76,6 @@ public class SynBioHubClientCmdRunner implements CommandLineRunner, ExitCodeGene
     }*/
 
     public static void main(String[] args) {
-        System.out.println(Arrays.toString(args));
         new SpringApplicationBuilder(SynBioHubClientCmdRunner.class).web(WebApplicationType.NONE).run(args);
     }
 
@@ -80,6 +83,11 @@ public class SynBioHubClientCmdRunner implements CommandLineRunner, ExitCodeGene
     public void run(String... args) throws Exception {
         LOGGER.debug("Running with args:");
         LOGGER.debug(Arrays.toString(args));
+
+        System.out.println(propertiesFilename);
+        Properties defaults = getProperties(this.propertiesFilename);
+        cmd.setDefaultValueProvider(new SynBioHubCmdDefaultProvider(defaults));
+
         // let picocli parse command line args and run the business logic
         exitCode = cmd.execute(args);
 
@@ -110,9 +118,11 @@ public class SynBioHubClientCmdRunner implements CommandLineRunner, ExitCodeGene
 
     protected static Properties getProperties(String propertiesFilename) {
         Properties prop = new Properties();
-        System.out.println(propertiesFilename);
  
-        try (InputStream stream = ClassLoader.getSystemResourceAsStream(propertiesFilename)) {
+        // printClassLoaderProps();
+        // ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+        // try (InputStream stream = classLoader.getSystemResourceAsStream(propertiesFilename)) {
+        try (InputStream stream = SynBioHubClientCmdRunner.class.getResourceAsStream(propertiesFilename)) {
             if (stream == null) {
                 throw new FileNotFoundException();
             }
@@ -123,6 +133,39 @@ public class SynBioHubClientCmdRunner implements CommandLineRunner, ExitCodeGene
         return prop;
     }
 
+    protected static void printClassLoaderProps() {
+        try {
+            SynBioHubClientCmdRunner runner = new SynBioHubClientCmdRunner();
+            Class clazz = runner.getClass();
+            ClassLoader cl = clazz.getClassLoader();
+            System.out.println("ClassLoader=" + cl);
+
+            // Where does the servlet itself live?
+            String resourceNameForClass = clazz.getName().replaceAll("\\.", "/") + ".class";
+            System.out.println("resourceNameForClass=" + resourceNameForClass);
+            for (Enumeration<URL> e = cl.getResources(resourceNameForClass); e.hasMoreElements();) {
+                System.out.println("resource=" + e.nextElement());
+            }
+
+            // What about a class that lives in a jar in WEB-INF/lib
+            clazz = Class.forName("org.slf4j.Logger");
+            resourceNameForClass = clazz.getName().replaceAll("\\.", "/") + ".class";
+            System.out.println("resourceNameForClass=" + resourceNameForClass);
+            for (Enumeration<URL> e = cl.getResources(resourceNameForClass); e.hasMoreElements();) {
+                System.out.println("resource=" + e.nextElement());
+            }
+
+            if (cl instanceof URLClassLoader) {
+                URLClassLoader ucl = (URLClassLoader) cl;
+                URL[] urls = ucl.getURLs();
+                for (int i = 0; i < urls.length; i++) {
+                    System.out.println("url[" + i + "]=" + urls[i]);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
     /*@Bean
     public RestTemplate restTemplate(RestTemplateBuilder builder) {
         return builder.build();
