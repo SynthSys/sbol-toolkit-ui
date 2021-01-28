@@ -10,8 +10,28 @@ import ed.biordm.sbol.service.SynBioHubClientServiceImpl;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Properties;
+import java.util.function.Supplier;
+import org.fusesource.jansi.AnsiConsole;
+import org.jline.console.SystemRegistry;
+import org.jline.console.impl.Builtins;
+import org.jline.console.impl.SystemRegistryImpl;
+import org.jline.keymap.KeyMap;
+import org.jline.reader.Binding;
+import org.jline.reader.EndOfFileException;
+import org.jline.reader.LineReader;
+import org.jline.reader.LineReaderBuilder;
+import org.jline.reader.MaskingCallback;
+import org.jline.reader.Parser;
+import org.jline.reader.Reference;
+import org.jline.reader.UserInterruptException;
+import org.jline.reader.impl.DefaultParser;
+import org.jline.terminal.Terminal;
+import org.jline.terminal.TerminalBuilder;
+import org.jline.widget.TailTipWidgets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,10 +42,11 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.web.client.RestTemplate;
 import picocli.CommandLine;
 import picocli.CommandLine.IFactory;
+import picocli.shell.jline3.PicocliCommands;
+import picocli.shell.jline3.PicocliCommands.PicocliCommandsFactory;
 
 
 /**
@@ -59,6 +80,7 @@ public class SynBioHubClientCmdRunner implements CommandLineRunner, ExitCodeGene
 
     private String propertiesFilename;
 
+    private static final boolean IS_TERMINAL_PROMPT = true;
     // constructor injection
     /*SynBioHubClientCmdRunner(IFactory factory, SynBioHubCmd synBioHubCmd,
             @Value("${synbiohub.cmd.properties}") String propertiesFilename) {
@@ -80,8 +102,17 @@ public class SynBioHubClientCmdRunner implements CommandLineRunner, ExitCodeGene
     public void run(String... args) throws Exception {
         LOGGER.debug("Running with args:");
         LOGGER.debug(Arrays.toString(args));
-        // let picocli parse command line args and run the business logic
-        exitCode = cmd.execute(args);
+        
+        if (IS_TERMINAL_PROMPT) {
+            // use jline3 to create an interactive terminal for the user
+            PicocliCommands picocliCommands = new PicocliCommands(cmd);
+            PicocliCommandsFactory cmdFactory = new PicocliCommandsFactory(factory);
+
+            runTerminal(picocliCommands, cmdFactory);
+        } else {
+            // let picocli parse command line args and run the business logic
+            exitCode = cmd.execute(args); 
+        }
 
         // From Apache Commons CLI...
         /*Option help = Option.builder("h").required(false).hasArg(false).longOpt("help").build();
@@ -161,4 +192,59 @@ public class SynBioHubClientCmdRunner implements CommandLineRunner, ExitCodeGene
     public SynBioHubClientService synBioHubClientService() {
         return new SynBioHubClientServiceImpl(new RestTemplateBuilder());
     }*/
+
+    protected void runTerminal(PicocliCommands picocliCommands,
+            PicocliCommandsFactory cmdFactory) throws Exception {
+        AnsiConsole.systemInstall();
+
+        Supplier<Path> workDir = () -> Paths.get(System.getProperty("user.dir"));
+        // set up JLine built-in commands
+        Builtins builtins = new Builtins(workDir, null, null);
+        builtins.rename(Builtins.Command.TTOP, "top");
+        builtins.alias("zle", "widget");
+        builtins.alias("bindkey", "keymap");
+
+        Parser parser = new DefaultParser();
+        try (Terminal terminal = TerminalBuilder.builder().build()) {
+            SystemRegistry systemRegistry = new SystemRegistryImpl(parser, terminal, workDir, null);
+            systemRegistry.setCommandRegistries(builtins, picocliCommands);
+            systemRegistry.register("help", picocliCommands);
+
+            LineReader reader = LineReaderBuilder.builder()
+                    .terminal(terminal)
+                    .completer(systemRegistry.completer())
+                    .parser(parser)
+                    .variable(LineReader.LIST_MAX, 50)   // max tab completion candidates
+                    .build();
+            builtins.setLineReader(reader);
+            cmdFactory.setTerminal(terminal);
+            TailTipWidgets widgets = new TailTipWidgets(reader, systemRegistry::commandDescription, 5, TailTipWidgets.TipType.COMPLETER);
+            widgets.enable();
+            KeyMap<Binding> keyMap = reader.getKeyMaps().get("main");
+            keyMap.bind(new Reference("tailtip-toggle"), KeyMap.alt("s"));
+
+            String prompt = "SynBioHub-Client> ";
+            String rightPrompt = null;
+
+            // start the shell and process input until the user quits with Ctrl-D
+            String line;
+            while (true) {
+                try {
+                    systemRegistry.cleanUp();
+                    line = reader.readLine(prompt, rightPrompt, (MaskingCallback) null, null);
+                    systemRegistry.execute(line);
+                } catch (UserInterruptException e) {
+                    // Ignore
+                } catch (EndOfFileException e) {
+                    return;
+                } catch (Exception e) {
+                    systemRegistry.trace(e);
+                }
+            }
+        } catch (Throwable t) {
+            t.printStackTrace();
+        } finally {
+            AnsiConsole.systemUninstall();
+        }
+    }
 }
