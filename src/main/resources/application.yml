@@ -33,6 +33,8 @@ spring:
     suffix: .html
     # template-resolver-order:
     # view-names:
+  main:
+    banner-mode: off
 
 logging:
   file:
