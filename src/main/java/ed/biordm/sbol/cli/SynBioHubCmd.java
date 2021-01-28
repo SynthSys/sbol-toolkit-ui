@@ -162,11 +162,11 @@ public class SynBioHubCmd implements Callable<Integer> {
 
     protected boolean verifyInput() {
         if (username == null) {
-            username = new String(System.console().readLine("Please enter your SynBioHub username (email address): "));
+            username = new String(System.console().readLine("[SynBioHub Client] Please enter your SynBioHub username (email address): "));
         }
 
         if (password == null) {
-            password = System.console().readPassword("Please enter your SynBioHub password: ");
+            password = System.console().readPassword("[SynBioHub Client] Please enter your SynBioHub password: ");
         }
 
         if (exclusiveUrlArgs == null) {
@@ -174,25 +174,25 @@ public class SynBioHubCmd implements Callable<Integer> {
         }
 
         if (exclusiveUrlArgs.collectionUrl == null && exclusiveUrlArgs.serverUrl == null) {
-            String response = new String(System.console().readLine("Do you want to upload SBOL files to an existing collection [Y | N]: ")).trim();
+            String response = new String(System.console().readLine("[SynBioHub Client] Do you want to upload SBOL files to an existing collection [Y | N]: ")).trim();
 
             while(!Y_N_PATTERN.matcher(response).matches()) {
-                response = new String(System.console().readLine("Do you want to upload SBOL files to an existing collection [Y | N]: ")).trim();
+                response = new String(System.console().readLine("[SynBioHub Client] Do you want to upload SBOL files to an existing collection [Y | N]: ")).trim();
             }
 
             if(response.equals("Y")) {
-                exclusiveUrlArgs.collectionUrl = new String(System.console().readLine("Please enter the URL of the collection you wish to upload to: "));
+                exclusiveUrlArgs.collectionUrl = new String(System.console().readLine("[SynBioHub Client] Please enter the URL of the collection you wish to upload to: "));
             } else {
-                exclusiveUrlArgs.serverUrl = new String(System.console().readLine("Please enter the URL of the SynBioHub server you wish to upload to: "));
+                exclusiveUrlArgs.serverUrl = new String(System.console().readLine("[SynBioHub Client] Please enter the URL of the SynBioHub server you wish to upload to: "));
 
                 if (collectionName == null) {
-                    collectionName = new String(System.console().readLine("Please enter a name for the new collection to create: "));
+                    collectionName = new String(System.console().readLine("[SynBioHub Client] Please enter a name for the new collection to create: "));
                 }
             }
         }
 
         if (dirPath == null) {
-            dirPath = new String(System.console().readLine("Please enter the path to the directory or SBOL file you wish to upload: "));
+            dirPath = new String(System.console().readLine("[SynBioHub Client] Please enter the path to the directory or SBOL file you wish to upload: "));
         }
 
         return true;

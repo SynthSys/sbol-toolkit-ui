@@ -144,8 +144,8 @@ public class SynBioHubClientServiceImpl implements SynBioHubClientService {
         authHeaders.setAcceptCharset(Collections.singletonList(StandardCharsets.UTF_8));
 
         HttpStatus resStatus = responseEntity.getStatusCode();
-        LOGGER.info("Response status for login request: {}", responseEntity.getStatusCodeValue());
-        LOGGER.info("Received response for login request: {}", responseEntity.getBody());
+        LOGGER.debug("Response status for login request: {}", responseEntity.getStatusCodeValue());
+        LOGGER.debug("Received response for login request: {}", responseEntity.getBody());
 
         if (resStatus.is2xxSuccessful()) {
             Object resBody = responseEntity.getBody();
@@ -181,8 +181,8 @@ public class SynBioHubClientServiceImpl implements SynBioHubClientService {
 
         HttpStatus resStatus = responseEntity.getStatusCode();
         int resStatusVal = responseEntity.getStatusCodeValue();
-        LOGGER.info("Response status for login request: {}", resStatusVal);
-        LOGGER.info("Received response for login request: {}", responseEntity.getBody());
+        LOGGER.info("[SynBioHub Client] Response status for login request: {}", resStatusVal);
+        LOGGER.info("[SynBioHub Client] Received response for login request: {}", responseEntity.getBody());
 
         HttpHeaders authHeaders = new HttpHeaders();
 
@@ -222,10 +222,16 @@ public class SynBioHubClientServiceImpl implements SynBioHubClientService {
         }
 
         for (String filename: fileNamesList) {
-            LOGGER.debug("Current file for upload: {}", filename);
+            LOGGER.info("[SynBioHub Client] Current file for upload: {}", filename);
+            boolean success = false;
 
             uploadFileToNewCollection(authHeaders, filename, overwriteMerge,
                     collectionName);
+
+            if (success == true) {
+                LOGGER.info("[SynBioHub Client] File {} successfully submitted to SynBioHub at {}",
+                        filename, this.synBioHubBaseUrl);
+            }
         }
         /*SimpleMailMessage message = new SimpleMailMessage(); // create message
         message.setFrom(NOREPLY_ADDRESS);                    // compose message
@@ -266,14 +272,14 @@ public class SynBioHubClientServiceImpl implements SynBioHubClientService {
         List<String> fileFailures = new ArrayList();
 
         for (String filename: fileNamesList) {
-            LOGGER.info("Current file for upload: {}", filename);
+            LOGGER.info("[SynBioHub Client] Current file for upload: {}", filename);
             boolean success = false;
 
             success = uploadFileToExistingCollection(authHeaders, filename, overwriteMerge,
                     collectionUrl);
 
             if (success == true) {
-                LOGGER.info("File {} successfully submitted to SynBioHub at {}",
+                LOGGER.info("[SynBioHub Client] File {} successfully submitted to SynBioHub at {}",
                         filename, this.synBioHubBaseUrl);
             }
         }
@@ -319,7 +325,7 @@ public class SynBioHubClientServiceImpl implements SynBioHubClientService {
                 // printing the file nams
                 //fileNamesList.forEach(System.out::println);
             } catch (IOException e) {
-                LOGGER.error("Error locating files for upload", e);
+                LOGGER.error("[SynBioHub Client] Error locating files for upload", e);
             }
         }
 
@@ -455,9 +461,9 @@ public class SynBioHubClientServiceImpl implements SynBioHubClientService {
             FileInputStream fileInputStream = new FileInputStream(file);
             fileInputStream.read(fileBytes);
         } catch (FileNotFoundException e) {
-            LOGGER.error("Unable to find file: {}", file.getAbsolutePath(), e);
+            LOGGER.error("[SynBioHub Client] Unable to find file: {}", file.getAbsolutePath(), e);
         } catch (IOException e) {
-            LOGGER.error("Unable to read file: {}", file.getAbsolutePath(), e);
+            LOGGER.error("[SynBioHub Client] Unable to read file: {}", file.getAbsolutePath(), e);
         }
         
         return fileBytes;

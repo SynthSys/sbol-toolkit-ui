@@ -84,7 +84,7 @@ public class SynBioHubClientCmdRunner implements CommandLineRunner, ExitCodeGene
         LOGGER.debug("Running with args:");
         LOGGER.debug(Arrays.toString(args));
 
-        System.out.println(propertiesFilename);
+        LOGGER.debug(propertiesFilename);
         Properties defaults = getProperties(this.propertiesFilename);
         cmd.setDefaultValueProvider(new SynBioHubCmdDefaultProvider(defaults));
 

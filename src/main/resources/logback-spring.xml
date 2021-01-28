@@ -3,14 +3,33 @@
 
     <property name="LOGS" value="./logs" />
 
-    <appender name="Console"
-        class="ch.qos.logback.core.ConsoleAppender">
-        <layout class="ch.qos.logback.classic.PatternLayout">
+    <appender name="Console" class="ch.qos.logback.core.ConsoleAppender">
+<!--        <filter class="ch.qos.logback.core.filter.EvaluatorFilter">
+            <evaluator>        -->
+              <!--<matcher>
+                <Name>cliOutput</Name>-->
+                <!-- filter out odd non CLI output statements -->
+                <!--<regex>^[SynBioHub Client] .*</regex> 
+                </matcher>-->
+<!--                <matcher>
+                  <Name>odd</Name>-->
+                  <!-- filter out odd numbered statements -->
+<!--                  <regex>statement [13579]</regex>
+                </matcher>-->
+              <!--<expression>odd.matches(event.getRequestURI())</expression>-->
+<!--                <expression>System.out.println("ROBERT!!!! " );</expression>
+            </evaluator>
+            <OnMismatch>DENY</OnMismatch>
+            <OnMatch>NEUTRAL</OnMatch>
+        </filter>-->
+        <filter class="ed.biordm.sbol.cli.SynBioHubClientLogFilter" />
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
             <Pattern>
-                %black(%d{ISO8601}) %highlight(%-5level) [%blue(%t)] %yellow(%C{1.}): %msg%n%throwable
+                %msg%n%throwable
             </Pattern>
-        </layout>
+        </encoder>
     </appender>
+
 
     <appender name="RollingFile"
         class="ch.qos.logback.core.rolling.RollingFileAppender">
