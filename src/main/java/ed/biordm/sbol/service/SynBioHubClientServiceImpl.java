@@ -263,11 +263,19 @@ public class SynBioHubClientServiceImpl implements SynBioHubClientService {
             overwriteMerge = 4;
         }
 
-        for (String filename: fileNamesList) {
-            LOGGER.debug("Current file for upload: {}", filename);
+        List<String> fileFailures = new ArrayList();
 
-            uploadFileToExistingCollection(authHeaders, filename, overwriteMerge,
+        for (String filename: fileNamesList) {
+            LOGGER.info("Current file for upload: {}", filename);
+            boolean success = false;
+
+            success = uploadFileToExistingCollection(authHeaders, filename, overwriteMerge,
                     collectionUrl);
+
+            if (success == true) {
+                LOGGER.info("File {} successfully submitted to SynBioHub at {}",
+                        filename, this.synBioHubBaseUrl);
+            }
         }
         /*SimpleMailMessage message = new SimpleMailMessage(); // create message
         message.setFrom(NOREPLY_ADDRESS);                    // compose message
