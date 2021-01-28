@@ -260,7 +260,7 @@ public class SynBioHubClientServiceImpl implements SynBioHubClientService {
         if (isOverwrite) {
             overwriteMerge = 3;
         } else {
-            overwriteMerge = 4;
+            overwriteMerge = 3;
         }
 
         List<String> fileFailures = new ArrayList();

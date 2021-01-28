@@ -65,13 +65,13 @@ public class SynBioHubCmd implements Callable<Integer> {
     // @Option(names = {"-u", "--username"}, description = "Username", interactive = true, required = true)
     // char[] username;
 
-    @Option(names = {"-u", "--username"}, description = "Username", interactive = true, arity = "0..1", required = true)
+    @Option(names = {"-u", "--username"}, description = "Username", interactive = true, arity = "0..1"/*, required = true*/)
     String username;
 
-    @Option(names = {"-p", "--password"}, description = "Passphrase", interactive = true, arity = "0..1", required = true)
+    @Option(names = {"-p", "--password"}, description = "Passphrase", interactive = true, arity = "0..1"/*, required = true*/)
     char[] password;
 
-    @ArgGroup(exclusive = true, multiplicity = "1")
+    @ArgGroup(exclusive = true/*, multiplicity = "1"*/)
     ExclusiveURLArgs exclusiveUrlArgs;
 
     /* @ArgGroup(exclusive = false)
@@ -112,6 +112,8 @@ public class SynBioHubCmd implements Callable<Integer> {
     
     public Integer call() throws Exception {
         LOGGER.info("synBioHubCmd was called with --username={}", username);
+
+        verifyInput();
         
         byte[] bytes = new byte[password.length];
         for (int i = 0; i < bytes.length; i++) { bytes[i] = (byte) password[i]; }
@@ -125,8 +127,6 @@ public class SynBioHubCmd implements Callable<Integer> {
 
         LOGGER.debug("Specified server URL: {}", exclusiveUrlArgs.serverUrl);
         LOGGER.debug("Specified collection URL: {}", exclusiveUrlArgs.collectionUrl);
-
-        verifyInput();
 
         if(exclusiveUrlArgs.serverUrl != null) {
             LOGGER.debug("Specified Collection Name: {}", collectionName);
@@ -181,13 +181,15 @@ public class SynBioHubCmd implements Callable<Integer> {
 
     protected boolean verifyInput() {
         if (username == null) {
-            username = new String(System.console().readLine("We really need a username: "));
-            System.out.printf("Ok, we got: %s%n", username);
+            username = new String(System.console().readLine("Please enter your SynBioHub username (email address): "));
         }
 
         if (password == null) {
-            username = new String(System.console().readPassword("We really need a password: "));
-            System.out.printf("Ok, we got: %s%n", password);
+            password = System.console().readPassword("Please enter your SynBioHub password: ");
+        }
+
+        if (exclusiveUrlArgs == null) {
+            exclusiveUrlArgs = new ExclusiveURLArgs();
         }
 
         if (exclusiveUrlArgs.collectionUrl == null && exclusiveUrlArgs.serverUrl == null) {
@@ -200,8 +202,16 @@ public class SynBioHubCmd implements Callable<Integer> {
             if(response.equals("Y")) {
                 exclusiveUrlArgs.collectionUrl = new String(System.console().readLine("Please enter the URL of the collection you wish to upload to: "));
             } else {
-                exclusiveUrlArgs.serverUrl = new String(System.console().readLine("Please enter the server URL of the SynBioHub instance you wish to upload to: "));
+                exclusiveUrlArgs.serverUrl = new String(System.console().readLine("Please enter the URL of the SynBioHub server you wish to upload to: "));
+
+                if (collectionName == null) {
+                    collectionName = new String(System.console().readLine("Please enter a name for the new collection to create: "));
+                }
             }
+        }
+
+        if (dirPath == null) {
+            dirPath = new String(System.console().readLine("Please enter the path to the directory or SBOL file you wish to upload: "));
         }
 
         return true;

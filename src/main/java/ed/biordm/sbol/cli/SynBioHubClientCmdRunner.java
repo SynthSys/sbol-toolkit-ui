@@ -15,6 +15,7 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Properties;
 import java.util.function.Supplier;
+import java.util.regex.Pattern;
 import org.fusesource.jansi.AnsiConsole;
 import org.jline.console.SystemRegistry;
 import org.jline.console.impl.Builtins;
@@ -80,7 +81,7 @@ public class SynBioHubClientCmdRunner implements CommandLineRunner, ExitCodeGene
 
     private String propertiesFilename;
 
-    private static final boolean IS_TERMINAL_PROMPT = true;
+    private static final boolean IS_TERMINAL_PROMPT = false;
     // constructor injection
     /*SynBioHubClientCmdRunner(IFactory factory, SynBioHubCmd synBioHubCmd,
             @Value("${synbiohub.cmd.properties}") String propertiesFilename) {
@@ -246,5 +247,40 @@ public class SynBioHubClientCmdRunner implements CommandLineRunner, ExitCodeGene
         } finally {
             AnsiConsole.systemUninstall();
         }
+    }
+
+    protected boolean verifyInput(CommandLine cmd) {
+        final Pattern Y_N_PATTERN = Pattern.compile("[Y|N]{1}");
+
+        String username = null;
+        String password = null;
+        String collectionUrl = null;
+        String serverUrl = null;
+
+        if (username == null) {
+            username = new String(System.console().readLine("We really need a username: "));
+            System.out.printf("Ok, we got: %s%n", username);
+        }
+
+        if (password == null) {
+            username = new String(System.console().readPassword("We really need a password: "));
+            System.out.printf("Ok, we got: %s%n", password);
+        }
+
+        if (collectionUrl == null && serverUrl == null) {
+            String response = new String(System.console().readLine("Do you want to upload SBOL files to an existing collection [Y | N]: ")).trim();
+
+            while(!Y_N_PATTERN.matcher(response).matches()) {
+                response = new String(System.console().readLine("Do you want to upload SBOL files to an existing collection [Y | N]: ")).trim();
+            }
+
+            if(response.equals("Y")) {
+                collectionUrl = new String(System.console().readLine("Please enter the URL of the collection you wish to upload to: "));
+            } else {
+                serverUrl = new String(System.console().readLine("Please enter the server URL of the SynBioHub instance you wish to upload to: "));
+            }
+        }
+
+        return true;
     }
 }
