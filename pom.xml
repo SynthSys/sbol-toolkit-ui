@@ -12,7 +12,7 @@
     <groupId>ed.biordm</groupId>
     <artifactId>sbol-toolkit-web</artifactId>
     <version>1.0.0-SNAPSHOT</version>
-    <packaging>war</packaging>
+    <packaging>jar</packaging>
     <name>sbol-toolkit-web</name>
     <description>Demo project for Spring Boot</description>
 
@@ -81,38 +81,8 @@
                     <target>11</target>
                 </configuration>
             </plugin>
-            <!--<plugin>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.22.2</version>
-                <dependencies>
-                    <dependency>
-                         <groupId>org.junit.platform</groupId>
-                         <artifactId>junit-platform-surefire-provider</artifactId>
-                         <version>1.3.2</version>
-                     </dependency>
-                 </dependencies>
-            </plugin>-->
-            <plugin>
-              <groupId>org.codehaus.mojo</groupId>
-              <artifactId>appassembler-maven-plugin</artifactId>
-              <version>1.10</version>
-              <configuration>
-                <programs>
-                  <program>
-                    <mainClass>ed.biordm.sbol.cli.SynBioHubClientCmdRunner</mainClass>
-                    <id>sbol-toolkit-web</id>
-                  </program>
-                </programs>
-              </configuration>
-            </plugin>
         </plugins>
     </build>
-    
-    <!--<parent>
-        <groupId>org.sbolstandard</groupId>
-        <artifactId>libSBOLj-parent</artifactId>
-         <version>2.4.0</version>
-    </parent> -->   
     
     <dependencies>
         <dependency>
@@ -146,16 +116,6 @@
                     <artifactId>junit-vintage-engine</artifactId>
                 </exclusion>
             </exclusions>
-        </dependency>
-
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-actuator</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-devtools</artifactId>
         </dependency>
 
         <dependency>
@@ -197,12 +157,6 @@
         </dependency>                  
 
         <dependency>
-            <groupId>commons-cli</groupId>
-            <artifactId>commons-cli</artifactId>
-            <version>1.4</version>
-        </dependency>
-
-        <dependency>
             <groupId>info.picocli</groupId>
             <artifactId>picocli-spring-boot-starter</artifactId>
             <version>4.6.1</version>
@@ -222,12 +176,6 @@
             <scope>test</scope>
         </dependency>
 
-        <!--<dependency>
-            <groupId>org.junit.platform</groupId>
-            <artifactId>junit-platform-runner</artifactId>
-            <scope>test</scope>
-        </dependency>-->
-
         <!-- Test system exit status -->
         <dependency>
             <groupId>com.github.stefanbirkner</groupId>
@@ -235,30 +183,5 @@
             <version>1.19.0</version>
             <scope>test</scope>
         </dependency>
-
-        <!-- PowerMock framework to make testing SpringBootApplication runner easy -->
-        <!--<dependency>
-            <groupId>org.powermock</groupId>
-            <artifactId>powermock-module-junit4</artifactId>
-            <version>1.7.4</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.javassist</groupId>
-                    <artifactId>javassist</artifactId>
-                </exclusion>
-            </exclusions>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.powermock</groupId>
-            <artifactId>powermock-api-mockito</artifactId>
-            <version>1.7.4</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.javassist</groupId>
-            <artifactId>javassist</artifactId>
-            <version>3.20.0-GA</version>
-        </dependency>-->
     </dependencies>
 </project>
