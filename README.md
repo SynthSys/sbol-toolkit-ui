@@ -19,11 +19,15 @@ docker run -d --name synbiohub --link my-virtuoso:virtuoso -p 7777:7777 --entryp
   * virtuoso.ini = /data/virtuoso.ini
   * virtuoso data = /data
 
-## Building the CLI Application
+## Building the Sprint Boot Command CLI Application
+
+In NetBeans, right-click on the project in the Projects explorer window, and select 'Set Configuration' -> 'cmdCli' from the context menu.
+
+## Building the [Deprecated] CLI Application
 
 In NetBeans, right-click on the project in the Projects explorer window, and select 'Set Configuration' -> 'cli' from the context menu.
 
-## Launching the CLI Application
+## Launching the [Deprecated] CLI Application
 
 ```
 java -jar target/sbol-toolkit-web-1.0.0-SNAPSHOT.war --collection-url=http://localhost:7777/user/Johnny/a_random_id/a_random_id_collection/1 --username=<email> password=<password> --dir-path=D:\temp\sbol\codA_Km_0081_slr1130.xml --file-ext-filter=xml --overwrite=true
