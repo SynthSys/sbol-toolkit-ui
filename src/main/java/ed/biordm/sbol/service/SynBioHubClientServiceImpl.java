@@ -227,7 +227,7 @@ public class SynBioHubClientServiceImpl implements SynBioHubClientService {
             LOGGER.info(CLIENT_LOG_PREFIX.concat("Current file for upload: {}"), filename);
             boolean success = false;
 
-            uploadFileToNewCollection(authHeaders, filename, overwriteMerge,
+            success = uploadFileToNewCollection(authHeaders, filename, overwriteMerge,
                     collectionName);
 
             if (success == true) {
@@ -369,7 +369,7 @@ public class SynBioHubClientServiceImpl implements SynBioHubClientService {
             String filename, int overwriteMerge, String collectionName) {
         boolean success = false;
 
-        String collId = collectionName.replace(" ", "");
+        String collId = sanitizeName(collectionName);
         String collVersion = "1.0";
         String collDesc = "";   // is a required parameter
         collDesc = collectionName;
@@ -469,6 +469,18 @@ public class SynBioHubClientServiceImpl implements SynBioHubClientService {
         }
         
         return fileBytes;
+    }
+
+    /**
+     * name should be sanitized for conversion into display id as alphanumeric
+     * with _ (replace all non alphanumeric characters with _)
+     *
+     * @param name
+     * @return The sanitized string
+     */
+    protected String sanitizeName(String name) {
+        String cleanName = name.replaceAll("[^\\p{IsAlphabetic}\\p{IsDigit}]", "_");
+        return cleanName;
     }
 
     @Override
