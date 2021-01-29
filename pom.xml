@@ -27,14 +27,28 @@
 
     <profiles>
         <profile>
-            <id>cli</id>
+            <id>cmdCli</id>
             <properties>
-                <spring.boot.mainclass>ed.biordm.sbol.cli.SynBioHubClientCmdRunner</spring.boot.mainclass>
+                <spring.boot.mainclass>ed.biordm.sbol.synbio.SBootApplication</spring.boot.mainclass>
                 <maven.test.skip>true</maven.test.skip>
             </properties>
             <activation>
                 <activeByDefault>true</activeByDefault>
             </activation>
+            <build>
+                <resources>
+                    <resource>
+                        <directory>src/main/resources</directory>
+                    </resource>
+                </resources>
+            </build>
+        </profile>
+        <profile>
+            <id>cli</id>
+            <properties>
+                <spring.boot.mainclass>ed.biordm.sbol.cli.SynBioHubClientCmdRunner</spring.boot.mainclass>
+                <maven.test.skip>true</maven.test.skip>
+            </properties>
             <build>
                 <resources>
                     <resource>
