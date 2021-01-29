@@ -52,6 +52,8 @@ public class SynBioHubClientServiceImpl implements SynBioHubClientService {
     // private static final ch.qos.logback.classic.Logger LOGGER = (ch.qos.logback.classic.Logger) LoggerFactory.getLogger(SynBioHubClientServiceImpl.class);
     private static final Logger LOGGER = LoggerFactory.getLogger(SynBioHubClientServiceImpl.class);
 
+    private static final String CLIENT_LOG_PREFIX = "[SynBioHub Client] ";
+
     @Autowired
     private RestTemplate restTemplate;
 
@@ -181,8 +183,8 @@ public class SynBioHubClientServiceImpl implements SynBioHubClientService {
 
         HttpStatus resStatus = responseEntity.getStatusCode();
         int resStatusVal = responseEntity.getStatusCodeValue();
-        LOGGER.info("[SynBioHub Client] Response status for login request: {}", resStatusVal);
-        LOGGER.info("[SynBioHub Client] Received response for login request: {}", responseEntity.getBody());
+        LOGGER.info(CLIENT_LOG_PREFIX.concat("Response status for login request: {}"), resStatusVal);
+        LOGGER.info(CLIENT_LOG_PREFIX.concat("Received response for login request: {}"), responseEntity.getBody());
 
         HttpHeaders authHeaders = new HttpHeaders();
 
@@ -222,14 +224,14 @@ public class SynBioHubClientServiceImpl implements SynBioHubClientService {
         }
 
         for (String filename: fileNamesList) {
-            LOGGER.info("[SynBioHub Client] Current file for upload: {}", filename);
+            LOGGER.info(CLIENT_LOG_PREFIX.concat("Current file for upload: {}"), filename);
             boolean success = false;
 
             uploadFileToNewCollection(authHeaders, filename, overwriteMerge,
                     collectionName);
 
             if (success == true) {
-                LOGGER.info("[SynBioHub Client] File {} successfully submitted to SynBioHub at {}",
+                LOGGER.info(CLIENT_LOG_PREFIX.concat("File {} successfully submitted to SynBioHub at {}"),
                         filename, this.synBioHubBaseUrl);
             }
         }
@@ -272,14 +274,14 @@ public class SynBioHubClientServiceImpl implements SynBioHubClientService {
         List<String> fileFailures = new ArrayList();
 
         for (String filename: fileNamesList) {
-            LOGGER.info("[SynBioHub Client] Current file for upload: {}", filename);
+            LOGGER.info(CLIENT_LOG_PREFIX.concat("Current file for upload: {}"), filename);
             boolean success = false;
 
             success = uploadFileToExistingCollection(authHeaders, filename, overwriteMerge,
                     collectionUrl);
 
             if (success == true) {
-                LOGGER.info("[SynBioHub Client] File {} successfully submitted to SynBioHub at {}",
+                LOGGER.info(CLIENT_LOG_PREFIX.concat("File {} successfully submitted to SynBioHub at {}"),
                         filename, this.synBioHubBaseUrl);
             }
         }
@@ -325,7 +327,7 @@ public class SynBioHubClientServiceImpl implements SynBioHubClientService {
                 // printing the file nams
                 //fileNamesList.forEach(System.out::println);
             } catch (IOException e) {
-                LOGGER.error("[SynBioHub Client] Error locating files for upload", e);
+                LOGGER.error(CLIENT_LOG_PREFIX.concat("Error locating files for upload"), e);
             }
         }
 
@@ -461,9 +463,9 @@ public class SynBioHubClientServiceImpl implements SynBioHubClientService {
             FileInputStream fileInputStream = new FileInputStream(file);
             fileInputStream.read(fileBytes);
         } catch (FileNotFoundException e) {
-            LOGGER.error("[SynBioHub Client] Unable to find file: {}", file.getAbsolutePath(), e);
+            LOGGER.error(CLIENT_LOG_PREFIX.concat("Unable to find file: {}"), file.getAbsolutePath(), e);
         } catch (IOException e) {
-            LOGGER.error("[SynBioHub Client] Unable to read file: {}", file.getAbsolutePath(), e);
+            LOGGER.error(CLIENT_LOG_PREFIX.concat("Unable to read file: {}"), file.getAbsolutePath(), e);
         }
         
         return fileBytes;
